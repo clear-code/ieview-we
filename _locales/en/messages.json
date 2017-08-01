@@ -1,0 +1,16 @@
+{
+  "extensionName": { "message": "IE View WE" },
+  "extensionDescription": { "message": "Provides ability to open pages and links by Internet Explorer (Cloned IE View based on WebExtensions-based)" },
+
+  "contextMenu.page.label": { "message": "Open this Page by IE" },
+  "contextMenu.link.label": { "message": "Open this Link by IE" },
+
+  "config.ieapp.label.before":  { "message": "Path to Internet Explorer:" },
+  "config.ieapp.label.after":   { "message": "" },
+  "config.ieargs.label.before": { "message": "Command Line Arguments:" },
+  "config.ieargs.label.after":  { "message": "" },
+  "config.forceielist.caption": { "message": "Websites to be opened by IE always" },
+  "config.disableForce.label":  { "message": "Deactivate the above list" },
+
+  "config.debug.label": { "message": "Print debug log" }
+}
