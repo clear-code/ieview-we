@@ -31,7 +31,8 @@ function uninstallBlocker() {
 }
 function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
-  return { cancel: false };
+  open(aDetails.url);
+  return { cancel: true };
 }
 
 configs.$load().then(() => {
