@@ -19,5 +19,6 @@ configs = new Configs({
 	ieargs       : '',
 	forceielist  : '',
 	disableForce : false,
+	contextMenu  : true,
 	debug        : false
 });
