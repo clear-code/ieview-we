@@ -55,7 +55,7 @@ func Launch(path string, defaultArgs []string, url string) {
   command := exec.Command(path, args...)
   response := &LaunchResponse{true, path, args}
 
-  err := command.Start()
+  err := command.Run()
   if err != nil {
     log.Fatal(err)
     response.Success = false
