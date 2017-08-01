@@ -16,7 +16,7 @@ type RequestParams struct {
   Url  string   `json:url`
 }
 type Request struct {
-  Command string `json:"command"`
+  Command string        `json:"command"`
   Params  RequestParams `json:"params"`
 }
 
@@ -45,8 +45,8 @@ func main() {
 
 
 type LaunchResponse struct {
-  Success bool `json:"success"`
-  Path    string `json:"command"`
+  Success bool     `json:"success"`
+  Path    string   `json:"command"`
   Args    []string `json:"args"`
 }
 
