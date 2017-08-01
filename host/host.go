@@ -3,6 +3,7 @@ package main
 import (
   "os"
   "os/exec"
+  "syscall"
   "log"
   "encoding/json"
   "golang.org/x/sys/windows/registry" 
@@ -55,7 +56,8 @@ func Launch(path string, defaultArgs []string, url string) {
   command := exec.Command(path, args...)
   response := &LaunchResponse{true, path, args}
 
-  err := command.Run()
+  command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP}
+  err := command.Start()
   if err != nil {
     log.Fatal(err)
     response.Success = false
