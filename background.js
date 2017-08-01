@@ -13,20 +13,32 @@ function installMenuItems() {
   });
 }
 
+var gForceList = [];
+function initForceList() {
+  gForceList = configs.forceielist.trim().split(/\s+/);
+}
+
 installMenuItems();
+initForceList();
 
 configs.$load().then(() => {
   installMenuItems();
+  initForceList();
 });
 configs.$addObserver((aKey) => {
-  if (aKey != 'contextMenu')
-    return;
-
+  switch (aKey) {
+    case 'contextMenu':
   if (configs.contextMenu) {
     installMenuItems();
   }
   else {
     browser.contextMenus.removeAll();
+  }
+      break;
+
+    case 'forceielist':
+      initForceList();
+      break;
   }
 });
 
