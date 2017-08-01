@@ -22,7 +22,9 @@ installMenuItems();
 initForceList();
 
 configs.$load().then(() => {
-  installMenuItems();
+  if (configs.contextMenu)
+    installMenuItems();
+
   initForceList();
 });
 configs.$addObserver((aKey) => {
