@@ -37,22 +37,3 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
 
   open(url);
 });
-
-function open(aURL) {
-  if (!configs.ieapp && !configs.ieargs)
-    return;
-
-  let message = {
-    cmd: 'exec',
-    command: configs.ieapp,
-    arguments: configs.ieargs.split(/\s+/).concat([aURL])
-  };
-  return browser.runtime.sendNativeMessage('com.add0n.node', message).then(
-    (aResponse) => {
-      log('Received: ', aResponse);
-    },
-    (aError) => {
-      log('Error: ', aError);
-    }
-  );
-}
