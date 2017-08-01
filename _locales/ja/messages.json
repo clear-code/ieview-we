@@ -10,7 +10,7 @@
   "config.ieargs.label.before": { "message": "起動オプション" },
   "config.ieargs.label.after":  { "message": "" },
   "config.forceielist.caption": { "message": "Internet Explorerで常に開くWebサイト" },
-  "config.disableForce.label":  { "message": "このリストを無効化する" },
+  "config.disableForce.label":  { "message": "無効化" },
 
   "config.debug.label": { "message": "デバッグログを出力" }
 }

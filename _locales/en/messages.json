@@ -10,7 +10,7 @@
   "config.ieargs.label.before": { "message": "Command Line Arguments:" },
   "config.ieargs.label.after":  { "message": "" },
   "config.forceielist.caption": { "message": "Websites to be opened by IE always" },
-  "config.disableForce.label":  { "message": "Deactivate the above list" },
+  "config.disableForce.label":  { "message": "Disable" },
 
   "config.debug.label": { "message": "Print debug log" }
 }
