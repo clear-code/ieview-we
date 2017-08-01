@@ -30,7 +30,7 @@ function uninstallBlocker() {
     browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
 }
 function onBeforeRequest(aDetails) {
-  log('onBeforeRequest', url);
+  log('onBeforeRequest', aDetails);
   return { cancel: false };
 }
 
