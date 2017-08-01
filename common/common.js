@@ -22,23 +22,3 @@ configs = new Configs({
 	contextMenu  : true,
 	debug        : false
 });
-
-function open(aURL) {
-  if (!configs.ieapp && !configs.ieargs)
-    return;
-
-  let message = {
-    cmd: 'exec',
-    command: configs.ieapp,
-    arguments: configs.ieargs.trim().split(/\s+/).filter((aItem) => !!aItem).concat([aURL])
-  };
-  log('Sending: ', message);
-  return browser.runtime.sendNativeMessage('com.add0n.node', message).then(
-    (aResponse) => {
-      log('Received: ', aResponse);
-    },
-    (aError) => {
-      log('Error: ', aError);
-    }
-  );
-}

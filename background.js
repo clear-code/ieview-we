@@ -87,8 +87,30 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
   let url = aInfo.linkUrl || aInfo.pageUrl || aTab.url;
   log('procesing url = ' + url);
 
-  open(url);
+  launch(url);
 });
+
+function launch(aURL) {
+  if (!configs.ieapp && !configs.ieargs)
+    return;
+
+  let message = {
+    command: 'launch',
+    params: {
+      path: configs.ieapp,
+      args: configs.ieargs.trim().split(/\s+/).filter((aItem) => !!aItem),
+      url:  aURL
+    }
+  };
+  return send(message).then(
+    (aResponse) => {
+      log('Received: ', aResponse);
+    },
+    (aError) => {
+      log('Error: ', aError);
+    }
+  );
+}
 
 function send(aMessage) {
   log('Sending: ', aMessage);
