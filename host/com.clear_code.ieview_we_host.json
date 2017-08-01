@@ -1,0 +1,9 @@
+{
+  "name": "com.clear_code.ieview_we_host",
+  "description": "IE View WE Native Messaging Host",
+  "path": "host.exe",
+  "type": "stdio",
+  "allowed_extensions": [
+    "ieview-we@clear-code.com"
+  ]
+}
