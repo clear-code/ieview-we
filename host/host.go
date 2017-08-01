@@ -46,7 +46,7 @@ func main() {
 
 type LaunchResponse struct {
   Success bool     `json:"success"`
-  Path    string   `json:"command"`
+  Path    string   `json:"path"`
   Args    []string `json:"args"`
 }
 
