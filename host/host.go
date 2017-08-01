@@ -46,13 +46,15 @@ func main() {
 
 type LaunchResponse struct {
   Success bool `json:"success"`
+  Path    string `json:"command"`
+  Args    []string `json:"args"`
 }
 
 func Launch(path string, defaultArgs []string, url string) {
-  response := &LaunchResponse{true}
-
   args := append(defaultArgs, url)
   command := exec.Command(path, args...)
+  response := &LaunchResponse{true, path, args}
+
   err := command.Start()
   if err != nil {
     log.Fatal(err)
