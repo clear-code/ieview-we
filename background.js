@@ -46,12 +46,12 @@ configs.$load().then(() => {
 configs.$addObserver((aKey) => {
   switch (aKey) {
     case 'contextMenu':
-  if (configs.contextMenu) {
-    installMenuItems();
-  }
-  else {
-    browser.contextMenus.removeAll();
-  }
+      if (configs.contextMenu) {
+        installMenuItems();
+      }
+      else {
+        browser.contextMenus.removeAll();
+      }
       break;
 
     case 'forceielist':
