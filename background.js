@@ -14,7 +14,7 @@ function installMenuItems() {
 }
 
 function installBlocker() {
-  var list = configs.forceielist.trim().split(/\s+/);
+  var list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !aItem);
   if (list.length > 0 &&
       !browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.addListener(

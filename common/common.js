@@ -30,7 +30,7 @@ function open(aURL) {
   let message = {
     cmd: 'exec',
     command: configs.ieapp,
-    arguments: configs.ieargs.trim().split(/\s+/).concat([aURL])
+    arguments: configs.ieargs.trim().split(/\s+/).filter((aItem) => !aItem).concat([aURL])
   };
   log('Sending: ', message);
   return browser.runtime.sendNativeMessage('com.add0n.node', message).then(
