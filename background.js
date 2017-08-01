@@ -36,6 +36,19 @@ function onBeforeRequest(aDetails) {
 }
 
 configs.$load().then(() => {
+  if (!configs.ieapp) {
+    send({ command: 'get-ie-path' }).then(
+      (aResponse) => {
+        log('Received: ', aResponse);
+        if (aResponse.path)
+          configs.ieapp = aResponse.path;
+      },
+      (aError) => {
+        log('Error: ', aError);
+      }
+    );
+  }
+
   if (configs.contextMenu)
     installMenuItems();
 
@@ -76,3 +89,8 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
 
   open(url);
 });
+
+function send(aMessage) {
+  log('Sending: ', aMessage);
+  return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', aMessage);
+}
