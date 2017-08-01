@@ -13,14 +13,15 @@ function installMenuItems() {
   });
 }
 
-var gForceList = [];
-function initForceList() {
-  gForceList = configs.forceielist.trim().split(/\s+/);
-}
-
 function installBlocker() {
-  if (!browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
-    browser.webRequest.onBeforeRequest.addListener(onBeforeRequest, '<all_urls>', { blocking: true });
+  var list = configs.forceielist.trim().split(/\s+/);
+  if (list.length > 0 &&
+      !browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
+    browser.webRequest.onBeforeRequest.addListener(
+      onBeforeRequest,
+      list,
+      { blocking: true }
+    );
 }
 function uninstallBlocker() {
   if (browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
@@ -32,13 +33,10 @@ function onBeforeRequest(aDetails) {
 }
 
 installMenuItems();
-initForceList();
 
 configs.$load().then(() => {
   if (configs.contextMenu)
     installMenuItems();
-
-  initForceList();
 
   if (!configs.disableForce)
     installBlocker();
@@ -55,7 +53,9 @@ configs.$addObserver((aKey) => {
       break;
 
     case 'forceielist':
-      initForceList();
+      uninstallBlocker();
+      if (!configs.disableForce)
+        installBlocker();
       break;
 
     case 'disableForce':
