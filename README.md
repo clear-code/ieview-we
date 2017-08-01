@@ -2,9 +2,14 @@
 
 Provides ability to open pages and links by Internet Explorer (Cloned IE View based on WebExtensions-based)
 
-# Dependencies
+# How to build the native messaging host
 
- * https://github.com/andy-portmen/native-client
+```bash
+$ cd $GOHOME
+$ go get github.com/clear-code/ieview-we
+$ go get golang.org/x/sys/windows/registry
+$ go get github.com/lhside/chrome-go
+```
 
 # License
 
