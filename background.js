@@ -32,8 +32,6 @@ function onBeforeRequest(aDetails) {
   return { cancel: false };
 }
 
-installMenuItems();
-
 configs.$load().then(() => {
   if (configs.contextMenu)
     installMenuItems();
