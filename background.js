@@ -20,8 +20,9 @@ function installBlocker() {
       !browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.addListener(
       onBeforeRequest,
-      list,
-      { blocking: true }
+      { urls: list,
+        types: ['main_frame', 'sub_frame'] },
+      ['blocking']
     );
 }
 function uninstallBlocker() {
