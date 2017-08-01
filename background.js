@@ -3,15 +3,13 @@ function installMenuItems(aMenuItems) {
     id: 'page',
     type: 'normal',
     title: browser.i18n.getMessage('contextMenu.page.label'),
-    contexts: ['page', 'tab'],
-    documentUrlPatterns: '<all_urls>'
+    contexts: ['page', 'tab']
   });
   browser.contextMenus.create({
     id: 'link',
     type: 'normal',
     title: browser.i18n.getMessage('contextMenu.link.label'),
-    contexts: ['link'],
-    targetUrlPatterns: '<all_urls>'
+    contexts: ['link']
   });
 }
 
