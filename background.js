@@ -1,4 +1,4 @@
-function installMenuItems(aMenuItems) {
+function installMenuItems() {
   browser.contextMenus.create({
     id: 'page',
     type: 'normal',
@@ -16,8 +16,7 @@ function installMenuItems(aMenuItems) {
 installMenuItems();
 
 configs.$load().then(() => {
-  if (configs.debug)
-    installMenuItems();
+  installMenuItems();
 });
 configs.$addObserver((aKey) => {
   if (aKey != 'contextMenu')
