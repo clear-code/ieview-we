@@ -6,7 +6,9 @@
   "permissions": [
     "contextMenus",
     "nativeMessaging",
-    "storage"
+    "storage",
+    "webRequest",
+    "webRequestBlocking"
   ],
   "background": {
     "scripts": [

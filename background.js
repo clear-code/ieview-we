@@ -18,6 +18,19 @@ function initForceList() {
   gForceList = configs.forceielist.trim().split(/\s+/);
 }
 
+function installBlocker() {
+  if (!browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
+    browser.webRequest.onBeforeRequest.addListener(onBeforeRequest, '<all_urls>', { blocking: true });
+}
+function uninstallBlocker() {
+  if (browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
+    browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
+}
+function onBeforeRequest(aDetails) {
+  log('onBeforeRequest', url);
+  return { cancel: false };
+}
+
 installMenuItems();
 initForceList();
 
@@ -26,6 +39,9 @@ configs.$load().then(() => {
     installMenuItems();
 
   initForceList();
+
+  if (!configs.disableForce)
+    installBlocker();
 });
 configs.$addObserver((aKey) => {
   switch (aKey) {
@@ -40,6 +56,15 @@ configs.$addObserver((aKey) => {
 
     case 'forceielist':
       initForceList();
+      break;
+
+    case 'disableForce':
+      if (configs.disableForce) {
+        uninstallBlocker();
+      }
+      else {
+        installBlocker();
+      }
       break;
   }
 });
