@@ -37,6 +37,8 @@ func main() {
     Launch(request.Params.Path, request.Params.Args, request.Params.Url, request.Params.NoWait)
   case "get-ie-path":
     SendIEPath()
+  case "read-mcd-configs":
+    SendMCDConfigs()
   default: // just echo
     err = chrome.Post(rawRequest, os.Stdout)
     if err != nil {
@@ -115,3 +117,35 @@ func GetIEPath() (path string) {
   }
   return
 }
+
+
+type SendMCDConfigsResponse struct {
+  IEApp        string `json:"ieapp"`
+  IEArgs       string `json:"ieargs"`
+  NoWait       bool   `json:"noWait"`
+  ForceIEList  string `json:"forceielist"`
+  DisableForce bool   `json:"disableForce"`
+  ContextMenu  bool   `json:"contextMenu"`
+  Debug        bool   `json:"debug"`
+}
+
+func SendMCDConfigs() {
+  response := &SendMCDConfigsResponse{}
+  ReadLocalMCDConfigs(response)
+  ReadRemoteMCDConfigs(response)
+  body, err := json.Marshal(response)
+  if err != nil {
+    log.Fatal(err)
+  }
+  err = chrome.Post(body, os.Stdout)
+  if err != nil {
+    log.Fatal(err)
+  }
+}
+
+func ReadLocalMCDConfigs(response SendMCDConfigsResponse) {
+}
+
+func ReadRemoteMCDConfigs(response SendMCDConfigsResponse) {
+}
+
