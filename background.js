@@ -36,35 +36,56 @@ function onBeforeRequest(aDetails) {
 }
 
 configs.$load().then(() => {
-  send({ command: 'read-mcd-configs' }).then(
-    (aResponse) => {
-      applyMCDConfigs(aResponse.configs);
-
-      if (!configs.ieapp) {
-        send({ command: 'get-ie-path' }).then(
-          (aResponse) => {
-            log('Received: ', aResponse);
-            if (aResponse.path)
-              configs.ieapp = aResponse.path;
-          },
-          (aError) => {
-            log('Error: ', aError);
-          }
-        );
-      }
-
+  applyMCDConfigs()
+    .then(() => {
+      return setDefaultPath();
+    })
+    .then(() => {
       if (configs.contextMenu)
         installMenuItems();
 
       if (!configs.disableForce)
         installBlocker();
+
+      configs.$addObserver(onConfigUpdated);
+    });
+});
+
+function applyMCDConfigs() {
+  return send({ command: 'read-mcd-configs' }).then(
+    (aResponse) => {
+      Object.keys(configs.$default).forEach((aKey) => {
+        if (aResponse.undefineds.indexOf(aKey) > -1)
+          return;
+        log('applying ' + aKey + '=' + aResponse[aKey]);
+        configs[aKey] = aResponse[aKey];
+      });
     },
     (aError) => {
-      log('Error: ', aError);
+      log('Failed to read MCD configs: ', aError);
     }
   );
-});
-configs.$addObserver((aKey) => {
+}
+
+function setDefaultPath() {
+  if (!configs.ieapp) {
+    return send({ command: 'get-ie-path' }).then(
+      (aResponse) => {
+        log('Received: ', aResponse);
+        if (aResponse.path)
+          configs.ieapp = aResponse.path;
+      },
+      (aError) => {
+        log('Error: ', aError);
+      }
+    );
+  }
+  else {
+    return Promise.resolve();
+  }
+}
+
+function onConfigUpdated(aKey) {
   switch (aKey) {
     case 'contextMenu':
       if (configs.contextMenu) {
@@ -90,7 +111,7 @@ configs.$addObserver((aKey) => {
       }
       break;
   }
-});
+}
 
 browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
   let url = aInfo.linkUrl || aInfo.pageUrl || aTab.url;
@@ -99,10 +120,6 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
   launch(url);
 });
 
-
-function applyMCDConfigs(aConfigs) {
-  // codes to parse MCD configs
-}
 
 function launch(aURL) {
   if (!configs.ieapp && !configs.ieargs)
