@@ -5,10 +5,7 @@ Provides ability to open pages and links by Internet Explorer (Cloned IE View ba
 # How to build the native messaging host
 
 ```bash
-$ cd $GOHOME
-$ go get github.com/clear-code/ieview-we
-$ go get golang.org/x/sys/windows/registry
-$ go get github.com/lhside/chrome-go
+$ make host
 ```
 
 # License
