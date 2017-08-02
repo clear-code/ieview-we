@@ -18,4 +18,5 @@ extlib/webextensions-lib-l10n/l10n.js:
 
 host:
 	host/build.sh
+	cd host && zip -r -9 ../ieview-we-host.zip 386 amd64 *.bat *.json
 
