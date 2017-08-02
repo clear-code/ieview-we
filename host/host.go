@@ -15,6 +15,7 @@ type RequestParams struct {
   Path string   `json:path`
   Args []string `json:args`
   Url  string   `json:url`
+  NoWait bool   `json:noWait`
 }
 type Request struct {
   Command string        `json:"command"`
@@ -33,7 +34,7 @@ func main() {
 
   switch command := request.Command; command {
   case "launch":
-    Launch(request.Params.Path, request.Params.Args, request.Params.Url)
+    Launch(request.Params.Path, request.Params.Args, request.Params.Url, request.Params.NoWait)
   case "get-ie-path":
     SendIEPath()
   default: // just echo
@@ -51,16 +52,24 @@ type LaunchResponse struct {
   Args    []string `json:"args"`
 }
 
-func Launch(path string, defaultArgs []string, url string) {
+func Launch(path string, defaultArgs []string, url string, noWait bool) {
   args := append(defaultArgs, url)
   command := exec.Command(path, args...)
   response := &LaunchResponse{true, path, args}
 
-  command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP}
-  err := command.Start()
-  if err != nil {
-    log.Fatal(err)
-    response.Success = false
+  if noWait {
+    command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP}
+    err := command.Start()
+    if err != nil {
+      log.Fatal(err)
+      response.Success = false
+    }
+  } else {
+    err := command.Run()
+    if err != nil {
+      log.Fatal(err)
+      response.Success = false
+    }
   }
 
   body, err := json.Marshal(response)

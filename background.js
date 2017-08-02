@@ -99,7 +99,8 @@ function launch(aURL) {
     params: {
       path: configs.ieapp,
       args: configs.ieargs.trim().split(/\s+/).filter((aItem) => !!aItem),
-      url:  aURL
+      url:  aURL,
+      noWait: configs.noWait
     }
   };
   return send(message).then(
