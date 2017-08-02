@@ -13,10 +13,10 @@ import (
 
 type RequestParams struct {
   // launch
-  Path string   `json:path`
-  Args []string `json:args`
-  Url  string   `json:url`
-  NoWait bool   `json:noWait`
+  Path   string   `json:path`
+  Args   []string `json:args`
+  Url    string   `json:url`
+  NoWait bool     `json:noWait`
 }
 type Request struct {
   Command string        `json:"command"`
