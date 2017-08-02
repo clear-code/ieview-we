@@ -1,4 +1,4 @@
-.PHONY: xpi
+.PHONY: xpi host
 
 xpi: extlib/webextensions-lib-configs/Configs.js extlib/webextensions-lib-options/Options.js extlib/webextensions-lib-l10n/l10n.js
 	git submodule update
@@ -15,4 +15,7 @@ extlib/webextensions-lib-options/Options.js:
 
 extlib/webextensions-lib-l10n/l10n.js:
 	git submodule update --init
+
+host:
+	host/build.sh
 
