@@ -131,26 +131,26 @@ type SendMCDConfigsResponse struct {
 }
 
 func SendMCDConfigs() {
-  configs, err := mcd.Load()
+  configs, err := mcd.New()
   if err != nil {
     log.Fatal(err)
   }
 
   response := &SendMCDConfigsResponse{}
 
-  ieApp, err := mcd.GetStringValue(configs, "extensions.ieview.ieapp")
+  ieApp, err := configs.GetStringValue("extensions.ieview.ieapp")
   if err == nil { response.IEApp = ieApp }
-  ieArgs, err := mcd.GetStringValue(configs, "extensions.ieview.ieargs")
+  ieArgs, err := configs.GetStringValue("extensions.ieview.ieargs")
   if err == nil { response.IEArgs = ieArgs }
-  noWait, err := mcd.GetBooleanValue(configs, "extensions.ieview.noWait")
+  noWait, err := configs.GetBooleanValue("extensions.ieview.noWait")
   if err == nil { response.NoWait = noWait }
-  forceIEList, err := mcd.GetStringValue(configs, "extensions.ieview.forceielist")
+  forceIEList, err := configs.GetStringValue("extensions.ieview.forceielist")
   if err == nil { response.ForceIEList = forceIEList }
-  disableForce, err := mcd.GetBooleanValue(configs, "extensions.ieview.disableForce")
+  disableForce, err := configs.GetBooleanValue("extensions.ieview.disableForce")
   if err == nil { response.DisableForce = disableForce }
-  contextMenu, err := mcd.GetBooleanValue(configs, "extensions.ieview.contextMenu")
+  contextMenu, err := configs.GetBooleanValue("extensions.ieview.contextMenu")
   if err == nil { response.ContextMenu = contextMenu }
-  debug, err := mcd.GetBooleanValue(configs, "extensions.ieview.debug")
+  debug, err := configs.GetBooleanValue("extensions.ieview.debug")
   if err == nil { response.Debug = debug }
 
   body, err := json.Marshal(response)
