@@ -125,7 +125,7 @@ func GetIEPath() (path string) {
 
 
 type SendMCDConfigsResponse struct {
-  Configs string `json:"local"`
+  Configs string `json:"configs"`
 }
 
 func SendMCDConfigs() {
