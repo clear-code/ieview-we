@@ -5,6 +5,14 @@
 dist_dir="$(cd "$(dirname "$0")" && pwd)"
 temp_src="src/temp_ieview_we"
 
+if go version 2>&1 >/dev/null
+then
+  echo "using $(go version)"
+else
+  echo 'ERROR: golang is missing.' 1>&2
+  exit 1
+fi
+
 if [ "$GOPATH" = '' ]
 then
   echo 'ERROR: You must set GOPATH environment variable before you run this script.' 1>&2
@@ -20,6 +28,7 @@ fi
 main() {
   cd "$GOPATH"
 
+  echo "preparing dependencies..."
   # prepare_dependency github.com/clear-code/ieview-we
   mkdir -p "$temp_src"
   ln -s "$dist_dir" "$temp_src/host"
@@ -31,6 +40,8 @@ main() {
 
   rm "$temp_src/host"
   rm -rf "$temp_src"
+
+  echo "done."
 }
 
 prepare_dependency() {
@@ -41,6 +52,7 @@ prepare_dependency() {
 build_for() {
   local arch="$1"
   local path="$(echo "$temp_src" | sed 's;^src/;;')/host"
+  echo "building for $arch..."
   env GOOS=windows GOARCH="$1" go build "$path"
   mkdir -p "$dist_dir/$arch"
   mv host.exe "$dist_dir/$arch/"
