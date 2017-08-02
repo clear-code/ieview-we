@@ -62,7 +62,7 @@ configs.$load().then(() => {
     (aError) => {
       log('Error: ', aError);
     }
-  )
+  );
 });
 configs.$addObserver((aKey) => {
   switch (aKey) {
