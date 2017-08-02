@@ -13,6 +13,7 @@ import (
   "encoding/json"
   "golang.org/x/sys/windows/registry" 
   "github.com/lhside/chrome-go"
+  "github.com/robertkrimen/otto"
 )
 
 type RequestParams struct {
@@ -125,13 +126,102 @@ func GetIEPath() (path string) {
 
 
 type SendMCDConfigsResponse struct {
-  Configs string `json:"configs"`
+  IEApp        string `json:"ieapp"`
+  IEArgs       string `json:"ieargs"`
+  NoWait       bool   `json:"noWait"`
+  ForceIEList  string `json:"forceielist"`
+  DisableForce bool   `json:"disableForce"`
+  ContextMenu  bool   `json:"contextMenu"`
+  Debug        bool   `json:"debug"`
+}
+
+func ReadConfigStringValue(vm *otto.Otto, key string) (value_string string, err error) {
+  if value, err := vm.Run("getPref('" + key + "')"); err == nil {
+    if value_string, err := value.ToString(); err == nil {
+      return value_string, nil
+    }
+  }
+  return "", errors.New("unknown configuration: " + key)
+}
+func ReadConfigIntegerValue(vm *otto.Otto, key string) (value_integer int64, err error) {
+  if value, err := vm.Run("getPref('" + key + "')"); err == nil {
+    if value_integer, err := value.ToInteger(); err == nil {
+      return value_integer, nil
+    }
+  }
+  return 0, errors.New("unknown configuration: " + key)
+}
+func ReadConfigBooleanValue(vm *otto.Otto, key string) (value_boolean bool, err error) {
+  if value, err := vm.Run("getPref('" + key + "')"); err == nil {
+    if value_boolean, err := value.ToBoolean(); err == nil {
+      return value_boolean, nil
+    }
+  }
+  return false, errors.New("unknown configuration: " + key)
 }
 
 func SendMCDConfigs() {
   local := ReadLocalMCDConfigs()
   remote := ReadRemoteMCDConfigs()
-  response := &SendMCDConfigsResponse{local + remote}
+
+  vm := otto.New()
+  vm.Set("getenv", func(call otto.FunctionCall) otto.Value {
+    name := call.Argument(0).String()
+    result, _ := vm.ToValue(os.ExpandEnv("${" + name + "}"))
+    return result
+  })
+  _, err := vm.Run(`
+    var $$defaultPrefs = {};
+    var $$prefs = {};
+    function pref(key, value) {
+      $$prefs[key] = value;
+    }
+    function defaultPref(key, value) {
+      $$defaultPrefs[key] = value;
+    }
+    function lockPref(key, value) {
+      delete $$prefs[key];
+      $$defaultPrefs[key] = value;
+    }
+    function clearPref(key) {
+      delete $$prefs[key];
+    }
+    function getPref(key) {
+      if (key in $$prefs)
+        return $$prefs[key];
+      if (key in $$defaultPrefs)
+        return $$defaultPrefs[key];
+      return null;
+    }
+    function unlockPref(key) {
+    }
+    var Components = {
+      classes: {},
+      interfaces: {},
+      utils: {}
+    };
+  ` + local + "\n" + remote)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  response := &SendMCDConfigsResponse{}
+
+  ieApp, err := ReadConfigStringValue(vm, "extensions.ieview.ieapp")
+  if err == nil { response.IEApp = ieApp }
+  ieArgs, err := ReadConfigStringValue(vm, "extensions.ieview.ieargs")
+  if err == nil { response.IEArgs = ieArgs }
+  noWait, err := ReadConfigBooleanValue(vm, "extensions.ieview.noWait")
+  if err == nil { response.NoWait = noWait }
+  forceIEList, err := ReadConfigStringValue(vm, "extensions.ieview.forceielist")
+  if err == nil { response.ForceIEList = forceIEList }
+  disableForce, err := ReadConfigBooleanValue(vm, "extensions.ieview.disableForce")
+  if err == nil { response.DisableForce = disableForce }
+  contextMenu, err := ReadConfigBooleanValue(vm, "extensions.ieview.contextMenu")
+  if err == nil { response.ContextMenu = contextMenu }
+  debug, err := ReadConfigBooleanValue(vm, "extensions.ieview.debug")
+  if err == nil { response.Debug = debug }
+
   body, err := json.Marshal(response)
   if err != nil {
     log.Fatal(err)

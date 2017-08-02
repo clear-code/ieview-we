@@ -34,6 +34,7 @@ main() {
   ln -s "$dist_dir" "$temp_src/host"
   prepare_dependency golang.org/x/sys/windows/registry
   prepare_dependency github.com/lhside/chrome-go
+  prepare_dependency github.com/robertkrimen/otto
 
   build_for 386
   build_for amd64
