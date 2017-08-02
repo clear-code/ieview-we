@@ -35,6 +35,7 @@ main() {
   prepare_dependency golang.org/x/sys/windows/registry
   prepare_dependency github.com/lhside/chrome-go
   prepare_dependency github.com/robertkrimen/otto
+  prepare_dependency github.com/claer-code/mcd-go
 
   build_for 386
   build_for amd64
