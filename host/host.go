@@ -133,31 +133,40 @@ type SendMCDConfigsResponse struct {
   DisableForce bool   `json:"disableForce"`
   ContextMenu  bool   `json:"contextMenu"`
   Debug        bool   `json:"debug"`
+  Undefineds   []string `json:"undefineds"`
 }
 
-func ReadConfigStringValue(vm *otto.Otto, key string) (value_string string, err error) {
-  if value, err := vm.Run("getPref('" + key + "')"); err == nil {
-    if value_string, err := value.ToString(); err == nil {
-      return value_string, nil
-    }
+func ReadConfigStringValue(vm *otto.Otto, key string) (stringValue string, err error) {
+  value, err := vm.Run("getPref('" + key + "')")
+  stringValue, err = value.ToString();
+  if stringValue == "undefined" {
+    return "", errors.New("unknown pref: " + key)
   }
-  return "", errors.New("unknown configuration: " + key)
+  return stringValue, nil
 }
-func ReadConfigIntegerValue(vm *otto.Otto, key string) (value_integer int64, err error) {
-  if value, err := vm.Run("getPref('" + key + "')"); err == nil {
-    if value_integer, err := value.ToInteger(); err == nil {
-      return value_integer, nil
-    }
+func ReadConfigIntegerValue(vm *otto.Otto, key string) (integerValue int64, err error) {
+  value, err := vm.Run("getPref('" + key + "')")
+  stringValue, err := value.ToString();
+  if stringValue == "undefined" {
+    return 0, errors.New("unknown pref: " + key)
   }
-  return 0, errors.New("unknown configuration: " + key)
+  integerValue, err = value.ToInteger();
+  if err != nil {
+    return 0, err
+  }
+  return integerValue, nil
 }
-func ReadConfigBooleanValue(vm *otto.Otto, key string) (value_boolean bool, err error) {
-  if value, err := vm.Run("getPref('" + key + "')"); err == nil {
-    if value_boolean, err := value.ToBoolean(); err == nil {
-      return value_boolean, nil
-    }
+func ReadConfigBooleanValue(vm *otto.Otto, key string) (booleanValue bool, err error) {
+  value, err := vm.Run("getPref('" + key + "')")
+  stringValue, err := value.ToString();
+  if stringValue == "undefined" {
+    return false, errors.New("unknown pref: " + key)
   }
-  return false, errors.New("unknown configuration: " + key)
+  booleanValue, err = value.ToBoolean();
+  if err != nil {
+    return false, err
+  }
+  return booleanValue, nil
 }
 
 func SendMCDConfigs() {
@@ -170,6 +179,7 @@ func SendMCDConfigs() {
     result, _ := vm.ToValue(os.ExpandEnv("${" + name + "}"))
     return result
   })
+  // See also https://dxr.mozilla.org/mozilla-central/source/extensions/pref/autoconfig/src/prefcalls.js
   _, err := vm.Run(`
     var $$defaultPrefs = {};
     var $$prefs = {};
@@ -191,7 +201,7 @@ func SendMCDConfigs() {
         return $$prefs[key];
       if (key in $$defaultPrefs)
         return $$defaultPrefs[key];
-      return null;
+      return undefined;
     }
     function unlockPref(key) {
     }
@@ -208,19 +218,19 @@ func SendMCDConfigs() {
   response := &SendMCDConfigsResponse{}
 
   ieApp, err := ReadConfigStringValue(vm, "extensions.ieview.ieapp")
-  if err == nil { response.IEApp = ieApp }
+  if err == nil { response.IEApp = ieApp } else { response.Undefineds = append(response.Undefineds, "ieapp") }
   ieArgs, err := ReadConfigStringValue(vm, "extensions.ieview.ieargs")
-  if err == nil { response.IEArgs = ieArgs }
+  if err == nil { response.IEArgs = ieArgs } else { response.Undefineds = append(response.Undefineds, "ieargs") }
   noWait, err := ReadConfigBooleanValue(vm, "extensions.ieview.noWait")
-  if err == nil { response.NoWait = noWait }
+  if err == nil { response.NoWait = noWait } else { response.Undefineds = append(response.Undefineds, "noWait") }
   forceIEList, err := ReadConfigStringValue(vm, "extensions.ieview.forceielist")
-  if err == nil { response.ForceIEList = forceIEList }
+  if err == nil { response.ForceIEList = forceIEList } else { response.Undefineds = append(response.Undefineds, "forceielist") }
   disableForce, err := ReadConfigBooleanValue(vm, "extensions.ieview.disableForce")
-  if err == nil { response.DisableForce = disableForce }
+  if err == nil { response.DisableForce = disableForce } else { response.Undefineds = append(response.Undefineds, "disableForce") }
   contextMenu, err := ReadConfigBooleanValue(vm, "extensions.ieview.contextMenu")
-  if err == nil { response.ContextMenu = contextMenu }
+  if err == nil { response.ContextMenu = contextMenu } else { response.Undefineds = append(response.Undefineds, "contextMenu") }
   debug, err := ReadConfigBooleanValue(vm, "extensions.ieview.debug")
-  if err == nil { response.Debug = debug }
+  if err == nil { response.Debug = debug } else { response.Undefineds = append(response.Undefineds, "debug") }
 
   body, err := json.Marshal(response)
   if err != nil {
