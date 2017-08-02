@@ -145,11 +145,11 @@ func SendMCDConfigs() {
 func ReadLocalMCDConfigs() (configs string) {
   path, err := GetLocalMCDPath()
   if err != nil {
-    log.Fatal(err)
+    return ""
   }
   buffer, err := ioutil.ReadFile(path)
   if err != nil {
-    log.Fatal(err)
+    return ""
   }
   return string(buffer)
 }
@@ -159,16 +159,21 @@ func GetLocalMCDPath() (path string, err error) {
   if err != nil {
     return "", err
   }
+  //TODO: We should detect the effective file.
+  // Currently we return the first one always.
   pattern := filepath.Join(filepath.Dir(exePath), "*.cfg")
+  path, err = GetFirstMatchedFile(pattern)
+  return
+}
+
+func GetFirstMatchedFile(pattern string) (path string, err error) {
   possibleFiles, err := filepath.Glob(pattern)
   if err != nil {
     return "", err
   }
   if len(possibleFiles) == 0 {
-    return "", errors.New("no local MCD file")
+    return "", errors.New("no match")
   }
-  //TODO: We should detect the effective file.
-  // Currently we return the first one always.
   return possibleFiles[0], nil
 }
 
@@ -195,6 +200,27 @@ func GetPathToRunningApp() (path string, err error) {
 
 func ReadRemoteMCDConfigs() (configs string) {
   // codes to read failover.jsc in the profile
+  path, err := GetFailoverJscPath()
+  if err != nil {
+    return ""
+  }
+  buffer, err := ioutil.ReadFile(path)
+  if err != nil {
+    return ""
+  }
+  return string(buffer)
+}
+
+func GetFailoverJscPath() (path string, err error) {
+  //TODO: We should detect the actually used profile directory.
+  // Currently we return the default profile.
+  pattern := os.ExpandEnv(`${AppData}\Mozilla\Firefox\Profiles\*.default\failover.jsc`)
+  path, err = GetFirstMatchedFile(pattern)
+  if path != "" {
+    return
+  }
+  pattern = os.ExpandEnv(`${AppData}\Mozilla\Firefox\Profiles\*\failover.jsc`)
+  path, err = GetFirstMatchedFile(pattern)
   return
 }
 
