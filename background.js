@@ -57,6 +57,7 @@ function applyMCDConfigs() {
       log('loaded MCD configs: ', aResponse);
       Object.keys(aResponse).forEach((aKey) => {
         configs[aKey] = aResponse[aKey];
+        configs.$lock(aKey);
       });
     },
     (aError) => {
