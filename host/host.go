@@ -1,10 +1,15 @@
 package main
 
 import (
+  "log"
+  "errors"
   "os"
   "os/exec"
   "syscall"
-  "log"
+  "unicode/utf16"
+  "unsafe"
+  "path/filepath"
+  "io/ioutil"
   "encoding/json"
   "golang.org/x/sys/windows/registry" 
   "github.com/lhside/chrome-go"
@@ -138,8 +143,54 @@ func SendMCDConfigs() {
 }
 
 func ReadLocalMCDConfigs() (configs string) {
-  // codes to read *.cfg
-  return
+  path, err := GetLocalMCDPath()
+  if err != nil {
+    log.Fatal(err)
+  }
+  buffer, err := ioutil.ReadFile(path)
+  if err != nil {
+    log.Fatal(err)
+  }
+  return string(buffer)
+}
+
+func GetLocalMCDPath() (path string, err error) {
+  exePath, err := GetPathToRunningApp()
+  if err != nil {
+    return "", err
+  }
+  pattern := filepath.Join(filepath.Dir(exePath), "*.cfg")
+  possibleFiles, err := filepath.Glob(pattern)
+  if err != nil {
+    return "", err
+  }
+  if len(possibleFiles) == 0 {
+    return "", errors.New("no local MCD file")
+  }
+  //TODO: We should detect the effective file.
+  // Currently we return the first one always.
+  return possibleFiles[0], nil
+}
+
+const PROCESS_VM_READ = 1 << 4
+
+func GetPathToRunningApp() (path string, err error) {
+  parentId := os.Getppid()
+  inheritHandle := false
+  processHandle, err := syscall.OpenProcess(syscall.PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, inheritHandle, uint32(parentId))
+  defer syscall.CloseHandle(processHandle)
+  if err != nil {
+    return "", err
+  }
+  getModuleFileNameEx := syscall.MustLoadDLL("psapi.dll").MustFindProc("GetModuleFileNameExW")
+  buffer := make([]uint16, syscall.MAX_PATH)
+  bufferSize := uint32(len(buffer))
+  rawLength, _, err := getModuleFileNameEx.Call(uintptr(processHandle), 0, uintptr(unsafe.Pointer(&buffer[0])), uintptr(bufferSize))
+  length := uint32(rawLength)
+  if length == 0 {
+    return "", errors.New("failed to get the path of the application")
+  }
+  return string(utf16.Decode(buffer[0:length])), nil
 }
 
 func ReadRemoteMCDConfigs() (configs string) {
