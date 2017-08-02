@@ -5,7 +5,7 @@ xpi: extlib/webextensions-lib-configs/Configs.js extlib/webextensions-lib-option
 	cp extlib/webextensions-lib-configs/Configs.js common/
 	cp extlib/webextensions-lib-options/Options.js options/
 	cp extlib/webextensions-lib-l10n/l10n.js options/
-	rm ieview-we.xpi
+	rm -f ieview-we.xpi
 	zip -r -0 ieview-we.xpi *.json *.js _locales common options
 
 extlib/webextensions-lib-configs/Configs.js:
@@ -19,6 +19,6 @@ extlib/webextensions-lib-l10n/l10n.js:
 
 host:
 	host/build.sh
-	rm ieview-we-host.zip
+	rm -f ieview-we-host.zip
 	cd host && zip -r -9 ../ieview-we-host.zip 386 amd64 *.bat *.json
 
