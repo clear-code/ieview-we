@@ -40,24 +40,24 @@ configs.$load().then(() => {
     (aResponse) => {
       applyMCDConfigs(aResponse.configs);
 
-  if (!configs.ieapp) {
-    send({ command: 'get-ie-path' }).then(
-      (aResponse) => {
-        log('Received: ', aResponse);
-        if (aResponse.path)
-          configs.ieapp = aResponse.path;
-      },
-      (aError) => {
-        log('Error: ', aError);
+      if (!configs.ieapp) {
+        send({ command: 'get-ie-path' }).then(
+          (aResponse) => {
+            log('Received: ', aResponse);
+            if (aResponse.path)
+              configs.ieapp = aResponse.path;
+          },
+          (aError) => {
+            log('Error: ', aError);
+          }
+        );
       }
-    );
-  }
 
-  if (configs.contextMenu)
-    installMenuItems();
+      if (configs.contextMenu)
+        installMenuItems();
 
-  if (!configs.disableForce)
-    installBlocker();
+      if (!configs.disableForce)
+        installBlocker();
     },
     (aError) => {
       log('Error: ', aError);
