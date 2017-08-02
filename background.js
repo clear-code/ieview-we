@@ -54,10 +54,8 @@ configs.$load().then(() => {
 function applyMCDConfigs() {
   return send({ command: 'read-mcd-configs' }).then(
     (aResponse) => {
-      Object.keys(configs.$default).forEach((aKey) => {
-        if (aResponse.undefineds.indexOf(aKey) > -1)
-          return;
-        log('applying ' + aKey + '=' + aResponse[aKey]);
+      log('loaded MCD configs: ', aResponse);
+      Object.keys(aResponse).forEach((aKey) => {
         configs[aKey] = aResponse[aKey];
       });
     },

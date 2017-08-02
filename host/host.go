@@ -121,14 +121,13 @@ func GetIEPath() (path string) {
 
 
 type SendMCDConfigsResponse struct {
-  IEApp        string `json:"ieapp"`
-  IEArgs       string `json:"ieargs"`
-  NoWait       bool   `json:"noWait"`
-  ForceIEList  string `json:"forceielist"`
-  DisableForce bool   `json:"disableForce"`
-  ContextMenu  bool   `json:"contextMenu"`
-  Debug        bool   `json:"debug"`
-  Undefineds   []string `json:"undefineds"`
+  IEApp        string `json:"ieapp,omitempty"`
+  IEArgs       string `json:"ieargs,omitempty"`
+  NoWait       bool   `json:"noWait,omitempty"`
+  ForceIEList  string `json:"forceielist,omitempty"`
+  DisableForce bool   `json:"disableForce,omitempty"`
+  ContextMenu  bool   `json:"contextMenu,omitempty"`
+  Debug        bool   `json:"debug,omitempty"`
 }
 
 func SendMCDConfigs() {
@@ -140,19 +139,19 @@ func SendMCDConfigs() {
   response := &SendMCDConfigsResponse{}
 
   ieApp, err := mcd.GetStringValue(configs, "extensions.ieview.ieapp")
-  if err == nil { response.IEApp = ieApp } else { response.Undefineds = append(response.Undefineds, "ieapp") }
+  if err == nil { response.IEApp = ieApp }
   ieArgs, err := mcd.GetStringValue(configs, "extensions.ieview.ieargs")
-  if err == nil { response.IEArgs = ieArgs } else { response.Undefineds = append(response.Undefineds, "ieargs") }
+  if err == nil { response.IEArgs = ieArgs }
   noWait, err := mcd.GetBooleanValue(configs, "extensions.ieview.noWait")
-  if err == nil { response.NoWait = noWait } else { response.Undefineds = append(response.Undefineds, "noWait") }
+  if err == nil { response.NoWait = noWait }
   forceIEList, err := mcd.GetStringValue(configs, "extensions.ieview.forceielist")
-  if err == nil { response.ForceIEList = forceIEList } else { response.Undefineds = append(response.Undefineds, "forceielist") }
+  if err == nil { response.ForceIEList = forceIEList }
   disableForce, err := mcd.GetBooleanValue(configs, "extensions.ieview.disableForce")
-  if err == nil { response.DisableForce = disableForce } else { response.Undefineds = append(response.Undefineds, "disableForce") }
+  if err == nil { response.DisableForce = disableForce }
   contextMenu, err := mcd.GetBooleanValue(configs, "extensions.ieview.contextMenu")
-  if err == nil { response.ContextMenu = contextMenu } else { response.Undefineds = append(response.Undefineds, "contextMenu") }
+  if err == nil { response.ContextMenu = contextMenu }
   debug, err := mcd.GetBooleanValue(configs, "extensions.ieview.debug")
-  if err == nil { response.Debug = debug } else { response.Undefineds = append(response.Undefineds, "debug") }
+  if err == nil { response.Debug = debug }
 
   body, err := json.Marshal(response)
   if err != nil {
