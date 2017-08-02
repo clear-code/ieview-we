@@ -36,6 +36,10 @@ function onBeforeRequest(aDetails) {
 }
 
 configs.$load().then(() => {
+  send({ command: 'read-mcd-configs' }).then(
+    (aResponse) => {
+      applyMCDConfigs(aResponse.configs);
+
   if (!configs.ieapp) {
     send({ command: 'get-ie-path' }).then(
       (aResponse) => {
@@ -54,6 +58,11 @@ configs.$load().then(() => {
 
   if (!configs.disableForce)
     installBlocker();
+    },
+    (aError) => {
+      log('Error: ', aError);
+    }
+  )
 });
 configs.$addObserver((aKey) => {
   switch (aKey) {
@@ -89,6 +98,11 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
 
   launch(url);
 });
+
+
+function applyMCDConfigs(aConfigs) {
+  // codes to parse MCD configs
+}
 
 function launch(aURL) {
   if (!configs.ieapp && !configs.ieargs)

@@ -120,19 +120,13 @@ func GetIEPath() (path string) {
 
 
 type SendMCDConfigsResponse struct {
-  IEApp        string `json:"ieapp"`
-  IEArgs       string `json:"ieargs"`
-  NoWait       bool   `json:"noWait"`
-  ForceIEList  string `json:"forceielist"`
-  DisableForce bool   `json:"disableForce"`
-  ContextMenu  bool   `json:"contextMenu"`
-  Debug        bool   `json:"debug"`
+  Configs string `json:"local"`
 }
 
 func SendMCDConfigs() {
-  response := &SendMCDConfigsResponse{}
-  ReadLocalMCDConfigs(response)
-  ReadRemoteMCDConfigs(response)
+  local := ReadLocalMCDConfigs()
+  remote := ReadRemoteMCDConfigs()
+  response := &SendMCDConfigsResponse{local + remote}
   body, err := json.Marshal(response)
   if err != nil {
     log.Fatal(err)
@@ -143,9 +137,13 @@ func SendMCDConfigs() {
   }
 }
 
-func ReadLocalMCDConfigs(response SendMCDConfigsResponse) {
+func ReadLocalMCDConfigs() (configs string) {
+  // codes to read *.cfg
+  return
 }
 
-func ReadRemoteMCDConfigs(response SendMCDConfigsResponse) {
+func ReadRemoteMCDConfigs() (configs string) {
+  // codes to read failover.jsc in the profile
+  return
 }
 
