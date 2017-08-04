@@ -29,6 +29,7 @@ main() {
   cd "$GOPATH"
 
   echo "preparing dependencies..."
+  prepare_dependency github.com/mitchellh/gox
   # prepare_dependency github.com/clear-code/ieview-we
   mkdir -p "$temp_src"
   ln -s "$dist_dir" "$temp_src/host"
@@ -37,8 +38,16 @@ main() {
   prepare_dependency github.com/robertkrimen/otto
   prepare_dependency github.com/clear-code/mcd-go
 
-  build_for 386
-  build_for amd64
+  local path="$(echo "$temp_src" | sed 's;^src/;;')/host"
+  gox -os="windows" "$path"
+
+  local arch
+  for binary in *.exe
+  do
+    arch="$(basename "$binary" '.exe' | sed 's/.\+_windows_//')"
+    mkdir -p "$dist_dir/$arch"
+    mv "$binary" "$dist_dir/$arch/host.exe"
+  done
 
   rm "$temp_src/host"
   rm -rf "$temp_src"
@@ -49,15 +58,6 @@ main() {
 prepare_dependency() {
   local path="$1"
   [ -d "src/$path" ] || go get "$path"
-}
-
-build_for() {
-  local arch="$1"
-  local path="$(echo "$temp_src" | sed 's;^src/;;')/host"
-  echo "building for $arch..."
-  env GOOS=windows GOARCH="$1" go build "$path"
-  mkdir -p "$dist_dir/$arch"
-  mv host.exe "$dist_dir/$arch/"
 }
 
 main
