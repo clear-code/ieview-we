@@ -57,6 +57,7 @@ func Launch(path string, defaultArgs []string, url string) {
         args := []string{path}
 	args = append(args, defaultArgs...)
 	args = append(args, url)
+	// We need another launcher to keep launched external application running after this process is dead.
 	command := exec.Command("launch.bat", args...)
 	response := &LaunchResponse{true, path, args}
 
@@ -65,6 +66,7 @@ func Launch(path string, defaultArgs []string, url string) {
 		log.Fatal(err)
 		response.Success = false
 	}
+	// Wait until the launcher completely finishes.
 	time.Sleep(3 * time.Second)
 
 	body, err := json.Marshal(response)
