@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"syscall"
+	"time"
 )
 
 type RequestParams struct {
@@ -16,7 +16,6 @@ type RequestParams struct {
 	Path   string   `json:path`
 	Args   []string `json:args`
 	Url    string   `json:url`
-	NoWait bool     `json:noWait`
 }
 type Request struct {
 	Command string        `json:"command"`
@@ -35,7 +34,7 @@ func main() {
 
 	switch command := request.Command; command {
 	case "launch":
-		Launch(request.Params.Path, request.Params.Args, request.Params.Url, request.Params.NoWait)
+		Launch(request.Params.Path, request.Params.Args, request.Params.Url)
 	case "get-ie-path":
 		SendIEPath()
 	case "read-mcd-configs":
@@ -54,25 +53,19 @@ type LaunchResponse struct {
 	Args    []string `json:"args"`
 }
 
-func Launch(path string, defaultArgs []string, url string, noWait bool) {
-	args := append(defaultArgs, url)
-	command := exec.Command(path, args...)
+func Launch(path string, defaultArgs []string, url string) {
+        args := []string{path}
+	args = append(args, defaultArgs...)
+	args = append(args, url)
+	command := exec.Command("launch.bat", args...)
 	response := &LaunchResponse{true, path, args}
 
-	if noWait {
-		command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP}
 		err := command.Start()
 		if err != nil {
 			log.Fatal(err)
 			response.Success = false
 		}
-	} else {
-		err := command.Run()
-		if err != nil {
-			log.Fatal(err)
-			response.Success = false
-		}
-	}
+	time.Sleep(3 * time.Second)
 
 	body, err := json.Marshal(response)
 	if err != nil {
@@ -120,7 +113,6 @@ func GetIEPath() (path string) {
 type SendMCDConfigsResponse struct {
 	IEApp        string `json:"ieapp,omitempty"`
 	IEArgs       string `json:"ieargs,omitempty"`
-	NoWait       bool   `json:"noWait,omitempty"`
 	ForceIEList  string `json:"forceielist,omitempty"`
 	DisableForce bool   `json:"disableForce,omitempty"`
 	ContextMenu  bool   `json:"contextMenu,omitempty"`
@@ -142,10 +134,6 @@ func SendMCDConfigs() {
 	ieArgs, err := configs.GetStringValue("extensions.ieview.ieargs")
 	if err == nil {
 		response.IEArgs = ieArgs
-	}
-	noWait, err := configs.GetBooleanValue("extensions.ieview.noWait")
-	if err == nil {
-		response.NoWait = noWait
 	}
 	forceIEList, err := configs.GetStringValue("extensions.ieview.forceielist")
 	if err == nil {
