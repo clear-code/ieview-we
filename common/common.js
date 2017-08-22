@@ -17,7 +17,6 @@ function log(aMessage, ...aArgs)
 configs = new Configs({
 	ieapp        : '',
 	ieargs       : '',
-	noWait       : true,
 	forceielist  : '',
 	disableForce : false,
 	contextMenu  : true,

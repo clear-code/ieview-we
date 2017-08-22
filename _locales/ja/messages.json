@@ -9,7 +9,6 @@
   "config.ieapp.label.after":   { "message": "" },
   "config.ieargs.label.before": { "message": "起動オプション" },
   "config.ieargs.label.after":  { "message": "" },
-  "config.noWait.label":        { "message": "外部プロセスとの接続をすぐに終える" },
   "config.contextMenu.label":   { "message": "コンテキストメニューに「IEで開く」を追加する" },
   "config.forceielist.caption": { "message": "Internet Explorerで常に開くWebサイト" },
   "config.disableForce.label":  { "message": "無効化" },
