@@ -60,11 +60,11 @@ func Launch(path string, defaultArgs []string, url string) {
 	command := exec.Command("launch.bat", args...)
 	response := &LaunchResponse{true, path, args}
 
-		err := command.Start()
-		if err != nil {
-			log.Fatal(err)
-			response.Success = false
-		}
+	err := command.Start()
+	if err != nil {
+		log.Fatal(err)
+		response.Success = false
+	}
 	time.Sleep(3 * time.Second)
 
 	body, err := json.Marshal(response)
