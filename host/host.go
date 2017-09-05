@@ -14,9 +14,9 @@ import (
 
 type RequestParams struct {
 	// launch
-	Path   string   `json:path`
-	Args   []string `json:args`
-	Url    string   `json:url`
+	Path string   `json:path`
+	Args []string `json:args`
+	Url  string   `json:url`
 }
 type Request struct {
 	Command string        `json:"command"`
