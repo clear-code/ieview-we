@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"syscall"
 	"time"
 )
 
@@ -54,11 +55,13 @@ type LaunchResponse struct {
 }
 
 func Launch(path string, defaultArgs []string, url string) {
-        args := []string{path}
-	args = append(args, defaultArgs...)
-	args = append(args, url)
-	// We need another launcher to keep launched external application running after this process is dead.
-	command := exec.Command("launch.bat", args...)
+	args := append(defaultArgs, url)
+	command := exec.Command(path, args...)
+	// "0x01000000" is the raw version of "CREATE_BREAKAWAY_FROM_JOB".
+	// See also:
+	//   https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#Closing_the_native_app
+	//   https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx
+	command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x01000000}
 	response := &LaunchResponse{true, path, args}
 
 	err := command.Start()
