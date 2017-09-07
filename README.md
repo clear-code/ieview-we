@@ -1,6 +1,8 @@
 # IE View WE
 
-Provides ability to open pages and links by Internet Explorer (Cloned IE View based on WebExtensions-based)
+Provides ability to open pages and links by Internet Explorer (Cloned IE View based on WebExtensions-based.)
+
+This works only on Windows.
 
 # Steps to install
 
