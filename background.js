@@ -40,13 +40,13 @@ function onBeforeRequest(aDetails) {
   await applyMCDConfigs();
   await setDefaultPath();
 
-      if (configs.contextMenu)
-        installMenuItems();
+  if (configs.contextMenu)
+    installMenuItems();
 
-      if (!configs.disableForce)
-        installBlocker();
+  if (!configs.disableForce)
+    installBlocker();
 
-      configs.$addObserver(onConfigUpdated);
+  configs.$addObserver(onConfigUpdated);
 })();
 
 async function applyMCDConfigs() {
@@ -55,11 +55,11 @@ async function applyMCDConfigs() {
     log('loaded MCD configs: ', response);
     Object.keys(response).forEach((aKey) => {
       configs[aKey] = response[aKey];
-        configs.$lock(aKey);
-      });
+      configs.$lock(aKey);
+    });
   }
   catch(aError) {
-      log('Failed to read MCD configs: ', aError);
+    log('Failed to read MCD configs: ', aError);
   }
 }
 
@@ -75,7 +75,7 @@ async function setDefaultPath() {
     }
   }
   catch(aError) {
-        log('Error: ', aError);
+    log('Error: ', aError);
   }
 }
 
@@ -132,7 +132,7 @@ async function launch(aURL) {
     log('Received: ', response);
   }
   catch(aError) {
-      log('Error: ', aError);
+    log('Error: ', aError);
   }
 }
 
