@@ -35,12 +35,11 @@ function onBeforeRequest(aDetails) {
   return { cancel: true };
 }
 
-configs.$load().then(() => {
-  applyMCDConfigs()
-    .then(() => {
-      return setDefaultPath();
-    })
-    .then(() => {
+(async () => {
+  await configs.$load();
+  await applyMCDConfigs();
+  await setDefaultPath();
+
       if (configs.contextMenu)
         installMenuItems();
 
@@ -48,39 +47,35 @@ configs.$load().then(() => {
         installBlocker();
 
       configs.$addObserver(onConfigUpdated);
-    });
-});
+})();
 
-function applyMCDConfigs() {
-  return send({ command: 'read-mcd-configs' }).then(
-    (aResponse) => {
-      log('loaded MCD configs: ', aResponse);
-      Object.keys(aResponse).forEach((aKey) => {
-        configs[aKey] = aResponse[aKey];
+async function applyMCDConfigs() {
+  try {
+    var response = await send({ command: 'read-mcd-configs' });
+    log('loaded MCD configs: ', response);
+    Object.keys(response).forEach((aKey) => {
+      configs[aKey] = response[aKey];
         configs.$lock(aKey);
       });
-    },
-    (aError) => {
+  }
+  catch(aError) {
       log('Failed to read MCD configs: ', aError);
-    }
-  );
+  }
 }
 
-function setDefaultPath() {
-  if (!configs.ieapp) {
-    return send({ command: 'get-ie-path' }).then(
-      (aResponse) => {
-        log('Received: ', aResponse);
-        if (aResponse.path)
-          configs.ieapp = aResponse.path;
-      },
-      (aError) => {
-        log('Error: ', aError);
-      }
-    );
+async function setDefaultPath() {
+  if (configs.ieapp)
+    return;
+  try {
+    let response = await send({ command: 'get-ie-path' });
+    if (response) {
+      log('Received: ', response);
+      if (response.path)
+        configs.ieapp = response.path;
+    }
   }
-  else {
-    return Promise.resolve();
+  catch(aError) {
+        log('Error: ', aError);
   }
 }
 
@@ -120,7 +115,7 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
 });
 
 
-function launch(aURL) {
+async function launch(aURL) {
   if (!configs.ieapp && !configs.ieargs)
     return;
 
@@ -132,14 +127,13 @@ function launch(aURL) {
       url:  aURL
     }
   };
-  return send(message).then(
-    (aResponse) => {
-      log('Received: ', aResponse);
-    },
-    (aError) => {
+  try{
+    let response = await send(message);
+    log('Received: ', response);
+  }
+  catch(aError) {
       log('Error: ', aError);
-    }
-  );
+  }
 }
 
 function send(aMessage) {
