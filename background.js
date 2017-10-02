@@ -31,7 +31,7 @@ function uninstallBlocker() {
 }
 function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
-  open(aDetails.url);
+  launch(aDetails.url);
   return { cancel: true };
 }
 
