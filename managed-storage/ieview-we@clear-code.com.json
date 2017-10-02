@@ -1,0 +1,8 @@
+{
+  "name": "ieview-we@clear-code.com",
+  "description": "Managed Storage for IE View WE",
+  "type": "storage",
+  "data": {
+    "forceielist": "http://www.example.com/*"
+  }
+}
