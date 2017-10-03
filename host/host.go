@@ -23,16 +23,21 @@ type Request struct {
 	Params  RequestParams `json:"params"`
 }
 
+var DebugLogs []string
+
 func main() {
 	rawRequest, err := chrome.Receive(os.Stdin)
 	if err != nil {
+		DebugLogs = append(DebugLogs, "Failed to read message from stdin.")
 		log.Fatal(err)
 	}
 	request := &Request{}
 	if err := json.Unmarshal(rawRequest, request); err != nil {
+		DebugLogs = append(DebugLogs, "Failed to parse message.")
 		log.Fatal(err)
 	}
 
+	DebugLogs = append(DebugLogs, "Command is "+request.Command)
 	switch command := request.Command; command {
 	case "launch":
 		Launch(request.Params.Path, request.Params.Args, request.Params.Url)
@@ -52,6 +57,7 @@ type LaunchResponse struct {
 	Success bool     `json:"success"`
 	Path    string   `json:"path"`
 	Args    []string `json:"args"`
+	Logs    []string `json:"logs"`
 }
 
 func Launch(path string, defaultArgs []string, url string) {
@@ -62,16 +68,18 @@ func Launch(path string, defaultArgs []string, url string) {
 	//   https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#Closing_the_native_app
 	//   https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx
 	command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x01000000}
-	response := &LaunchResponse{true, path, args}
+	response := &LaunchResponse{true, path, args, DebugLogs}
 
 	err := command.Start()
 	if err != nil {
+		DebugLogs = append(DebugLogs, "Failed to launch "+path)
 		log.Fatal(err)
 		response.Success = false
 	}
 	// Wait until the launcher completely finishes.
 	time.Sleep(3 * time.Second)
 
+	response.Logs = DebugLogs
 	body, err := json.Marshal(response)
 	if err != nil {
 		log.Fatal(err)
@@ -83,12 +91,13 @@ func Launch(path string, defaultArgs []string, url string) {
 }
 
 type SendIEPathResponse struct {
-	Path string `json:"path"`
+	Path string   `json:"path"`
+	Logs []string `json:"logs"`
 }
 
 func SendIEPath() {
 	path := GetIEPath()
-	response := &SendIEPathResponse{path}
+	response := &SendIEPathResponse{path, DebugLogs}
 	body, err := json.Marshal(response)
 	if err != nil {
 		log.Fatal(err)
@@ -100,33 +109,39 @@ func SendIEPath() {
 }
 
 func GetIEPath() (path string) {
+	keyPath := `SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe`
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE,
-		`SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe`,
+		keyPath,
 		registry.QUERY_VALUE)
 	if err != nil {
+		DebugLogs = append(DebugLogs, "Failed to open key "+keyPath)
 		log.Fatal(err)
 	}
 	defer key.Close()
 
 	path, _, err = key.GetStringValue("")
 	if err != nil {
+		DebugLogs = append(DebugLogs, "Failed to get value from key "+keyPath)
 		log.Fatal(err)
 	}
 	return
 }
 
 type SendMCDConfigsResponse struct {
-	IEApp        string `json:"ieapp,omitempty"`
-	IEArgs       string `json:"ieargs,omitempty"`
-	ForceIEList  string `json:"forceielist,omitempty"`
-	DisableForce bool   `json:"disableForce,omitempty"`
-	ContextMenu  bool   `json:"contextMenu,omitempty"`
-	Debug        bool   `json:"debug,omitempty"`
+	IEApp        string   `json:"ieapp,omitempty"`
+	IEArgs       string   `json:"ieargs,omitempty"`
+	ForceIEList  string   `json:"forceielist,omitempty"`
+	DisableForce bool     `json:"disableForce,omitempty"`
+	ContextMenu  bool     `json:"contextMenu,omitempty"`
+	Debug        bool     `json:"debug,omitempty"`
+	Logs         []string `json:"logs"`
 }
 
 func SendMCDConfigs() {
 	configs, err := mcd.New()
+	DebugLogs = append(DebugLogs, mcd.DebugLogs...)
 	if err != nil {
+		DebugLogs = append(DebugLogs, "Failed to get MCD configs.")
 		log.Fatal(err)
 	}
 
@@ -157,6 +172,8 @@ func SendMCDConfigs() {
 		response.Debug = debug
 	}
 
+	DebugLogs = append(DebugLogs, configs.DebugLogs...)
+	response.Logs = DebugLogs
 	body, err := json.Marshal(response)
 	if err != nil {
 		log.Fatal(err)
