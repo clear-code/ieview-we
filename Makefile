@@ -1,4 +1,4 @@
-.PHONY: xpi host
+.PHONY: xpi host managed
 
 xpi: extlib/webextensions-lib-configs/Configs.js extlib/webextensions-lib-options/Options.js extlib/webextensions-lib-l10n/l10n.js
 	git submodule update
@@ -21,4 +21,10 @@ host:
 	host/build.sh
 	rm -f ieview-we-host.zip
 	cd host && zip -r -9 ../ieview-we-host.zip 386 amd64 *.bat *.json
+
+managed:
+	rm -f ieview-we-managed-storage.zip
+	cd managed-storage && zip -r -9 ../ieview-we-managed-storage.zip *.bat *.json
+
+all: host managed xpi
 
