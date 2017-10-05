@@ -5,7 +5,7 @@ SET NAME=ieview-we@clear-code.com
 ECHO Installing %NAME%...
 
 ECHO Checking permission...
-SET INSTALL_DIR=%ProgramFiles%\%NAME%
+SET INSTALL_DIR=%ProgramData%\%NAME%
 SET REG_BASE=HKLM
 MD "%INSTALL_DIR%_try"
 IF EXIST "%INSTALL_DIR%_try\" (
