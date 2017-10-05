@@ -5,9 +5,11 @@ import (
 	"github.com/clear-code/mcd-go"
 	"github.com/lhside/chrome-go"
 	"golang.org/x/sys/windows/registry"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -21,23 +23,35 @@ type RequestParams struct {
 type Request struct {
 	Command string        `json:"command"`
 	Params  RequestParams `json:"params"`
+	Logging bool          `json:"logging"`
 }
 
 var DebugLogs []string
 
 func main() {
+	log.SetOutput(ioutil.Discard)
+
 	rawRequest, err := chrome.Receive(os.Stdin)
 	if err != nil {
-		DebugLogs = append(DebugLogs, "Failed to read message from stdin.")
 		log.Fatal(err)
 	}
 	request := &Request{}
 	if err := json.Unmarshal(rawRequest, request); err != nil {
-		DebugLogs = append(DebugLogs, "Failed to parse message.")
 		log.Fatal(err)
 	}
 
-	DebugLogs = append(DebugLogs, "Command is "+request.Command)
+	if request.Logging {
+		logfile, err := os.OpenFile("./log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+		if err != nil {
+			log.Fatal(err)
+			panic("Failed to open log.txt:" + err.Error())
+		}
+		defer logfile.Close()
+		log.SetOutput(logfile)
+		log.SetFlags(log.Ldate | log.Ltime)
+	}
+
+	LogForDebug("Command is " + request.Command)
 	switch command := request.Command; command {
 	case "launch":
 		Launch(request.Params.Path, request.Params.Args, request.Params.Url)
@@ -51,6 +65,11 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+}
+
+func LogForDebug(message string) {
+	DebugLogs = append(DebugLogs, message)
+	log.Print(message)
 }
 
 type LaunchResponse struct {
@@ -72,7 +91,7 @@ func Launch(path string, defaultArgs []string, url string) {
 
 	err := command.Start()
 	if err != nil {
-		DebugLogs = append(DebugLogs, "Failed to launch "+path)
+		LogForDebug("Failed to launch " + path)
 		log.Fatal(err)
 		response.Success = false
 	}
@@ -114,14 +133,14 @@ func GetIEPath() (path string) {
 		keyPath,
 		registry.QUERY_VALUE)
 	if err != nil {
-		DebugLogs = append(DebugLogs, "Failed to open key "+keyPath)
+		LogForDebug("Failed to open key " + keyPath)
 		log.Fatal(err)
 	}
 	defer key.Close()
 
 	path, _, err = key.GetStringValue("")
 	if err != nil {
-		DebugLogs = append(DebugLogs, "Failed to get value from key "+keyPath)
+		LogForDebug("Failed to get value from key " + keyPath)
 		log.Fatal(err)
 	}
 	return
@@ -139,9 +158,11 @@ type SendMCDConfigsResponse struct {
 
 func SendMCDConfigs() {
 	configs, err := mcd.New()
-	DebugLogs = append(DebugLogs, mcd.DebugLogs...)
+	if len(mcd.DebugLogs) > 0 {
+		LogForDebug("Logs from mcd:\n  " + strings.Join(mcd.DebugLogs, "\n  "))
+	}
 	if err != nil {
-		DebugLogs = append(DebugLogs, "Failed to get MCD configs.")
+		LogForDebug("Failed to get MCD configs.")
 		log.Fatal(err)
 	}
 
@@ -172,7 +193,9 @@ func SendMCDConfigs() {
 		response.Debug = debug
 	}
 
-	DebugLogs = append(DebugLogs, configs.DebugLogs...)
+	if len(configs.DebugLogs) > 0 {
+		LogForDebug("Logs from mcd configs:\n  " + strings.Join(configs.DebugLogs, "\n  "))
+	}
 	response.Logs = DebugLogs
 	body, err := json.Marshal(response)
 	if err != nil {
