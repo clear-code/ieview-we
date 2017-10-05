@@ -165,8 +165,8 @@ func SendMCDConfigs() {
 		LogForDebug("Logs from mcd:\n  " + strings.Join(mcd.DebugLogs, "\n  "))
 	}
 	if err != nil {
-		LogForDebug("Failed to get MCD configs.")
-		log.Fatal(err)
+		LogForDebug("Failed to read MCD configs.\n" + err.Error())
+		//log.Fatal(err)
 	}
 
 	response := &SendMCDConfigsResponse{}
