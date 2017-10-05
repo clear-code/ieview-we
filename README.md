@@ -4,6 +4,10 @@ Provides ability to open pages and links by Internet Explorer (Cloned IE View ba
 
 This works only on Windows.
 
+*IMPORTANT NOTE: The list of URLs which should be opened by IE is not compatible to the legacy version's one.*
+You need to rewrite them based on the [matching pattern spec for Firefox addons](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Match_patterns).
+For example: `http://example.com` => `http://example.com/*` (note that the added wild card to match any page under the domain.)
+
 # Steps to install
 
  1. Download a zip package of the native messaging host from the [releases page](https://github.com/clear-code/ieview-we/releases).
