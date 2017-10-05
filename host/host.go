@@ -43,8 +43,11 @@ func main() {
 	if request.Logging {
 		logfile, err := os.OpenFile("./log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
-			log.Fatal(err)
-			panic("Failed to open log.txt:" + err.Error())
+			logfilePath := os.ExpandEnv(`${temp}\com.clear_code.ieview_we.log.txt`)
+			logfile, err = os.OpenFile(logfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 		defer logfile.Close()
 		log.SetOutput(logfile)
