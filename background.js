@@ -3,7 +3,7 @@ function installMenuItems() {
     id: 'page',
     type: 'normal',
     title: browser.i18n.getMessage('contextMenu.page.label'),
-    contexts: ['page', 'tab']
+    contexts: installMenuItems.supportsTabContext ? ['page', 'tab'] : ['page']
   });
   browser.contextMenus.create({
     id: 'link',
@@ -12,6 +12,7 @@ function installMenuItems() {
     contexts: ['link']
   });
 }
+installMenuItems.supportsTabContext = true;
 
 function installBlocker() {
   var list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
@@ -39,6 +40,11 @@ function onBeforeRequest(aDetails) {
   await configs.$load();
   await applyMCDConfigs();
   await setDefaultPath();
+
+  var browserInfo = await browser.runtime.getBrowserInfo();
+  if (browserInfo.name == 'Firefox' &&
+      parseInt(browserInfo.version.split('.')[0]) < 53)
+    installMenuItems.supportsTabContext = false;
 
   if (configs.contextMenu)
     installMenuItems();
