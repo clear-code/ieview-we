@@ -13,6 +13,8 @@
   "config.onlyMainFrame.label": { "message": "Only check URL which is shown in location bar" },
   "config.forceielist.caption": { "message": "Websites to be opened by IE always" },
   "config.disableForce.label":  { "message": "Disable" },
+  "config.sitesOpenedBySelf.caption": { "message": "Exceptive websites (opened in Firefox directly)" },
+  "config.disableException.label":  { "message": "Disable" },
 
   "config.debug.label": { "message": "Print debug log" }
 }
