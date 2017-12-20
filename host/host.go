@@ -155,6 +155,7 @@ type SendMCDConfigsResponse struct {
 	ForceIEList  string   `json:"forceielist,omitempty"`
 	DisableForce bool     `json:"disableForce,omitempty"`
 	ContextMenu  bool     `json:"contextMenu,omitempty"`
+	OnlyMainFrame    bool `json:"onlyMainFrame,omitempty"`
 	Debug        bool     `json:"debug,omitempty"`
 	Logs         []string `json:"logs"`
 }
@@ -190,6 +191,10 @@ func SendMCDConfigs() {
 	contextMenu, err := configs.GetBooleanValue("extensions.ieview.contextMenu")
 	if err == nil {
 		response.ContextMenu = contextMenu
+	}
+	onlyMainFrame, err := configs.GetBooleanValue("extensions.ieview.onlyMainFrame")
+	if err == nil {
+		response.OnlyMainFrame = onlyMainFrame
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {
