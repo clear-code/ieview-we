@@ -12,6 +12,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
+	"path/filepath"
 )
 
 type RequestParams struct {
@@ -41,16 +43,23 @@ func main() {
 	}
 
 	if request.Logging {
-		logfile, err := os.OpenFile("./log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+		logfileDir := os.ExpandEnv(`${temp}`)
+		//
+		rotationTime := 24 * time.Hour
+		maxAge := 12 * 24 * time.Hour
+		// for debugging
+		//rotationTime = 120 * time.Second
+		//maxAge = 5 * 120 * time.Second
+		rotateLog, err := rotatelogs.New(filepath.Join(logfileDir, "com.clear_code.ieview_we.log.%Y%m%d%H%M.txt"),
+			rotatelogs.WithMaxAge(maxAge),
+			rotatelogs.WithRotationTime(rotationTime),
+		)
 		if err != nil {
-			logfilePath := os.ExpandEnv(`${temp}\com.clear_code.ieview_we.log.txt`)
-			logfile, err = os.OpenFile(logfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-			if err != nil {
-				log.Fatal(err)
-			}
+			log.Fatal(err)
 		}
-		defer logfile.Close()
-		log.SetOutput(logfile)
+		defer rotateLog.Close()
+
+		log.SetOutput(rotateLog)
 		log.SetFlags(log.Ldate | log.Ltime)
 	}
 
