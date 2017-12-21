@@ -20,5 +20,6 @@ configs = new Configs({
 	forceielist  : '',
 	disableForce : false,
 	contextMenu  : true,
+	onlyMainFrame: true,
 	debug        : false
 });

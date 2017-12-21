@@ -150,13 +150,14 @@ func GetIEPath() (path string) {
 }
 
 type SendMCDConfigsResponse struct {
-	IEApp        string   `json:"ieapp,omitempty"`
-	IEArgs       string   `json:"ieargs,omitempty"`
-	ForceIEList  string   `json:"forceielist,omitempty"`
-	DisableForce bool     `json:"disableForce,omitempty"`
-	ContextMenu  bool     `json:"contextMenu,omitempty"`
-	Debug        bool     `json:"debug,omitempty"`
-	Logs         []string `json:"logs"`
+	IEApp          string   `json:"ieapp,omitempty"`
+	IEArgs         string   `json:"ieargs,omitempty"`
+	ForceIEList    string   `json:"forceielist,omitempty"`
+	DisableForce   bool     `json:"disableForce,omitempty"`
+	ContextMenu    bool     `json:"contextMenu,omitempty"`
+	OnlyMainFrame  bool     `json:"onlyMainFrame,omitempty"`
+	Debug          bool     `json:"debug,omitempty"`
+	Logs           []string `json:"logs"`
 }
 
 func SendMCDConfigs() {
@@ -190,6 +191,10 @@ func SendMCDConfigs() {
 	contextMenu, err := configs.GetBooleanValue("extensions.ieview.contextMenu")
 	if err == nil {
 		response.ContextMenu = contextMenu
+	}
+	onlyMainFrame, err := configs.GetBooleanValue("extensions.ieview.onlyMainFrame")
+	if err == nil {
+		response.OnlyMainFrame = onlyMainFrame
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {

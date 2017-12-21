@@ -17,12 +17,15 @@ installMenuItems.supportsTabContext = true;
 function installBlocker() {
   var list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
   log('force list: ', list);
+  var types = ['main_frame'];
+  if (!configs.onlyMainFrame)
+    types.push('sub_frame');
   if (list.length > 0 &&
       !browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.addListener(
       onBeforeRequest,
       { urls: list,
-        types: ['main_frame', 'sub_frame'] },
+        types },
       ['blocking']
     );
 }
