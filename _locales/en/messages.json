@@ -15,6 +15,7 @@
   "config.disableForce.label":        { "message": "Disable" },
   "config.sitesOpenedBySelf.caption": { "message": "Exceptive websites (opened in Firefox directly)" },
   "config.disableException.label":    { "message": "Disable" },
+  "config.ignoreQueryString.label":   { "message": "Ignore query string in URL" },
 
   "config.debug.label": { "message": "Print debug log" }
 }

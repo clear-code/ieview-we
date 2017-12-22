@@ -168,6 +168,7 @@ type SendMCDConfigsResponse struct {
 	OnlyMainFrame     bool     `json:"onlyMainFrame,omitempty"`
 	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
 	DisableException  bool     `json:"disableException,omitempty"`
+	IgnoreQueryString bool     `json:"ignoreQueryString,omitempty"`
 	Debug             bool     `json:"debug,omitempty"`
 	Logs              []string `json:"logs"`
 }
@@ -215,6 +216,10 @@ func SendMCDConfigs() {
 	onlyMainFrame, err := configs.GetBooleanValue("extensions.ieview.onlyMainFrame")
 	if err == nil {
 		response.OnlyMainFrame = onlyMainFrame
+	}
+	ignoreQueryString, err := configs.GetBooleanValue("extensions.ieview.ignoreQueryString")
+	if err == nil {
+		response.IgnoreQueryString = ignoreQueryString
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {

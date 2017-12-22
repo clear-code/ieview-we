@@ -37,11 +37,15 @@ function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
   var redirected = true;
 
+  var targetURL = aDetails.url;
+  if (configs.ignoreQueryString)
+    targetURL = aDetails.url.replace(/\?.*/, '');
+
   if (sitesOpenedBySelfRegex) {
     log('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
     var matched = false;
-    log('test url:', aDetails.url);
-    matched = sitesOpenedBySelfRegex.test(aDetails.url);
+    log('test url:', targetURL);
+    matched = sitesOpenedBySelfRegex.test(targetURL);
     log('matched?: ', matched);
     if (matched)
       redirected = false;
