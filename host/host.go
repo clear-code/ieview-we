@@ -165,6 +165,8 @@ type SendMCDConfigsResponse struct {
 	DisableForce   bool     `json:"disableForce,omitempty"`
 	ContextMenu    bool     `json:"contextMenu,omitempty"`
 	OnlyMainFrame  bool     `json:"onlyMainFrame,omitempty"`
+	SitesOpendedBySelf string `json:"sitesOpenedBySelf,omitempty"`
+	DisableException   bool   `json:"disableException,omitempty"`
 	Debug          bool     `json:"debug,omitempty"`
 	Logs           []string `json:"logs"`
 }
@@ -196,6 +198,14 @@ func SendMCDConfigs() {
 	disableForce, err := configs.GetBooleanValue("extensions.ieview.disableForce")
 	if err == nil {
 		response.DisableForce = disableForce
+	}
+	sitesOpenedBySelf, err := configs.GetStringValue("extensions.ieview.sitesOpenedBySelf")
+	if err == nil {
+		response.SitesOpenedBySelf = sitesOpenedBySelf
+	}
+	disableException, err := configs.GetBooleanValue("extensions.ieview.disableException")
+	if err == nil {
+		response.DisableException = disableException
 	}
 	contextMenu, err := configs.GetBooleanValue("extensions.ieview.contextMenu")
 	if err == nil {

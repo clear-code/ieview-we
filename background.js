@@ -35,8 +35,25 @@ function uninstallBlocker() {
 }
 function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
-  launch(aDetails.url);
-  return { cancel: true };
+  var redirected = true;
+
+  if (sitesOpenedBySelfRegex) {
+    log('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
+    var matched = false;
+    log('test url:', aDetails.url);
+    matched = sitesOpenedBySelfRegex.test(aDetails.url);
+    log('matched?: ', matched);
+    if (matched)
+      redirected = false;
+    log('redirected?: ', redirected);
+  }
+  if (redirected) {
+    launch(aDetails.url);
+  }
+  else {
+    log('url is not redirected: ', aDetails.url);
+  }
+  return { cancel: redirected };
 }
 
 /**
@@ -121,6 +138,8 @@ function matchPatternToRegExp(pattern) {
   if (!configs.disableForce)
     installBlocker();
 
+  setSitesOpenedBySelf();
+
   configs.$addObserver(onConfigUpdated);
 })();
 
@@ -154,6 +173,19 @@ async function setDefaultPath() {
   }
 }
 
+var sitesOpenedBySelfList = [];
+var sitesOpenedBySelfRegex = null;
+function setSitesOpenedBySelf() {
+  if (configs.disableException) {
+    sitesOpenedBySelfList = [];
+    sitesOpenedBySelfRegex = null;
+  }
+  else {
+    sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
+    sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+  }
+}
+
 function onConfigUpdated(aKey) {
   switch (aKey) {
     case 'contextMenu':
@@ -178,6 +210,11 @@ function onConfigUpdated(aKey) {
       else {
         installBlocker();
       }
+      break;
+    case 'sitesOpenedBySelf':
+      // fall through
+    case 'disableException':
+      setSitesOpenedBySelf()
       break;
   }
 }

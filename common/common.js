@@ -21,5 +21,7 @@ configs = new Configs({
 	disableForce : false,
 	contextMenu  : true,
 	onlyMainFrame: true,
+	sitesOpenedBySelf : '',
+	disableException  : false,
 	debug        : false
 });
