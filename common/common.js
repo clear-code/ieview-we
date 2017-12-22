@@ -15,11 +15,13 @@ function log(aMessage, ...aArgs)
 }
 
 configs = new Configs({
-	ieapp        : '',
-	ieargs       : '',
-	forceielist  : '',
-	disableForce : false,
-	contextMenu  : true,
-	onlyMainFrame: true,
-	debug        : false
+	ieapp             : '',
+	ieargs            : '',
+	forceielist       : '',
+	disableForce      : false,
+	contextMenu       : true,
+	onlyMainFrame     : true,
+	sitesOpenedBySelf : '',
+	disableException  : false,
+	debug             : false
 });

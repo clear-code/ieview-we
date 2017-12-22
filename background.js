@@ -35,8 +35,91 @@ function uninstallBlocker() {
 }
 function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
-  launch(aDetails.url);
-  return { cancel: true };
+  var redirected = true;
+
+  if (sitesOpenedBySelfRegex) {
+    log('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
+    var matched = false;
+    log('test url:', aDetails.url);
+    matched = sitesOpenedBySelfRegex.test(aDetails.url);
+    log('matched?: ', matched);
+    if (matched)
+      redirected = false;
+    log('redirected?: ', redirected);
+  }
+  if (redirected) {
+    launch(aDetails.url);
+  }
+  else {
+    log('url is not redirected: ', aDetails.url);
+  }
+  return { cancel: redirected };
+}
+
+/**
+ * Transforms a valid match pattern into a regular expression
+ * which matches all URLs included by that pattern.
+ *
+ * See https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Match_patterns
+ *
+ * @param  {string}  pattern  The pattern to transform.
+ * @return {RegExp}           The pattern's equivalent as a RegExp.
+ * @throws {TypeError}        If the pattern is not a valid MatchPattern
+ */
+function matchPatternToRegExp(pattern) {
+  if (pattern === '')
+    return (/^(?:http|https|file|ftp|app):\/\//);
+
+  const schemeSegment = '(\\*|http|https|file|ftp)';
+  const hostSegment = '(\\*|(?:\\*\\.)?(?:[^/*]+))?';
+  const pathSegment = '(.*)';
+  const matchPatternRegExp = new RegExp(
+    `^${schemeSegment}://${hostSegment}/${pathSegment}$`
+  );
+
+  let match = matchPatternRegExp.exec(pattern);
+  if (!match)
+    throw new TypeError(`"${pattern}" is not a valid MatchPattern`);
+
+  let [, scheme, host, path] = match;
+  if (!host)
+    throw new TypeError(`"${pattern}" does not have a valid host`);
+
+  let regex = '^';
+
+  if (scheme === '*') {
+    regex += '(http|https)';
+  }
+  else {
+    regex += scheme;
+  }
+
+  regex += '://';
+
+  if (host && host === '*') {
+    regex += '[^/]+?';
+  }
+  else if (host) {
+    if (host.match(/^\*\./)) {
+      regex += '[^/]*?';
+      host = host.substring(2);
+    }
+    regex += host.replace(/\./g, '\\.');
+  }
+
+  if (path) {
+    if (path === '*') {
+      regex += '(/.*)?';
+    }
+    else if (path.charAt(0) !== '/') {
+      regex += '/';
+      regex += path.replace(/\./g, '\\.').replace(/\*/g, '.*?');
+      regex += '/?';
+    }
+  }
+
+  regex += '$';
+  return new RegExp(regex);
 }
 
 (async () => {
@@ -54,6 +137,8 @@ function onBeforeRequest(aDetails) {
 
   if (!configs.disableForce)
     installBlocker();
+
+  setSitesOpenedBySelf();
 
   configs.$addObserver(onConfigUpdated);
 })();
@@ -88,6 +173,19 @@ async function setDefaultPath() {
   }
 }
 
+var sitesOpenedBySelfList = [];
+var sitesOpenedBySelfRegex = null;
+function setSitesOpenedBySelf() {
+  if (configs.disableException) {
+    sitesOpenedBySelfList = [];
+    sitesOpenedBySelfRegex = null;
+  }
+  else {
+    sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
+    sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+  }
+}
+
 function onConfigUpdated(aKey) {
   switch (aKey) {
     case 'contextMenu':
@@ -112,6 +210,11 @@ function onConfigUpdated(aKey) {
       else {
         installBlocker();
       }
+      break;
+    case 'sitesOpenedBySelf':
+      // fall through
+    case 'disableException':
+      setSitesOpenedBySelf()
       break;
   }
 }

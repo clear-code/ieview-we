@@ -5,14 +5,16 @@
   "contextMenu.page.label": { "message": "このページをIEで開く" },
   "contextMenu.link.label": { "message": "このリンクをIEで開く" },
 
-  "config.ieapp.label.before":  { "message": "Internet Explorerのパス" },
-  "config.ieapp.label.after":   { "message": "" },
-  "config.ieargs.label.before": { "message": "起動オプション" },
-  "config.ieargs.label.after":  { "message": "" },
-  "config.contextMenu.label":   { "message": "コンテキストメニューに「IEで開く」を追加する" },
-  "config.onlyMainFrame.label": { "message": "アドレスバーに表示されるURLのみを判定する" },
-  "config.forceielist.caption": { "message": "Internet Explorerで常に開くWebサイト" },
-  "config.disableForce.label":  { "message": "無効化" },
+  "config.ieapp.label.before":        { "message": "Internet Explorerのパス" },
+  "config.ieapp.label.after":         { "message": "" },
+  "config.ieargs.label.before":       { "message": "起動オプション" },
+  "config.ieargs.label.after":        { "message": "" },
+  "config.contextMenu.label":         { "message": "コンテキストメニューに「IEで開く」を追加する" },
+  "config.onlyMainFrame.label":       { "message": "アドレスバーに表示されるURLのみを判定する" },
+  "config.forceielist.caption":       { "message": "Internet Explorerで常に開くWebサイト" },
+  "config.disableForce.label":        { "message": "無効化" },
+  "config.sitesOpenedBySelf.caption": { "message": "IEで開く対象から除外する(Firefoxで直接開く)サイト" },
+  "config.disableException.label":    { "message": "無効化" },
 
   "config.debug.label": { "message": "デバッグログを出力" }
 }
