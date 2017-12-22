@@ -3,17 +3,17 @@ package main
 import (
 	"encoding/json"
 	"github.com/clear-code/mcd-go"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/lhside/chrome-go"
 	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
-	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
-	"path/filepath"
 )
 
 type RequestParams struct {
@@ -159,16 +159,16 @@ func GetIEPath() (path string) {
 }
 
 type SendMCDConfigsResponse struct {
-	IEApp              string   `json:"ieapp,omitempty"`
-	IEArgs             string   `json:"ieargs,omitempty"`
-	ForceIEList        string   `json:"forceielist,omitempty"`
-	DisableForce       bool     `json:"disableForce,omitempty"`
-	ContextMenu        bool     `json:"contextMenu,omitempty"`
-	OnlyMainFrame      bool     `json:"onlyMainFrame,omitempty"`
-	SitesOpenedBySelf  string   `json:"sitesOpenedBySelf,omitempty"`
-	DisableException   bool     `json:"disableException,omitempty"`
-	Debug              bool     `json:"debug,omitempty"`
-	Logs               []string `json:"logs"`
+	IEApp             string   `json:"ieapp,omitempty"`
+	IEArgs            string   `json:"ieargs,omitempty"`
+	ForceIEList       string   `json:"forceielist,omitempty"`
+	DisableForce      bool     `json:"disableForce,omitempty"`
+	ContextMenu       bool     `json:"contextMenu,omitempty"`
+	OnlyMainFrame     bool     `json:"onlyMainFrame,omitempty"`
+	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
+	DisableException  bool     `json:"disableException,omitempty"`
+	Debug             bool     `json:"debug,omitempty"`
+	Logs              []string `json:"logs"`
 }
 
 func SendMCDConfigs() {
