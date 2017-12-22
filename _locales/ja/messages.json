@@ -15,6 +15,7 @@
   "config.disableForce.label":        { "message": "無効化" },
   "config.sitesOpenedBySelf.caption": { "message": "IEで開く対象から除外する(Firefoxで直接開く)サイト" },
   "config.disableException.label":    { "message": "無効化" },
+  "config.ignoreQueryString.label":   { "message": "URLの?以降を無視する" },
 
   "config.debug.label": { "message": "デバッグログを出力" }
 }
