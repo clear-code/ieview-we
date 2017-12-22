@@ -119,6 +119,7 @@ func Launch(path string, defaultArgs []string, url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Print("Opened by external application: " + url + "\r\n")
 }
 
 type SendIEPathResponse struct {
