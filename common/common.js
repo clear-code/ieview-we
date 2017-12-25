@@ -19,7 +19,7 @@ function debug(aMessage, ...aArgs)
 	if (!configs || !configs.debug)
 		return;
 
-	console.log('[DEBUG] ' + aMessage, ...aArgs);
+	log('[DEBUG] ' + aMessage, ...aArgs);
 }
 
 configs = new Configs({
