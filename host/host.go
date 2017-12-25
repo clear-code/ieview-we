@@ -26,6 +26,7 @@ type Request struct {
 	Command string        `json:"command"`
 	Params  RequestParams `json:"params"`
 	Logging bool          `json:"logging"`
+	Debug   bool          `json:"debug"`
 }
 
 var DebugLogs []string
