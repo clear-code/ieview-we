@@ -106,7 +106,19 @@ type LaunchResponse struct {
 }
 
 func Launch(path string, defaultArgs []string, url string) {
-	args := append(defaultArgs, url)
+	args := []string{}
+	replacedPlaceholder := false
+	for _, arg := range defaultArgs {
+		if arg == "%s" || arg == "%**" {
+			args = append(args, url)
+			replacedPlaceholder = true
+		} else {
+			args = append(args, arg)
+		}
+	}
+	if !replacedPlaceholder {
+		args = append(args, url)
+	}
 	command := exec.Command(path, args...)
 	// "0x01000000" is the raw version of "CREATE_BREAKAWAY_FROM_JOB".
 	// See also:
