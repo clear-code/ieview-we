@@ -31,5 +31,6 @@ configs = new Configs({
 	onlyMainFrame     : true,
 	sitesOpenedBySelf : '',
 	disableException  : false,
+	logging           : true,
 	debug             : false
 });

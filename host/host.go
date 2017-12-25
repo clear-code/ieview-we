@@ -183,6 +183,7 @@ type SendMCDConfigsResponse struct {
 	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
 	DisableException  bool     `json:"disableException,omitempty"`
 	IgnoreQueryString bool     `json:"ignoreQueryString,omitempty"`
+	Logging           bool     `json:"logging,omitempty"`
 	Debug             bool     `json:"debug,omitempty"`
 	Logs              []string `json:"logs"`
 }
@@ -234,6 +235,10 @@ func SendMCDConfigs() {
 	ignoreQueryString, err := configs.GetBooleanValue("extensions.ieview.ignoreQueryString")
 	if err == nil {
 		response.IgnoreQueryString = ignoreQueryString
+	}
+	logging, err := configs.GetBooleanValue("extensions.ieview.logging")
+	if err == nil {
+		response.Logging = logging
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {
