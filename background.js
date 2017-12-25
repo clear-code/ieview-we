@@ -14,24 +14,36 @@ function installMenuItems() {
 }
 installMenuItems.supportsTabContext = true;
 
+var forceIEListRegex = null;
 function installBlocker() {
   var list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
   log('force list: ', list);
   var types = ['main_frame'];
   if (!configs.onlyMainFrame)
     types.push('sub_frame');
+  let urls = list;
+  forceIEListRegex = new RegExp('(' + list.map((pattern) => {
+    if (!VALID_MATCH_PATTERN.exec(pattern)) {
+      urls = ['<all_urls>'];
+      return migratePatternToRegExp(pattern);
+    } else {
+      return new RegExp(matchPatternToRegExp(pattern));
+    }
+  }).join('|') + ')');
+  log('forceIEListRegex:', forceIEListRegex);
+
   if (list.length > 0 &&
       !browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.addListener(
       onBeforeRequest,
-      { urls: list,
-        types },
+      { urls, types },
       ['blocking']
     );
 }
 function uninstallBlocker() {
   if (browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
+  forceIEListRegex = null;
 }
 function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
@@ -41,6 +53,18 @@ function onBeforeRequest(aDetails) {
   if (configs.ignoreQueryString)
     targetURL = aDetails.url.replace(/\?.*/, '');
 
+  if (forceIEListRegex) {
+    matched = forceIEListRegex.test(targetURL);
+    log('matched?: ', matched);
+    if (matched)
+      redirected = true;
+    else {
+      redirected = false;
+    }
+  }
+  else {
+    redirected = false;
+  }
   if (sitesOpenedBySelfRegex) {
     debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
     var matched = false;
@@ -60,6 +84,44 @@ function onBeforeRequest(aDetails) {
   return { cancel: redirected };
 }
 
+const VALID_MATCH_PATTERN = (() => {
+  const schemeSegment = '(\\*|http|https|file|ftp)';
+  const hostSegment = '(\\*|(?:\\*\\.)?(?:[^/*]+))?';
+  const pathSegment = '(.*)';
+  const regex = new RegExp(
+    `^${schemeSegment}://${hostSegment}/${pathSegment}$`
+  );
+  return regex;
+})();
+
+/**
+ * Transforms a pattern with wildcards (for original IE View) into a
+ * regular expression
+ * Note that two pass conversion is executed. First, pattern is converted into match patterns,
+ * then it is converted into regular expressions finally.
+ *
+ * @param  {string}  pattern  The pattern to transform.
+ * @return {RegExp}           The pattern's equivalent as a RegExp.
+ */
+function migratePatternToRegExp(invalidPattern) {
+  let pattern = invalidPattern;
+  if (pattern.charAt(0) === '*' && pattern.charAt(pattern.length - 1) === '*') {
+    let extracted = pattern.substring(1, pattern.length - 1);
+    log('convert host to regex:', '*://*' + extracted + '/*');
+    let hostRegex = matchPatternToRegExp('*://*.' + extracted + '/*');
+    log('convert path to regex:', '*://*' + extracted + '/*');
+    let pathRegex = matchPatternToRegExp('*://*/' + pattern);
+    log('migrated match pattern based regex:', hostRegex + '|' + pathRegex);
+    return new RegExp('(' + hostRegex + '|' + pathRegex + ')');
+  } else {
+    // Just convert * and ?
+    pattern = pattern.replace(/\*/g, ".*");
+    pattern = pattern.replace(/\?/g, ".?");
+    log('migrated regex pattern:', pattern);
+    return new RegExp(pattern);
+  }
+}
+
 /**
  * Transforms a valid match pattern into a regular expression
  * which matches all URLs included by that pattern.
@@ -74,16 +136,11 @@ function matchPatternToRegExp(pattern) {
   if (pattern === '')
     return (/^(?:http|https|file|ftp|app):\/\//);
 
-  const schemeSegment = '(\\*|http|https|file|ftp)';
-  const hostSegment = '(\\*|(?:\\*\\.)?(?:[^/*]+))?';
-  const pathSegment = '(.*)';
-  const matchPatternRegExp = new RegExp(
-    `^${schemeSegment}://${hostSegment}/${pathSegment}$`
-  );
-
-  let match = matchPatternRegExp.exec(pattern);
-  if (!match)
+  let match = VALID_MATCH_PATTERN.exec(pattern);
+  if (!match) {
+    log('pattern is not a valid MatchPattern', pattern);
     throw new TypeError(`"${pattern}" is not a valid MatchPattern`);
+  }
 
   let [, scheme, host, path] = match;
   if (!host)
