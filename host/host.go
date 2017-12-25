@@ -26,9 +26,12 @@ type Request struct {
 	Command string        `json:"command"`
 	Params  RequestParams `json:"params"`
 	Logging bool          `json:"logging"`
+	Debug   bool          `json:"debug"`
 }
 
 var DebugLogs []string
+var Logging bool
+var Debug bool
 
 func main() {
 	log.SetOutput(ioutil.Discard)
@@ -42,7 +45,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if request.Logging {
+	Logging = request.Logging
+	Debug = request.Debug
+	if Logging {
 		logfileDir := os.ExpandEnv(`${temp}`)
 		//
 		rotationTime := 24 * time.Hour
@@ -79,9 +84,18 @@ func main() {
 	}
 }
 
+func LogForInfo(message string) {
+	DebugLogs = append(DebugLogs, message)
+	if Logging {
+		log.Print(message + "\r\n")
+	}
+}
+
 func LogForDebug(message string) {
 	DebugLogs = append(DebugLogs, message)
-	log.Print(message + "\r\n")
+	if Logging && Debug {
+		log.Print(message + "\r\n")
+	}
 }
 
 type LaunchResponse struct {
@@ -119,7 +133,7 @@ func Launch(path string, defaultArgs []string, url string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print("Opened by external application: " + url + "\r\n")
+	LogForInfo("Opened by external application: " + url)
 }
 
 type SendIEPathResponse struct {
@@ -169,6 +183,7 @@ type SendMCDConfigsResponse struct {
 	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
 	DisableException  bool     `json:"disableException,omitempty"`
 	IgnoreQueryString bool     `json:"ignoreQueryString,omitempty"`
+	Logging           bool     `json:"logging,omitempty"`
 	Debug             bool     `json:"debug,omitempty"`
 	Logs              []string `json:"logs"`
 }
@@ -220,6 +235,10 @@ func SendMCDConfigs() {
 	ignoreQueryString, err := configs.GetBooleanValue("extensions.ieview.ignoreQueryString")
 	if err == nil {
 		response.IgnoreQueryString = ignoreQueryString
+	}
+	logging, err := configs.GetBooleanValue("extensions.ieview.logging")
+	if err == nil {
+		response.Logging = logging
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {

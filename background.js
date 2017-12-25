@@ -42,14 +42,14 @@ function onBeforeRequest(aDetails) {
     targetURL = aDetails.url.replace(/\?.*/, '');
 
   if (sitesOpenedBySelfRegex) {
-    log('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
+    debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
     var matched = false;
-    log('test url:', targetURL);
+    debug('test url:', targetURL);
     matched = sitesOpenedBySelfRegex.test(targetURL);
-    log('matched?: ', matched);
+    debug('matched?: ', matched);
     if (matched)
       redirected = false;
-    log('redirected?: ', redirected);
+    debug('redirected?: ', redirected);
   }
   if (redirected) {
     launch(aDetails.url);
@@ -186,7 +186,10 @@ function setSitesOpenedBySelf() {
   }
   else {
     sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
-    sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+    if (sitesOpenedBySelfList.length > 0)
+      sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+    else
+      sitesOpenedBySelfRegex = null;
   }
 }
 
@@ -254,7 +257,9 @@ async function launch(aURL) {
 
 function send(aMessage) {
   log('Sending: ', aMessage);
-  if (configs.debug)
+  if (configs.logging)
     aMessage.logging = true;
+  if (configs.debug)
+    aMessage.debug = true;
   return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', aMessage);
 }

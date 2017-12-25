@@ -17,5 +17,6 @@
   "config.disableException.label":    { "message": "無効化" },
   "config.ignoreQueryString.label":   { "message": "URLの?以降を無視する" },
 
-  "config.debug.label": { "message": "デバッグログを出力" }
+  "config.logging.label": { "message": "ログを保存する" },
+  "config.debug.label":   { "message": "デバッグログを出力" }
 }

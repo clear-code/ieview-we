@@ -8,10 +8,18 @@ var configs;
 
 function log(aMessage, ...aArgs)
 {
-	if (!configs || !configs.debug)
+	if (!configs || !configs.logging)
 		return;
 
 	console.log('ieview-we: ' + aMessage, ...aArgs);
+}
+
+function debug(aMessage, ...aArgs)
+{
+	if (!configs || !configs.debug)
+		return;
+
+	log('[DEBUG] ' + aMessage, ...aArgs);
 }
 
 configs = new Configs({
@@ -23,5 +31,6 @@ configs = new Configs({
 	onlyMainFrame     : true,
 	sitesOpenedBySelf : '',
 	disableException  : false,
+	logging           : true,
 	debug             : false
 });
