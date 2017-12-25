@@ -8,7 +8,7 @@ var configs;
 
 function log(aMessage, ...aArgs)
 {
-	if (!configs || !configs.debug)
+	if (!configs || !configs.logging)
 		return;
 
 	console.log('ieview-we: ' + aMessage, ...aArgs);
