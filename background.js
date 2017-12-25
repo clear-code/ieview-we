@@ -42,14 +42,14 @@ function onBeforeRequest(aDetails) {
     targetURL = aDetails.url.replace(/\?.*/, '');
 
   if (sitesOpenedBySelfRegex) {
-    log('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
+    debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
     var matched = false;
-    log('test url:', targetURL);
+    debug('test url:', targetURL);
     matched = sitesOpenedBySelfRegex.test(targetURL);
-    log('matched?: ', matched);
+    debug('matched?: ', matched);
     if (matched)
       redirected = false;
-    log('redirected?: ', redirected);
+    debug('redirected?: ', redirected);
   }
   if (redirected) {
     launch(aDetails.url);
