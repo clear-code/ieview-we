@@ -254,7 +254,9 @@ async function launch(aURL) {
 
 function send(aMessage) {
   log('Sending: ', aMessage);
-  if (configs.debug)
+  if (configs.logging)
     aMessage.logging = true;
+  if (configs.debug)
+    aMessage.debug = true;
   return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', aMessage);
 }
