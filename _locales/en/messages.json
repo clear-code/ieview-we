@@ -17,5 +17,6 @@
   "config.disableException.label":    { "message": "Disable" },
   "config.ignoreQueryString.label":   { "message": "Ignore query string in URL" },
 
-  "config.debug.label": { "message": "Print debug log" }
+  "config.logging.label": { "message": "Save log" },
+  "config.debug.label":   { "message": "Print debug log" }
 }
