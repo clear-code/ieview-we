@@ -186,7 +186,10 @@ function setSitesOpenedBySelf() {
   }
   else {
     sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
-    sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+    if (sitesOpenedBySelfList.length > 0)
+      sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+    else
+      sitesOpenedBySelfRegex = null;
   }
 }
 
