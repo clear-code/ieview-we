@@ -22,14 +22,14 @@ function installBlocker() {
   if (!configs.onlyMainFrame)
     types.push('sub_frame');
   let urls = list;
-  forceIEListRegex = new RegExp('(' + list.map((pattern) => {
+  forceIEListRegex = new RegExp(list.map((pattern) => {
     if (!VALID_MATCH_PATTERN.exec(pattern)) {
       urls = ['<all_urls>'];
-      return migratePatternToRegExp(pattern);
+      return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1")
     } else {
-      return new RegExp(matchPatternToRegExp(pattern));
+      return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
     }
-  }).join('|') + ')');
+  }).join('|'));
   log('forceIEListRegex:', forceIEListRegex);
 
   if (list.length > 0 &&
@@ -247,7 +247,9 @@ function setSitesOpenedBySelf() {
   else {
     sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
     if (sitesOpenedBySelfList.length > 0)
-      sitesOpenedBySelfRegex = new RegExp('(' + sitesOpenedBySelfList.map(matchPatternToRegExp).join('|') + ')');
+      sitesOpenedBySelfRegex = new RegExp(sitesOpenedBySelfList.map((pattern) => {
+        return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+      }).join('|'));
     else
       sitesOpenedBySelfRegex = null;
   }
