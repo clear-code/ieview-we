@@ -249,7 +249,12 @@ function setSitesOpenedBySelf() {
     sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
     if (sitesOpenedBySelfList.length > 0)
       sitesOpenedBySelfRegex = new RegExp(sitesOpenedBySelfList.map((pattern) => {
-        return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+        if (VALID_MATCH_PATTERN.exec(pattern)) {
+          return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+        }
+        else {
+          return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+        }
       }).join('|'));
     else
       sitesOpenedBySelfRegex = null;
