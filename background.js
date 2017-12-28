@@ -53,9 +53,11 @@ function onBeforeRequest(aDetails) {
   if (configs.ignoreQueryString)
     targetURL = aDetails.url.replace(/\?.*/, '');
 
+  debug('targetURL: ', targetURL);
   if (forceIEListRegex) {
+    debug('forceIEListRegex: ', forceIEListRegex);
     matched = forceIEListRegex.test(targetURL);
-    log('matched?: ', matched);
+    debug('matched to forceIEListRegex?: ', matched);
     if (matched)
       redirected = true;
     else {
@@ -67,10 +69,11 @@ function onBeforeRequest(aDetails) {
   }
   if (sitesOpenedBySelfRegex) {
     debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
+    debug('sitesOpenedBySelfRegex: ', sitesOpenedBySelfRegex);
     var matched = false;
     debug('test url:', targetURL);
     matched = sitesOpenedBySelfRegex.test(targetURL);
-    debug('matched?: ', matched);
+    debug('matched to sitesOpenedBySelfRegex?: ', matched);
     if (matched)
       redirected = false;
     debug('redirected?: ', redirected);
