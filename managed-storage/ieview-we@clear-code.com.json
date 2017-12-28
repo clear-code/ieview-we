@@ -3,7 +3,14 @@
   "description": "Managed Storage for IE View WE",
   "type": "storage",
   "data": {
-    "forceielist": "http://www.example.com/*",
-    "disableForce": false
+    "forceielist"      : "http://www.example.com/*",
+    "disableForce"     : false,
+    "contextMenu"      : true,
+    "onlyMainFrame"    : true,
+    "ignoreQueryString": false,
+    "sitesOpenedBySelf": "",
+    "disableException" : false,
+    "logging"          : true,
+    "debug"            : false
   }
 }
