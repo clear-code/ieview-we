@@ -20,6 +20,23 @@ For example: `http://example.com` => `http://example.com/*` (note that the added
  1. Uninstall "IE View WE" Firefox addon via the addon manager.
  2. Double-click the batch file named `uninstall.bat`.
 
+# How to customize Options
+
+There are some options which you can customize default behavior:
+You can also customize preset configuration via MCD.
+
+* `extensions.ieview.ieapp` Path to Internet Explorer (default: auto detection)
+* `extensions.ieview.ieargs` Command Line Arguments (default: empty)
+* `extensions.ieview.contextMenu` Add "Open by IE" items to the context menu (default: true)
+* `extensions.ieview.forceielist` Websites to be opened by IE always (default: empty)
+* `extensions.ieview.disableForce` Disable websites opened by IE always (dfault: false)
+* `extensions.ieview.sitesOpenedBySelf` Exceptive websites (opened in Firefox directly) (default: empty)
+* `extensions.ieview.disableException` Disable websites directly opened by Firefox (default: false)
+* `extensions.ieview.onlyMainFrame` Only check URL which is shown in location bar (default: true)
+* `extensions.ieview.ignoreQueryString` Ignore query string in URL (default: false)
+* `extensions.ieview.logging` Save log (default: true)
+* `extensions.ieview.debug` Print Debug log (default: false)
+
 # How to build the native messaging host
 
 ```bash
