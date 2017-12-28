@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"github.com/clear-code/mcd-go"
-	rotatelogs "gopkg.in/kenhys/go-file-rotatelogs.v4"
 	"github.com/lhside/chrome-go"
 	"golang.org/x/sys/windows/registry"
+	rotatelogs "gopkg.in/kenhys/go-file-rotatelogs.v4"
 	"io/ioutil"
 	"log"
 	"os"
