@@ -37,7 +37,9 @@ main() {
   prepare_dependency github.com/lhside/chrome-go
   prepare_dependency github.com/robertkrimen/otto
   prepare_dependency github.com/clear-code/mcd-go
-  prepare_dependency github.com/lestrrat/go-file-rotatelogs
+  # prepare_dependency github.com/lestrrat/go-file-rotatelogs
+  # Use patched branch until https://github.com/lestrrat/go-file-rotatelogs/pull/11 is merged
+  prepare_dependency gopkg.in/kenhys/go-file-rotatelogs.v4
 
   local path="$(echo "$temp_src" | sed 's;^src/;;')/host"
   gox -os="windows" "$path"
