@@ -21,6 +21,7 @@ function installBlocker() {
   var types = ['main_frame'];
   if (!configs.onlyMainFrame)
     types.push('sub_frame');
+  debug('frame types: ', types);
   let urls = list;
   forceIEListRegex = new RegExp(list.map((pattern) => {
     if (!VALID_MATCH_PATTERN.exec(pattern)) {
@@ -266,6 +267,8 @@ function onConfigUpdated(aKey) {
       }
       break;
 
+    case 'onlyMainFrame':
+      // fall through
     case 'forceielist':
       uninstallBlocker();
       if (!configs.disableForce)
