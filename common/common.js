@@ -29,6 +29,7 @@ configs = new Configs({
 	disableForce      : false,
 	contextMenu       : true,
 	onlyMainFrame     : true,
+	ignoreQueryString : false,
 	sitesOpenedBySelf : '',
 	disableException  : false,
 	logging           : true,
