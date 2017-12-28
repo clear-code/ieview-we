@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/clear-code/mcd-go"
-	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
+	rotatelogs "gopkg.in/kenhys/go-file-rotatelogs.v4"
 	"github.com/lhside/chrome-go"
 	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
@@ -51,13 +51,16 @@ func main() {
 		logfileDir := os.ExpandEnv(`${temp}`)
 		//
 		rotationTime := 24 * time.Hour
+		rotationCount := 12
 		maxAge := 12 * 24 * time.Hour
 		// for debugging
 		//rotationTime = 120 * time.Second
 		//maxAge = 5 * 120 * time.Second
+		//rotationCount = 5
 		rotateLog, err := rotatelogs.New(filepath.Join(logfileDir, "com.clear_code.ieview_we.log.%Y%m%d%H%M.txt"),
 			rotatelogs.WithMaxAge(maxAge),
 			rotatelogs.WithRotationTime(rotationTime),
+			rotatelogs.WithRotationCount(rotationCount),
 		)
 		if err != nil {
 			log.Fatal(err)
