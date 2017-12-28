@@ -111,12 +111,12 @@ function migratePatternToRegExp(invalidPattern) {
   let pattern = invalidPattern;
   if (pattern.charAt(0) === '*' && pattern.charAt(pattern.length - 1) === '*') {
     let extracted = pattern.substring(1, pattern.length - 1);
-    log('convert host to regex:', '*://*' + extracted + '/*');
+    log('convert host to regex:', '*://*.' + extracted + '/*');
     let hostRegex = matchPatternToRegExp('*://*.' + extracted + '/*');
-    log('convert path to regex:', '*://*' + extracted + '/*');
+    log('convert path to regex:', '*://*/' + pattern);
     let pathRegex = matchPatternToRegExp('*://*/' + pattern);
     log('migrated match pattern based regex:', hostRegex + '|' + pathRegex);
-    return new RegExp('(' + hostRegex + '|' + pathRegex + ')');
+    return new RegExp(`${hostRegex}`.replace(/^\/(.+)\//, "$1") + '|' + `${pathRegex}`.replace(/^\/(.+)\//, "$1"));
   } else {
     // Just convert * and ?
     pattern = pattern.replace(/\*/g, ".*");
@@ -249,7 +249,12 @@ function setSitesOpenedBySelf() {
     sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
     if (sitesOpenedBySelfList.length > 0)
       sitesOpenedBySelfRegex = new RegExp(sitesOpenedBySelfList.map((pattern) => {
-        return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+        if (VALID_MATCH_PATTERN.exec(pattern)) {
+          return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+        }
+        else {
+          return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+        }
       }).join('|'));
     else
       sitesOpenedBySelfRegex = null;
