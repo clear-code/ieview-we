@@ -111,9 +111,9 @@ function migratePatternToRegExp(invalidPattern) {
   let pattern = invalidPattern;
   if (pattern.charAt(0) === '*' && pattern.charAt(pattern.length - 1) === '*') {
     let extracted = pattern.substring(1, pattern.length - 1);
-    log('convert host to regex:', '*://*' + extracted + '/*');
+    log('convert host to regex:', '*://*.' + extracted + '/*');
     let hostRegex = matchPatternToRegExp('*://*.' + extracted + '/*');
-    log('convert path to regex:', '*://*' + extracted + '/*');
+    log('convert path to regex:', '*://*/' + pattern);
     let pathRegex = matchPatternToRegExp('*://*/' + pattern);
     log('migrated match pattern based regex:', hostRegex + '|' + pathRegex);
     return new RegExp(`${hostRegex}`.replace(/^\/(.+)\//, "$1") + '|' + `${pathRegex}`.replace(/^\/(.+)\//, "$1"));
