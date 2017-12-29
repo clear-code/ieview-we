@@ -5,7 +5,7 @@ import (
 	"github.com/clear-code/mcd-go"
 	"github.com/lhside/chrome-go"
 	"golang.org/x/sys/windows/registry"
-	rotatelogs "gopkg.in/kenhys/go-file-rotatelogs.v4"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"io/ioutil"
 	"log"
 	"os"
