@@ -33,5 +33,7 @@ configs = new Configs({
 	sitesOpenedBySelf : '',
 	disableException  : false,
 	logging           : true,
+	logRotationCount  : 12,
+	logRotationTime   : 24,
 	debug             : false
 });

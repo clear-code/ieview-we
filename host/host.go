@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/clear-code/mcd-go"
+	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/lhside/chrome-go"
 	"golang.org/x/sys/windows/registry"
-	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -23,10 +24,12 @@ type RequestParams struct {
 	Url  string   `json:url`
 }
 type Request struct {
-	Command string        `json:"command"`
-	Params  RequestParams `json:"params"`
-	Logging bool          `json:"logging"`
-	Debug   bool          `json:"debug"`
+	Command          string        `json:"command"`
+	Params           RequestParams `json:"params"`
+	Logging          bool          `json:"logging"`
+	LogRotationCount int           `json:"logRotationCount"`
+	LogRotationTime  int           `json:"logRotationTime"`
+	Debug            bool          `json:"debug"`
 }
 
 var DebugLogs []string
@@ -50,17 +53,15 @@ func main() {
 	if Logging {
 		logfileDir := os.ExpandEnv(`${temp}`)
 		//
-		rotationTime := 24 * time.Hour
-		rotationCount := 12
-		maxAge := 12 * 24 * time.Hour
+		logRotationTime := time.Duration(request.LogRotationTime) * time.Hour
+		logRotationCount := request.LogRotationCount
+		maxAge := time.Duration(-1)
 		// for debugging
-		//rotationTime = 120 * time.Second
-		//maxAge = 5 * 120 * time.Second
-		//rotationCount = 5
+		//logRotationTime = time.Duration(request.LogRotationTime) * time.Minute
 		rotateLog, err := rotatelogs.New(filepath.Join(logfileDir, "com.clear_code.ieview_we.log.%Y%m%d%H%M.txt"),
 			rotatelogs.WithMaxAge(maxAge),
-			rotatelogs.WithRotationTime(rotationTime),
-			rotatelogs.WithRotationCount(rotationCount),
+			rotatelogs.WithRotationTime(logRotationTime),
+			rotatelogs.WithRotationCount(logRotationCount),
 		)
 		if err != nil {
 			log.Fatal(err)
@@ -69,6 +70,8 @@ func main() {
 
 		log.SetOutput(rotateLog)
 		log.SetFlags(log.Ldate | log.Ltime)
+		LogForDebug("logRotationCount:" + fmt.Sprint(logRotationCount))
+		LogForDebug("logRotationTime:" + fmt.Sprint(logRotationTime))
 	}
 
 	LogForDebug("Command is " + request.Command)
@@ -199,6 +202,8 @@ type SendMCDConfigsResponse struct {
 	DisableException  bool     `json:"disableException,omitempty"`
 	IgnoreQueryString bool     `json:"ignoreQueryString,omitempty"`
 	Logging           bool     `json:"logging,omitempty"`
+	LogRotationCount  int64    `json:"logRotationCount,omitempty"`
+	LogRotationTime   int64    `json:"logRotationTime,omitempty"`
 	Debug             bool     `json:"debug,omitempty"`
 	Logs              []string `json:"logs"`
 }
@@ -254,6 +259,14 @@ func SendMCDConfigs() {
 	logging, err := configs.GetBooleanValue("extensions.ieview.logging")
 	if err == nil {
 		response.Logging = logging
+	}
+	logRotationCount, err := configs.GetIntegerValue("extensions.ieview.logRotationCount")
+	if err == nil {
+		response.LogRotationCount = logRotationCount
+	}
+	logRotationTime, err := configs.GetIntegerValue("extensions.ieview.logRotationTime")
+	if err == nil {
+		response.LogRotationTime = logRotationTime
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {

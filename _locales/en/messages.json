@@ -17,6 +17,8 @@
   "config.disableException.label":    { "message": "Disable" },
   "config.ignoreQueryString.label":   { "message": "Ignore query string in URL" },
 
-  "config.logging.label": { "message": "Save log" },
-  "config.debug.label":   { "message": "Print debug log" }
+  "config.logging.label":             { "message": "Save log" },
+  "config.logRotationCount.label":    { "message": "Max count of log files" },
+  "config.logRotationTime.label":     { "message": "Rotate log file by specified hour" },
+  "config.debug.label":               { "message": "Print debug log" }
 }

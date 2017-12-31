@@ -326,10 +326,12 @@ async function launch(aURL) {
 }
 
 function send(aMessage) {
-  log('Sending: ', aMessage);
   if (configs.logging)
     aMessage.logging = true;
   if (configs.debug)
     aMessage.debug = true;
+  aMessage.logRotationCount = configs.logRotationCount;
+  aMessage.logRotationTime = configs.logRotationTime;
+  log('Sending: ', aMessage);
   return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', aMessage);
 }
