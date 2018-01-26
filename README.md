@@ -28,14 +28,22 @@ You can also customize preset configuration via MCD.
 * `extensions.ieview.ieapp` Path to Internet Explorer (default: auto detection)
 * `extensions.ieview.ieargs` Command Line Arguments (default: empty)
 * `extensions.ieview.contextMenu` Add "Open by IE" items to the context menu (default: true)
+
+## Rules to open by ...
+
 * `extensions.ieview.forceielist` Websites to be opened by IE always (default: empty)
 * `extensions.ieview.disableForce` Disable websites opened by IE always (dfault: false)
 * `extensions.ieview.sitesOpenedBySelf` Exceptive websites (opened in Firefox directly) (default: empty)
 * `extensions.ieview.disableException` Disable websites directly opened by Firefox (default: false)
 * `extensions.ieview.onlyMainFrame` Only check URL which is shown in location bar (default: true)
 * `extensions.ieview.ignoreQueryString` Ignore query string in URL (default: false)
-* `extensions.ieview.logging` Save log (default: true)
+
+## Logging & Debugging
+
 * `extensions.ieview.debug` Print Debug log (default: false)
+* `extensions.ieview.logging` Save log (default: true)
+* `extensions.ieview.logRotationTime` Rotate log file by specified hour (default: 24)
+* `extensions.ieview.logRotationCount` Max count of log files (default: 12)
 
 # How to build the native messaging host
 
