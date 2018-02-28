@@ -195,16 +195,16 @@ type SendMCDConfigsResponse struct {
 	IEApp             string   `json:"ieapp,omitempty"`
 	IEArgs            string   `json:"ieargs,omitempty"`
 	ForceIEList       string   `json:"forceielist,omitempty"`
-	DisableForce      bool     `json:"disableForce,omitempty"`
-	ContextMenu       bool     `json:"contextMenu,omitempty"`
-	OnlyMainFrame     bool     `json:"onlyMainFrame,omitempty"`
+	DisableForce      bool     `json:"disableForce"`
+	ContextMenu       bool     `json:"contextMenu"`
+	OnlyMainFrame     bool     `json:"onlyMainFrame"`
 	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
-	DisableException  bool     `json:"disableException,omitempty"`
-	IgnoreQueryString bool     `json:"ignoreQueryString,omitempty"`
+	DisableException  bool     `json:"disableException"`
+	IgnoreQueryString bool     `json:"ignoreQueryString"`
 	Logging           bool     `json:"logging,omitempty"`
 	LogRotationCount  int64    `json:"logRotationCount,omitempty"`
 	LogRotationTime   int64    `json:"logRotationTime,omitempty"`
-	Debug             bool     `json:"debug,omitempty"`
+	Debug             bool     `json:"debug"`
 	Logs              []string `json:"logs"`
 }
 
