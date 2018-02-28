@@ -6,9 +6,7 @@
   "contextMenu_link_label": { "message": "このリンクをIEで開く" },
 
   "config_ieapp_label_before":        { "message": "Internet Explorerのパス" },
-  "config_ieapp_label_after":         { "message": "" },
   "config_ieargs_label_before":       { "message": "起動オプション" },
-  "config_ieargs_label_after":        { "message": "" },
   "config_contextMenu_label":         { "message": "コンテキストメニューに「IEで開く」を追加する" },
   "config_onlyMainFrame_label":       { "message": "アドレスバーに表示されるURLのみを判定する" },
   "config_forceielist_caption":       { "message": "Internet Explorerで常に開くWebサイト" },
