@@ -235,6 +235,8 @@ func SendMCDConfigs() {
 	disableForce, err := configs.GetBooleanValue("extensions.ieview.disableForce")
 	if err == nil {
 		response.DisableForce = disableForce
+	} else {
+		LogForDebug("Failed to read extensions.ieview.disableForce.\n" + err.Error())
 	}
 	sitesOpenedBySelf, err := configs.GetStringValue("extensions.ieview.sitesOpenedBySelf")
 	if err == nil {
@@ -243,18 +245,26 @@ func SendMCDConfigs() {
 	disableException, err := configs.GetBooleanValue("extensions.ieview.disableException")
 	if err == nil {
 		response.DisableException = disableException
+	} else {
+		LogForDebug("Failed to read extensions.ieview.disableException.\n" + err.Error())
 	}
 	contextMenu, err := configs.GetBooleanValue("extensions.ieview.contextMenu")
 	if err == nil {
 		response.ContextMenu = contextMenu
+	} else {
+		LogForDebug("Failed to read extensions.ieview.contextMenu.\n" + err.Error())
 	}
 	onlyMainFrame, err := configs.GetBooleanValue("extensions.ieview.onlyMainFrame")
 	if err == nil {
 		response.OnlyMainFrame = onlyMainFrame
+	} else {
+		LogForDebug("Failed to read extensions.ieview.onlyMainFrame.\n" + err.Error())
 	}
 	ignoreQueryString, err := configs.GetBooleanValue("extensions.ieview.ignoreQueryString")
 	if err == nil {
 		response.IgnoreQueryString = ignoreQueryString
+	} else {
+		LogForDebug("Failed to read extensions.ieview.ignoreQueryString.\n" + err.Error())
 	}
 	logging, err := configs.GetBooleanValue("extensions.ieview.logging")
 	if err == nil {
@@ -271,6 +281,8 @@ func SendMCDConfigs() {
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {
 		response.Debug = debug
+	} else {
+		LogForDebug("Failed to read extensions.ieview.debug.\n" + err.Error())
 	}
 
 	if len(configs.DebugLogs) > 0 {
