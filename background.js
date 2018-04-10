@@ -211,7 +211,7 @@ function matchPatternToRegExp(pattern) {
 async function applyMCDConfigs() {
   try {
     var response = await send({ command: 'read-mcd-configs' });
-    log('loaded MCD configs: ', response);
+    log('loaded MCD configs: ', JSON.stringify(response));
     Object.keys(response).forEach((aKey) => {
       configs[aKey] = response[aKey];
       configs.$lock(aKey);
