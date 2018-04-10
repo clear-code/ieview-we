@@ -55,41 +55,41 @@ function onBeforeRequest(aDetails) {
     redirected = false;
   }
   else {
-  var targetURL = aDetails.url;
-  if (configs.ignoreQueryString)
-    targetURL = aDetails.url.replace(/\?.*/, '');
-
-  debug('targetURL: ', targetURL);
-  if (forceIEListRegex) {
-    debug('forceIEListRegex: ', forceIEListRegex);
-    matched = forceIEListRegex.test(targetURL);
-    debug('matched to forceIEListRegex?: ', matched);
-    if (matched)
-      redirected = true;
+    var targetURL = aDetails.url;
+    if (configs.ignoreQueryString)
+      targetURL = aDetails.url.replace(/\?.*/, '');
+  
+    debug('targetURL: ', targetURL);
+    if (forceIEListRegex) {
+      debug('forceIEListRegex: ', forceIEListRegex);
+      matched = forceIEListRegex.test(targetURL);
+      debug('matched to forceIEListRegex?: ', matched);
+      if (matched)
+        redirected = true;
+      else {
+        redirected = false;
+      }
+    }
     else {
       redirected = false;
     }
-  }
-  else {
-    redirected = false;
-  }
-  if (sitesOpenedBySelfRegex) {
-    debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
-    debug('sitesOpenedBySelfRegex: ', sitesOpenedBySelfRegex);
-    var matched = false;
-    debug('test url:', targetURL);
-    matched = sitesOpenedBySelfRegex.test(targetURL);
-    debug('matched to sitesOpenedBySelfRegex?: ', matched);
-    if (matched)
-      redirected = false;
-    debug('redirected?: ', redirected);
-  }
-  if (redirected) {
-    launch(aDetails.url);
-  }
-  else {
-    log('url is not redirected: ', aDetails.url);
-  }
+    if (sitesOpenedBySelfRegex) {
+      debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
+      debug('sitesOpenedBySelfRegex: ', sitesOpenedBySelfRegex);
+      var matched = false;
+      debug('test url:', targetURL);
+      matched = sitesOpenedBySelfRegex.test(targetURL);
+      debug('matched to sitesOpenedBySelfRegex?: ', matched);
+      if (matched)
+        redirected = false;
+      debug('redirected?: ', redirected);
+    }
+    if (redirected) {
+      launch(aDetails.url);
+    }
+    else {
+      log('url is not redirected: ', aDetails.url);
+    }
   }
   return { cancel: redirected };
 }
