@@ -50,6 +50,11 @@ function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
   var redirected = true;
 
+  if (aDetails.tabId < 0) {
+    log('invalid tabId: ', aDetails.tabId);
+    redirected = false;
+  }
+  else {
   var targetURL = aDetails.url;
   if (configs.ignoreQueryString)
     targetURL = aDetails.url.replace(/\?.*/, '');
@@ -84,6 +89,7 @@ function onBeforeRequest(aDetails) {
   }
   else {
     log('url is not redirected: ', aDetails.url);
+  }
   }
   return { cancel: redirected };
 }
