@@ -234,7 +234,7 @@ async function setDefaultPath() {
   try {
     let response = await send({ command: 'get-ie-path' });
     if (response) {
-      log('Received: ', response);
+      log('Received: ', JSON.stringify(response));
       if (response.path)
         configs.ieapp = response.path;
     }
@@ -324,7 +324,7 @@ async function launch(aURL) {
   };
   try{
     let response = await send(message);
-    log('Received: ', response);
+    log('Received: ', JSON.stringify(response));
   }
   catch(aError) {
     log('Error: ', aError);
@@ -338,6 +338,6 @@ function send(aMessage) {
     aMessage.debug = true;
   aMessage.logRotationCount = configs.logRotationCount;
   aMessage.logRotationTime = configs.logRotationTime;
-  log('Sending: ', aMessage);
+  log('Sending: ', JSON.stringify(aMessage));
   return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', aMessage);
 }
