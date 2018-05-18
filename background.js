@@ -86,6 +86,11 @@ function onBeforeRequest(aDetails) {
     }
     if (redirected) {
       launch(aDetails.url);
+      if (configs.closeReloadPage &&
+          gOpeningTabs.has(aDetails.tabId)) {
+        gOpeningTabs.delete(aDetails.tabId);
+        browser.tabs.remove(aDetails.tabId);
+      }
     }
     else {
       log('url is not redirected: ', aDetails.url);
@@ -193,6 +198,8 @@ function matchPatternToRegExp(pattern) {
   return new RegExp(regex);
 }
 
+var gOpeningTabs = new Map();
+
 (async () => {
   await configs.$load();
   await applyMCDConfigs();
@@ -212,6 +219,18 @@ function matchPatternToRegExp(pattern) {
   setSitesOpenedBySelf();
 
   configs.$addObserver(onConfigUpdated);
+
+
+  browser.tabs.onCreated.addListener(aTab => {
+    gOpeningTabs.set(aTab.id, true);
+  });
+  browser.tabs.onUpdated.addListener((aTabId, aChangeInfo, aTab) => {
+    if (aChangeInfo.status == 'complete' ||
+        (aChangeInfo.url &&
+         !/^(about:(blank|newtab|home))$/.test(aChangeInfo.url))) {
+      gOpeningTabs.delete(aTabId);
+    }
+  });
 })();
 
 async function applyMCDConfigs() {

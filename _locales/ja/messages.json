@@ -11,6 +11,7 @@
   "config_onlyMainFrame_label":       { "message": "アドレスバーに表示されるURLのみを判定する" },
   "config_forceielist_caption":       { "message": "Internet Explorerで常に開くWebサイト" },
   "config_disableForce_label":        { "message": "無効化" },
+  "config_closeReloadPage_label":     { "message": "リダイレクト後に残された空のタブを閉じる" },
   "config_sitesOpenedBySelf_caption": { "message": "IEで開く対象から除外する(Firefoxで直接開く)サイト" },
   "config_disableException_label":    { "message": "無効化" },
   "config_ignoreQueryString_label":   { "message": "URLの?以降を無視する" },

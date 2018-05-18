@@ -196,6 +196,7 @@ type SendMCDConfigsResponse struct {
 	IEArgs            string   `json:"ieargs,omitempty"`
 	ForceIEList       string   `json:"forceielist,omitempty"`
 	DisableForce      bool     `json:"disableForce"`
+	CloseReloadPage   bool     `json:"closeReloadPage"`
 	ContextMenu       bool     `json:"contextMenu"`
 	OnlyMainFrame     bool     `json:"onlyMainFrame"`
 	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
@@ -237,6 +238,12 @@ func SendMCDConfigs() {
 		response.DisableForce = disableForce
 	} else {
 		LogForDebug("Failed to read extensions.ieview.disableForce.\n" + err.Error())
+	}
+	closeReloadPage, err := configs.GetBooleanValue("extensions.ieview.closeReloadPage")
+	if err == nil {
+		response.CloseReloadPage = closeReloadPage
+	} else {
+		LogForDebug("Failed to read extensions.ieview.closeReloadPage.\n" + err.Error())
 	}
 	sitesOpenedBySelf, err := configs.GetStringValue("extensions.ieview.sitesOpenedBySelf")
 	if err == nil {

@@ -27,6 +27,7 @@ configs = new Configs({
 	ieargs            : '',
 	forceielist       : '',
 	disableForce      : false,
+	closeReloadPage   : true,
 	contextMenu       : true,
 	onlyMainFrame     : true,
 	ignoreQueryString : false,
