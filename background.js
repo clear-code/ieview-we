@@ -201,7 +201,7 @@ function matchPatternToRegExp(pattern) {
 var gOpeningTabs = new Map();
 
 (async () => {
-  await configs.$load();
+  await configs.$loaded;
   await applyMCDConfigs();
   await setDefaultPath();
 
