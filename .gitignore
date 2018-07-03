@@ -1,8 +1,6 @@
 *.xpi
 *.zip
-**/Configs.js
-**/Options.js
-**/l10n.js
+extlib/*.js
 *.exe
 .goutputstream-*
 

@@ -1,21 +1,12 @@
 .PHONY: xpi host managed
 
-xpi: extlib/webextensions-lib-configs/Configs.js extlib/webextensions-lib-options/Options.js extlib/webextensions-lib-l10n/l10n.js
+xpi:
 	git submodule update
-	cp extlib/webextensions-lib-configs/Configs.js common/
-	cp extlib/webextensions-lib-options/Options.js options/
-	cp extlib/webextensions-lib-l10n/l10n.js options/
+	cp submodules/webextensions-lib-configs/Configs.js extlib/
+	cp submodules/webextensions-lib-options/Options.js extlib/
+	cp submodules/webextensions-lib-l10n/l10n.js extlib/
 	rm -f ieview-we.xpi
-	zip -r -0 ieview-we.xpi *.json *.js _locales common options
-
-extlib/webextensions-lib-configs/Configs.js:
-	git submodule update --init
-
-extlib/webextensions-lib-options/Options.js:
-	git submodule update --init
-
-extlib/webextensions-lib-l10n/l10n.js:
-	git submodule update --init
+	zip -r -0 ieview-we.xpi *.json *.js _locales common options extlib
 
 host:
 	host/build.sh
