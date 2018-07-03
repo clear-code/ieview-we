@@ -6,7 +6,7 @@ xpi:
 	cp submodules/webextensions-lib-options/Options.js extlib/
 	cp submodules/webextensions-lib-l10n/l10n.js extlib/
 	rm -f ieview-we.xpi
-	zip -r -0 ieview-we.xpi *.json *.js _locales common options extlib
+	zip -r -0 ieview-we.xpi *.json *.js _locales common options extlib -x '*/.*'
 
 host:
 	host/build.sh
