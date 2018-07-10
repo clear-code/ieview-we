@@ -2,13 +2,13 @@ function installMenuItems() {
   browser.contextMenus.create({
     id: 'page',
     type: 'normal',
-    title: browser.i18n.getMessage('contextMenu.page.label'),
+    title: browser.i18n.getMessage('contextMenu_page_label'),
     contexts: installMenuItems.supportsTabContext ? ['page', 'tab'] : ['page']
   });
   browser.contextMenus.create({
     id: 'link',
     type: 'normal',
-    title: browser.i18n.getMessage('contextMenu.link.label'),
+    title: browser.i18n.getMessage('contextMenu_link_label'),
     contexts: ['link']
   });
 }
