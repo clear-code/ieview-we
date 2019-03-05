@@ -192,20 +192,21 @@ func GetIEPath() (path string) {
 }
 
 type SendMCDConfigsResponse struct {
-	IEApp             string   `json:"ieapp,omitempty"`
-	IEArgs            string   `json:"ieargs,omitempty"`
-	ForceIEList       string   `json:"forceielist,omitempty"`
+	IEApp             string   `json:"ieapp"`
+	IEArgs            string   `json:"ieargs"`
+	ForceIEList       string   `json:"forceielist"`
 	DisableForce      bool     `json:"disableForce"`
 	CloseReloadPage   bool     `json:"closeReloadPage"`
 	ContextMenu       bool     `json:"contextMenu"`
 	OnlyMainFrame     bool     `json:"onlyMainFrame"`
-	SitesOpenedBySelf string   `json:"sitesOpenedBySelf,omitempty"`
+	SitesOpenedBySelf string   `json:"sitesOpenedBySelf"`
 	DisableException  bool     `json:"disableException"`
 	IgnoreQueryString bool     `json:"ignoreQueryString"`
-	Logging           bool     `json:"logging,omitempty"`
-	LogRotationCount  int64    `json:"logRotationCount,omitempty"`
-	LogRotationTime   int64    `json:"logRotationTime,omitempty"`
+	Logging           bool     `json:"logging"`
+	LogRotationCount  int64    `json:"logRotationCount"`
+	LogRotationTime   int64    `json:"logRotationTime"`
 	Debug             bool     `json:"debug"`
+	LoadedKeys        []string `json:"loadedKeys"`
 	Logs              []string `json:"logs"`
 }
 
@@ -221,73 +222,88 @@ func SendMCDConfigs() {
 
 	response := &SendMCDConfigsResponse{}
 
+    var LoadedKeys []string
 	ieApp, err := configs.GetStringValue("extensions.ieview.ieapp")
 	if err == nil {
 		response.IEApp = ieApp
+		LoadedKeys = append(LoadedKeys, "ieApp")
 	}
 	ieArgs, err := configs.GetStringValue("extensions.ieview.ieargs")
 	if err == nil {
 		response.IEArgs = ieArgs
+		LoadedKeys = append(LoadedKeys, "ieArgs")
 	}
 	forceIEList, err := configs.GetStringValue("extensions.ieview.forceielist")
 	if err == nil {
 		response.ForceIEList = forceIEList
+		LoadedKeys = append(LoadedKeys, "forceIEList")
 	}
 	disableForce, err := configs.GetBooleanValue("extensions.ieview.disableForce")
 	if err == nil {
 		response.DisableForce = disableForce
+		LoadedKeys = append(LoadedKeys, "disableForce")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.disableForce.\n" + err.Error())
 	}
 	closeReloadPage, err := configs.GetBooleanValue("extensions.ieview.closeReloadPage")
 	if err == nil {
 		response.CloseReloadPage = closeReloadPage
+		LoadedKeys = append(LoadedKeys, "closeReloadPage")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.closeReloadPage.\n" + err.Error())
 	}
 	sitesOpenedBySelf, err := configs.GetStringValue("extensions.ieview.sitesOpenedBySelf")
 	if err == nil {
 		response.SitesOpenedBySelf = sitesOpenedBySelf
+		LoadedKeys = append(LoadedKeys, "sitesOpenedBySelf")
 	}
 	disableException, err := configs.GetBooleanValue("extensions.ieview.disableException")
 	if err == nil {
 		response.DisableException = disableException
+		LoadedKeys = append(LoadedKeys, "disableException")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.disableException.\n" + err.Error())
 	}
 	contextMenu, err := configs.GetBooleanValue("extensions.ieview.contextMenu")
 	if err == nil {
 		response.ContextMenu = contextMenu
+		LoadedKeys = append(LoadedKeys, "contextMenu")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.contextMenu.\n" + err.Error())
 	}
 	onlyMainFrame, err := configs.GetBooleanValue("extensions.ieview.onlyMainFrame")
 	if err == nil {
 		response.OnlyMainFrame = onlyMainFrame
+		LoadedKeys = append(LoadedKeys, "onlyMainFrame")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.onlyMainFrame.\n" + err.Error())
 	}
 	ignoreQueryString, err := configs.GetBooleanValue("extensions.ieview.ignoreQueryString")
 	if err == nil {
 		response.IgnoreQueryString = ignoreQueryString
+		LoadedKeys = append(LoadedKeys, "ignoreQueryString")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.ignoreQueryString.\n" + err.Error())
 	}
 	logging, err := configs.GetBooleanValue("extensions.ieview.logging")
 	if err == nil {
 		response.Logging = logging
+		LoadedKeys = append(LoadedKeys, "logging")
 	}
 	logRotationCount, err := configs.GetIntegerValue("extensions.ieview.logRotationCount")
 	if err == nil {
 		response.LogRotationCount = logRotationCount
+		LoadedKeys = append(LoadedKeys, "logRotationCount")
 	}
 	logRotationTime, err := configs.GetIntegerValue("extensions.ieview.logRotationTime")
 	if err == nil {
 		response.LogRotationTime = logRotationTime
+		LoadedKeys = append(LoadedKeys, "logRotationTime")
 	}
 	debug, err := configs.GetBooleanValue("extensions.ieview.debug")
 	if err == nil {
 		response.Debug = debug
+		LoadedKeys = append(LoadedKeys, "debug")
 	} else {
 		LogForDebug("Failed to read extensions.ieview.debug.\n" + err.Error())
 	}
@@ -295,6 +311,7 @@ func SendMCDConfigs() {
 	if len(configs.DebugLogs) > 0 {
 		LogForDebug("Logs from mcd configs:\n  " + strings.Join(configs.DebugLogs, "\n  "))
 	}
+	response.LoadedKeys = LoadedKeys
 	response.Logs = DebugLogs
 	body, err := json.Marshal(response)
 	if err != nil {
