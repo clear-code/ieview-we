@@ -237,11 +237,19 @@ async function applyMCDConfigs() {
   try {
     var response = await send({ command: 'read-mcd-configs' });
     log('loaded MCD configs: ', JSON.stringify(response));
-    if (Array.isArray(response.loadedKeys))
-      response.loadedKeys.forEach((aKey) => {
+    if ('loadedKeys' in response) {
+      if (Array.isArray(response.loadedKeys))
+        response.loadedKeys.forEach((aKey) => {
+          configs[aKey] = response[aKey];
+          configs.$lock(aKey);
+        });
+    }
+    else {
+      Object.keys(response).forEach((aKey) => {
         configs[aKey] = response[aKey];
         configs.$lock(aKey);
       });
+    }
   }
   catch(aError) {
     log('Failed to read MCD configs: ', aError);
