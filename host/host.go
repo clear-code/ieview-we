@@ -77,7 +77,7 @@ func main() {
 	LogForDebug("Command is " + request.Command)
 	switch command := request.Command; command {
 	case "launch":
-		Launch(request.Params.Path, request.Params.Args, request.Params.Url)
+		Launch(request.Params.Path, request.Params.Args, "\"" + request.Params.Url + "\"")
 	case "get-ie-path":
 		SendIEPath()
 	case "read-mcd-configs":
