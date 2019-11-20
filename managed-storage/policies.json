@@ -1,6 +1,6 @@
 {
   "policies": {
-	"3rdparty": {
+    "3rdparty": {
       "Extensions": {
         "ieview-we@clear-code.com": {
           "forceielist"      : "http://www.example.com/*",
