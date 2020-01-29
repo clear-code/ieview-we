@@ -1,8 +1,8 @@
 .PHONY: xpi host managed
 
 xpi:
-	git submodule update
-	#cp submodules/webextensions-lib-configs/Configs.js extlib/
+	git submodule update --init
+	cp submodules/webextensions-lib-configs/Configs.js extlib/
 	cp submodules/webextensions-lib-options/Options.js extlib/
 	cp submodules/webextensions-lib-l10n/l10n.js extlib/
 	rm -f ieview-we.xpi
