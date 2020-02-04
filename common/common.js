@@ -36,5 +36,6 @@ configs = new Configs({
 	logging           : true,
 	logRotationCount  : 12,
 	logRotationTime   : 24,
+	useBrowserSelector: false,
 	debug             : false
 });

@@ -99,6 +99,55 @@ function onBeforeRequest(aDetails) {
   return { cancel: redirected };
 }
 
+/*
+ * BrowserSelector Support
+ *
+ * This implements the "bridge" mode that delegates the URL matching
+ * to BrowserSelector.
+ *
+ * For more details, visit the project page of BrowserSelector.
+ * https://gitlab.com/clear-code/browserselector/
+ */
+var BrowserSelector = {
+
+  HOST: "BrowserSelectorTalk",
+
+  init: function() {
+    this.callback = this.onBeforeRequest.bind(this);
+    this.listen();
+  },
+
+  listen: function() {
+    browser.webRequest.onBeforeRequest.addListener(
+      this.callback,
+      {
+        urls: ["<all_urls>"],
+        types: ["main_frame"]
+      },
+      ["blocking"]
+    );
+  },
+
+  onBeforeRequest: async function(details) {
+    var query = "Q firefox " + details.url;
+    var resp = await browser.runtime.sendNativeMessage(this.HOST, query);
+
+    if (!resp) {
+        return {};  // Continue anyway
+    }
+    if (resp.open) {
+        if (resp.close_tab) {
+            await browser.tabs.remove(details.tabId);
+        }
+        return {"cancel": true};  // Stop the request
+    }
+    return {};
+  }
+};
+
+/*
+ * main
+ */
 const VALID_MATCH_PATTERN = (() => {
   const schemeSegment = '(\\*|http|https|file|ftp)';
   const hostSegment = '(\\*|(?:\\*\\.)?(?:[^/*]+))?';
@@ -204,6 +253,10 @@ var gOpeningTabs = new Map();
   await configs.$loaded;
   await applyMCDConfigs();
   await setDefaultPath();
+
+  if (configs.useBrowserSelector) {
+    return BrowserSelector.init();
+  }
 
   var browserInfo = await browser.runtime.getBrowserInfo();
   if (browserInfo.name == 'Firefox' &&
