@@ -100,21 +100,20 @@ function onBeforeRequest(aDetails) {
 }
 
 /*
- * BrowserSelector Support
+ * Talk Protocol Support
  *
- * This implements the "bridge" mode that delegates the URL matching
- * to BrowserSelector.
+ * This implements the "bridge" mode that delegates the URL handling
+ * to Talk-compatible host programs (like BrowserSelector).
  *
  * For more details, visit the project page of BrowserSelector.
  * https://gitlab.com/clear-code/browserselector/
  */
-var BrowserSelector = {
-
-  HOST: "BrowserSelectorTalk",
+var TalkClient = {
 
   init: function() {
     this.callback = this.onBeforeRequest.bind(this);
     this.listen();
+    log('Running as Talk client');
   },
 
   listen: function() {
@@ -129,9 +128,13 @@ var BrowserSelector = {
   },
 
   onBeforeRequest: async function(details) {
+    var server = configs.talkServerName;
     var query = "Q firefox " + details.url;
-    var resp = await browser.runtime.sendNativeMessage(this.HOST, query);
 
+    debug('Query "' + query + '" to ' + server);
+    var resp = await browser.runtime.sendNativeMessage(server, query);
+
+    debug('Response was', JSON.stringify(resp));
     if (!resp) {
         return {};  // Continue anyway
     }
@@ -254,8 +257,8 @@ var gOpeningTabs = new Map();
   await applyMCDConfigs();
   await setDefaultPath();
 
-  if (configs.useBrowserSelector) {
-    return BrowserSelector.init();
+  if (configs.talkEnabled) {
+    return TalkClient.init();
   }
 
   var browserInfo = await browser.runtime.getBrowserInfo();

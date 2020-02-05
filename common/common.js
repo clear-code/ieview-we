@@ -23,19 +23,20 @@ function debug(aMessage, ...aArgs)
 }
 
 configs = new Configs({
-	ieapp             : '',
-	ieargs            : '',
-	forceielist       : '',
-	disableForce      : false,
-	closeReloadPage   : true,
-	contextMenu       : true,
-	onlyMainFrame     : true,
-	ignoreQueryString : false,
-	sitesOpenedBySelf : '',
-	disableException  : false,
-	logging           : true,
-	logRotationCount  : 12,
-	logRotationTime   : 24,
-	useBrowserSelector: false,
-	debug             : false
+	ieapp            : '',
+	ieargs           : '',
+	forceielist      : '',
+	disableForce     : false,
+	closeReloadPage  : true,
+	contextMenu      : true,
+	onlyMainFrame    : true,
+	ignoreQueryString: false,
+	sitesOpenedBySelf: '',
+	disableException : false,
+	logging          : true,
+	logRotationCount : 12,
+	logRotationTime  : 24,
+	talkEnabled      : false,
+	talkServerName   : '',
+	debug            : false
 });
