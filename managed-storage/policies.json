@@ -3,16 +3,17 @@
     "3rdparty": {
       "Extensions": {
         "ieview-we@clear-code.com": {
-          "forceielist"      : "http://www.example.com/*",
-          "disableForce"     : false,
-          "closeReloadPage"  : true,
-          "contextMenu"      : true,
-          "onlyMainFrame"    : true,
-          "ignoreQueryString": false,
-          "sitesOpenedBySelf": "",
-          "disableException" : false,
-          "logging"          : true,
-          "debug"            : false
+          "forceielist"       : "http://www.example.com/*",
+          "disableForce"      : false,
+          "closeReloadPage"   : true,
+          "contextMenu"       : true,
+          "onlyMainFrame"     : true,
+          "ignoreQueryString" : false,
+          "sitesOpenedBySelf" : "",
+          "disableException"  : false,
+          "logging"           : true,
+          "useBrowserSelector": false,
+          "debug"             : false
         }
       }
     }
