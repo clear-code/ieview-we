@@ -1,0 +1,7 @@
+{
+  "name": "ieview-we",
+  "version": "1.4.0",
+  "dependencies": {
+    "webextension-polyfill": "*"
+  }
+}

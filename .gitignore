@@ -4,3 +4,6 @@ extlib/*.js
 *.exe
 .goutputstream-*
 
+node_modules
+package-lock.json
+chrome
