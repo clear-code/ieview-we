@@ -12,7 +12,7 @@ function installMenuItems() {
     contexts: ['link']
   });
 }
-installMenuItems.supportsTabContext = true;
+installMenuItems.supportsTabContext = false;
 
 var forceIEListRegex = null;
 function installBlocker() {
@@ -261,10 +261,11 @@ var gOpeningTabs = new Map();
     return TalkClient.init();
   }
 
-  var browserInfo = await browser.runtime.getBrowserInfo();
-  if (browserInfo.name == 'Firefox' &&
-      parseInt(browserInfo.version.split('.')[0]) < 53)
-    installMenuItems.supportsTabContext = false;
+  var browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
+  if (browserInfo &&
+      browserInfo.name == 'Firefox' &&
+      parseInt(browserInfo.version.split('.')[0]) >= 53)
+    installMenuItems.supportsTabContext = true;
 
   if (configs.contextMenu)
     installMenuItems();
