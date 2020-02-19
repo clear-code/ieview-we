@@ -33,9 +33,9 @@ function installBlocker() {
   forceIEListRegex = new RegExp(list.map((pattern) => {
     if (!VALID_MATCH_PATTERN.exec(pattern)) {
       urls = ['<all_urls>'];
-      return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1")
+      return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1')
     } else {
-      return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+      return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1');
     }
   }).join('|'));
   log('forceIEListRegex:', forceIEListRegex);
@@ -131,16 +131,16 @@ var TalkClient = {
     browser.webRequest.onBeforeRequest.addListener(
       this.callback,
       {
-        urls: ["<all_urls>"],
-        types: ["main_frame"]
+        urls: ['<all_urls>'],
+        types: ['main_frame']
       },
-      ["blocking"]
+      ['blocking']
     );
   },
 
   onBeforeRequest: async function(details) {
     var server = configs.talkServerName;
-    var query = "Q firefox " + details.url;
+    var query = 'Q firefox ' + details.url;
 
     debug('Query "' + query + '" to ' + server);
     var resp = await browser.runtime.sendNativeMessage(server, query);
@@ -190,11 +190,11 @@ function migratePatternToRegExp(invalidPattern) {
     log('convert path to regex:', '*://*/' + pattern);
     let pathRegex = matchPatternToRegExp('*://*/' + pattern);
     log('migrated match pattern based regex:', hostRegex + '|' + pathRegex);
-    return new RegExp(`${hostRegex}`.replace(/^\/(.+)\//, "$1") + '|' + `${pathRegex}`.replace(/^\/(.+)\//, "$1"));
+    return new RegExp(`${hostRegex}`.replace(/^\/(.+)\//, '$1') + '|' + `${pathRegex}`.replace(/^\/(.+)\//, '$1'));
   } else {
     // Just convert * and ?
-    pattern = pattern.replace(/\*/g, ".*");
-    pattern = pattern.replace(/\?/g, ".?");
+    pattern = pattern.replace(/\*/g, '.*');
+    pattern = pattern.replace(/\?/g, '.?');
     log('migrated regex pattern:', pattern);
     return new RegExp(pattern);
   }
@@ -353,10 +353,10 @@ function setSitesOpenedBySelf() {
     if (sitesOpenedBySelfList.length > 0)
       sitesOpenedBySelfRegex = new RegExp(sitesOpenedBySelfList.map((pattern) => {
         if (VALID_MATCH_PATTERN.exec(pattern)) {
-          return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+          return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1');
         }
         else {
-          return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, "$1");
+          return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1');
         }
       }).join('|'));
     else
