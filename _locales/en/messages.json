@@ -12,7 +12,7 @@
   "config_forceielist_caption":       { "message": "Websites to be opened by IE always" },
   "config_disableForce_label":        { "message": "Disable" },
   "config_closeReloadPage_label":     { "message": "Close blank tab left after redirection" },
-  "config_sitesOpenedBySelf_caption": { "message": "Exceptive websites (opened in Firefox directly)" },
+  "config_sitesOpenedBySelf_caption": { "message": "Exceptive websites (opened in this browser directly)" },
   "config_disableException_label":    { "message": "Disable" },
   "config_ignoreQueryString_label":   { "message": "Ignore query string in URL" },
 
