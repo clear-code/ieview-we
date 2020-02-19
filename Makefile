@@ -14,7 +14,8 @@ chrome: prepare
 	[ -d node_modules ] || npm install
 	rm -rf chrome
 	mkdir -p chrome
-	cp -r manifest.json *.js _locales common options extlib chrome/
+	cat manifest.json | jq 'del(.applications)' > chrome/manifest.json
+	cp -r *.js _locales common options extlib chrome/
 	find chrome -name '.*' | xargs rm -rf
 	cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js extlib/
 	sed -i -r -e 's;("scripts": *\[);\1"extlib/browser-polyfill.min.js",;' chrome/manifest.json
