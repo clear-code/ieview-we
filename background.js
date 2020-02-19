@@ -1,3 +1,10 @@
+var gIsFirefox  = browser.runtime.getBrowserInfo;
+var gIsChromium = !browser.runtime.getBrowserInfo;
+
+var CANCEL_RESPONSE = gIsChromium ?
+  { redirectUrl: `data:text/html,${escape('<script type="application/javascript">history.back()</script>')}` } :
+  { cancel: true } ;
+
 function installMenuItems() {
   browser.contextMenus.create({
     id: 'page',
@@ -96,7 +103,11 @@ function onBeforeRequest(aDetails) {
       log('url is not redirected: ', aDetails.url);
     }
   }
-  return { cancel: redirected };
+
+  if (!redirected)
+    return {};
+
+  return CANCEL_RESPONSE;
 }
 
 /*
@@ -142,7 +153,7 @@ var TalkClient = {
         if (resp.close_tab) {
             await browser.tabs.remove(details.tabId);
         }
-        return {"cancel": true};  // Stop the request
+        return CANCEL_RESPONSE;  // Stop the request
     }
     return {};
   }
@@ -262,8 +273,9 @@ var gOpeningTabs = new Map();
   }
 
   var browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
-  if (browserInfo &&
-      browserInfo.name == 'Firefox' &&
+  gIsFirefox  = browserInfo && browserInfo.name == 'Firefox';
+  gIsChromium = !gIsFirefox;
+  if (gIsFirefox &&
       parseInt(browserInfo.version.split('.')[0]) >= 53)
     installMenuItems.supportsTabContext = true;
 
