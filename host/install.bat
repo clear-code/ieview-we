@@ -32,6 +32,7 @@ COPY *.bat "%INSTALL_DIR%\"
 ECHO Registering...
 FOR %%f IN ("%INSTALL_DIR%") DO SET EXPANDED_PATH=%%~sf
 REG ADD "%REG_BASE%\SOFTWARE\Mozilla\NativeMessagingHosts\%NAME%" /ve /t REG_SZ /d "%EXPANDED_PATH%\%NAME%.json" /f
+REG ADD "%REG_BASE%\SOFTWARE\Google\Chrome\NativeMessagingHosts\%NAME%" /ve /t REG_SZ /d "%EXPANDED_PATH%\%NAME%.json" /f
 
 ECHO Done.
 PAUSE
