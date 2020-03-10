@@ -160,6 +160,153 @@ var TalkClient = {
 };
 
 /*
+ * Talk Client for Google Chrome.
+ *
+ * We need a separate implementation for Google Chrome since
+ * chrome.webRequest won't allow to communicate with the host
+ * program within onBeforeRequest().
+ */
+var ChromeTalkClient = {
+
+  NAME: 'ChromeTalkClient',
+
+  INTERVAL: 3, /* N minutes between configuration refreshes */
+
+  init: function() {
+    this.cached = null;
+    this.isNewTab = {};
+    this.configure();
+    this.listen();
+    log('Running as Chrome Talk client');
+  },
+
+  configure: function() {
+    var server = configs.talkServerName;
+    var query = new String('C chrome');
+
+    chrome.runtime.sendNativeMessage(server, query, (resp) => {
+      this.cached = resp.config;
+      debug('[Talk] configure', resp.config);
+    });
+  },
+
+  listen: function() {
+    chrome.webRequest.onBeforeRequest.addListener(
+      this.onBeforeRequest.bind(this),
+      {
+        urls: ['<all_urls>'],
+        types: ['main_frame']
+      },
+      ['blocking']
+    );
+
+    /* Refresh config for every N minute */
+    chrome.alarms.create(this.NAME, {'periodInMinutes': this.INTERVAL});
+
+    chrome.alarms.onAlarm.addListener((alarm) => {
+      if (alarm.name === this.NAME) {
+        this.configure();
+      }
+    });
+
+    /* Tab book-keeping for intelligent tab handlings */
+    chrome.tabs.onCreated.addListener(tab => {
+      this.isNewTab[tab.id] = 1;
+    });
+
+    chrome.tabs.onUpdated.addListener((id, info, tab) => {
+      if (info.status === 'complete') {
+        delete this.isNewTab[tab.id];
+      }
+    });
+  },
+
+  /* Convert BrowserSelector's pattern into RegExp */
+  regex: function(pattern, bs) {
+    if (bs.UseRegex)
+        return RegExp(pattern);
+
+    // BrowserSelector support a 'simple' pattern that allows to use
+    // `*` for any strings, and `?` for any single character.
+    var specials = /(\.|\+|\(|\)|\[|\]|\\|\^|\$|\|)/g;
+    //                .  +  (  )  [  ]  \  ^  $  |
+
+    pattern = pattern.replace(specials, '\\$1');
+    pattern = pattern.replace(/\*/g, '.*');
+    pattern = pattern.replace(/\?/g, '.');
+
+    return RegExp('^' + pattern + '$');
+  },
+
+  redirect: function(bs, details) {
+    var server = configs.talkServerName;
+    var query = new String('Q chrome ' + details.url);
+
+    chrome.tabs.get(details.tabId, (tab) => {
+      /* This is required for Chrome's "preload" tabs */
+      if (!tab) return;
+
+      /* Open another browser via Query */
+      chrome.runtime.sendNativeMessage(server, query);
+
+      /* Close the opening tab automatically (if required) */
+      if (bs.CloseEmptyTab && this.isNewTab[details.tabId]) {
+        chrome.tabs.remove(details.tabId);
+      }
+    });
+    return CANCEL_RESPONSE;
+  },
+
+  onBeforeRequest: function(details) {
+    var bs = this.cached;
+    var host = details.url.split('/')[2];
+
+    if (!bs) {
+      log('[Talk] config cache is empty. Fetching...');
+      this.configure();
+      return;
+    }
+
+    /* HostNamePatterns */
+    for (var i = 0; i < bs.HostNamePatterns.length; i++) {
+      var pattern = bs.HostNamePatterns[i][0].toLowerCase();
+      var browser = bs.HostNamePatterns[i][1].toLowerCase();
+
+      if (this.regex(pattern, bs).test(host)) {
+        debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
+        if (browser == 'chrome')
+          return;
+        if (browser == '' && bs.SecondBrowser == 'chrome')
+          return;
+        return this.redirect(bs, details);
+      }
+    }
+
+    /* URLPatterns */
+    for (var i = 0; i < bs.URLPatterns.length; i++) {
+      var pattern = bs.URLPatterns[i][0].toLowerCase();
+      var browser = bs.URLPatterns[i][1].toLowerCase();
+
+      if (this.regex(pattern, bs).test(details.url)) {
+        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
+        if (browser == 'chrome')
+          return;
+        if (browser == '' && bs.SecondBrowser == 'chrome')
+          return;
+        return this.redirect(bs, details);
+      }
+    }
+
+    /* No pattern matched */
+    debug('[Talk] No pattern matched', {url: details.url})
+    if (bs.DefaultBrowser !== 'chrome') {
+      return this.redirect(bs, details);
+    }
+  }
+};
+
+
+/*
  * main
  */
 const VALID_MATCH_PATTERN = (() => {
@@ -265,12 +412,17 @@ var gOpeningTabs = new Map();
 
 (async () => {
   await configs.$loaded;
-  await applyMCDConfigs();
-  await setDefaultPath();
 
   if (configs.talkEnabled) {
-    return TalkClient.init();
+    if (gIsChromium) {
+        return ChromeTalkClient.init();
+    } else {
+        return TalkClient.init();
+    }
   }
+
+  await applyMCDConfigs();
+  await setDefaultPath();
 
   var browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
   gIsFirefox  = browserInfo && browserInfo.name == 'Firefox';

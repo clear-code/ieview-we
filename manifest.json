@@ -7,6 +7,7 @@
     "contextMenus",
     "nativeMessaging",
     "storage",
+    "alarms",
     "tabs",
     "webRequest",
     "webRequestBlocking",
