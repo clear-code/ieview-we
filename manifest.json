@@ -20,6 +20,9 @@
       "background.js"
     ]
   },
+  "icons": {
+    "128": "misc/128x128.png"
+  },
   "options_ui": {
     "page": "options/options.html",
     "chrome_style": true
