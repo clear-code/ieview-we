@@ -122,6 +122,7 @@ function onBeforeRequest(aDetails) {
 var TalkClient = {
 
   init: function() {
+    this.isNewTab = {};
     this.callback = this.onBeforeRequest.bind(this);
     this.listen();
     log('Running as Talk client');
@@ -136,6 +137,17 @@ var TalkClient = {
       },
       ['blocking']
     );
+
+    /* Tab book-keeping for intelligent tab handlings */
+    browser.tabs.onCreated.addListener(tab => {
+      this.isNewTab[tab.id] = 1;
+    });
+
+    browser.tabs.onUpdated.addListener((id, info, tab) => {
+      if (info.status === 'complete') {
+        delete this.isNewTab[tab.id];
+      }
+    });
   },
 
   onBeforeRequest: async function(details) {
@@ -150,7 +162,8 @@ var TalkClient = {
         return {};  // Continue anyway
     }
     if (resp.open) {
-        if (resp.close_tab) {
+        if (resp.close_tab && this.isNewTab[details.tabId]) {
+            delete this.isNewTab[details.tabId];
             await browser.tabs.remove(details.tabId);
         }
         return CANCEL_RESPONSE;  // Stop the request
