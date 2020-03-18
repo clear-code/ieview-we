@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "ieapp":             {"type": "string"},
+    "ieargs":            {"type": "string"},
+    "forceielist":       {"type": "string"},
+    "disableForce":      {"type": "boolean"},
+    "closeReloadPage":   {"type": "boolean"},
+    "contextMenu":       {"type": "boolean"},
+    "onlyMainFrame":     {"type": "boolean"},
+    "ignoreQueryString": {"type": "boolean"},
+    "sitesOpenedBySelf": {"type": "string"},
+    "disableException":  {"type": "boolean"},
+    "logging":           {"type": "boolean"},
+    "logRotationCount":  {"type": "integer"},
+    "logRotationTime":   {"type": "integer"},
+    "talkEnabled":       {"type": "boolean"},
+    "talkServerName":    {"type": "string"},
+    "debug":             {"type": "boolean"}
+  }
+}
