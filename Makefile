@@ -8,7 +8,7 @@ prepare:
 
 xpi: prepare
 	rm -f ieview-we.xpi
-	zip -r -9 ieview-we.xpi *.json *.js _locales common options extlib -x '*/.*'
+	zip -r -9 ieview-we.xpi manifest.json *.js _locales common options extlib -x '*/.*' -x extlib/browser-polyfill.min.js
 
 chrome: prepare
 	[ -d node_modules ] || npm install
