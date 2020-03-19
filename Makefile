@@ -23,6 +23,15 @@ chrome: prepare
 	sed -i -r -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
 	cd chrome && zip -r ../ieview-we.zip .
 
+
+# knldjmfmopnpolahpmmgbagdohdnhkik
+DUMMY_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyXQ/A52JivHZKh4YO/9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB"
+
+chrome-test: chrome
+	cat chrome/manifest.json | jq '.key = ${DUMMY_KEY}' > chrome/manifest.json.tmp
+	mv chrome/manifest.json.tmp chrome/manifest.json
+	cd chrome && zip -r ../ieview-we-test.zip .
+
 host:
 	host/build.sh
 	rm -f ieview-we-host.zip
