@@ -248,7 +248,7 @@ var ChromeTalkClient = {
     pattern = pattern.replace(/\*/g, '.*');
     pattern = pattern.replace(/\?/g, '.');
 
-    return RegExp('^' + pattern + '$');
+    return RegExp('^' + pattern + '$', 'i');
   },
 
   redirect: function(bs, details) {
@@ -282,7 +282,7 @@ var ChromeTalkClient = {
 
     /* HostNamePatterns */
     for (var i = 0; i < bs.HostNamePatterns.length; i++) {
-      var pattern = bs.HostNamePatterns[i][0].toLowerCase();
+      var pattern = bs.HostNamePatterns[i][0];
       var browser = bs.HostNamePatterns[i][1].toLowerCase();
 
       if (this.regex(pattern, bs).test(host)) {
@@ -297,7 +297,7 @@ var ChromeTalkClient = {
 
     /* URLPatterns */
     for (var i = 0; i < bs.URLPatterns.length; i++) {
-      var pattern = bs.URLPatterns[i][0].toLowerCase();
+      var pattern = bs.URLPatterns[i][0];
       var browser = bs.URLPatterns[i][1].toLowerCase();
 
       if (this.regex(pattern, bs).test(details.url)) {
