@@ -18,7 +18,7 @@ chrome: prepare
 	cp -r managed_schema.json *.js _locales common options extlib chrome/
 	cp -r misc/128x128.png chrome/misc
 	find chrome -name '.*' | xargs rm -rf
-	cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js extlib/
+	cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js chrome/extlib/
 	sed -i -r -e 's;("scripts": *\[);\1"extlib/browser-polyfill.min.js",;' chrome/manifest.json
 	sed -i -r -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
 	cd chrome && zip -r ../ieview-we.zip .
