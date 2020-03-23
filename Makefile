@@ -26,9 +26,10 @@ chrome: prepare
 
 # knldjmfmopnpolahpmmgbagdohdnhkik
 DUMMY_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyXQ/A52JivHZKh4YO/9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB"
+DUMMY_VER := $(shell date +%m%d)
 
 chrome-test: chrome
-	cat chrome/manifest.json | jq '.key = ${DUMMY_KEY}' > chrome/manifest.json.tmp
+	cat chrome/manifest.json | jq '.key = ${DUMMY_KEY}' | jq '.version+=".1${DUMMY_VER}"' > chrome/manifest.json.tmp
 	mv chrome/manifest.json.tmp chrome/manifest.json
 	cd chrome && zip -r ../ieview-we-test.zip .
 
