@@ -280,13 +280,13 @@ var ChromeTalkClient = {
       return;
     }
 
-    /* HostNamePatterns */
-    for (var i = 0; i < bs.HostNamePatterns.length; i++) {
-      var pattern = bs.HostNamePatterns[i][0];
-      var browser = bs.HostNamePatterns[i][1].toLowerCase();
+    /* URLPatterns */
+    for (var i = 0; i < bs.URLPatterns.length; i++) {
+      var pattern = bs.URLPatterns[i][0];
+      var browser = bs.URLPatterns[i][1].toLowerCase();
 
-      if (this.regex(pattern, bs).test(host)) {
-        debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
+      if (this.regex(pattern, bs).test(details.url)) {
+        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
         if (browser == 'chrome')
           return;
         if (browser == '' && bs.SecondBrowser == 'chrome')
@@ -295,13 +295,13 @@ var ChromeTalkClient = {
       }
     }
 
-    /* URLPatterns */
-    for (var i = 0; i < bs.URLPatterns.length; i++) {
-      var pattern = bs.URLPatterns[i][0];
-      var browser = bs.URLPatterns[i][1].toLowerCase();
+    /* HostNamePatterns */
+    for (var i = 0; i < bs.HostNamePatterns.length; i++) {
+      var pattern = bs.HostNamePatterns[i][0];
+      var browser = bs.HostNamePatterns[i][1].toLowerCase();
 
-      if (this.regex(pattern, bs).test(details.url)) {
-        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
+      if (this.regex(pattern, bs).test(host)) {
+        debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
         if (browser == 'chrome')
           return;
         if (browser == '' && bs.SecondBrowser == 'chrome')
