@@ -252,11 +252,18 @@ var ChromeTalkClient = {
   },
 
   redirect: function(bs, details) {
+    if (details.tabId < 0) return;
+
     var server = configs.talkServerName;
     var query = new String('Q chrome ' + details.url);
 
     chrome.tabs.get(details.tabId, (tab) => {
       /* This is required for Chrome's "preload" tabs */
+      if (chrome.runtime.lastError) {
+        debug("[Talk] tabs.get() fails", chrome.runtime.lastError.message);
+        return;
+      }
+
       if (!tab) return;
 
       /* Open another browser via Query */
