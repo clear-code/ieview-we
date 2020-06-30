@@ -126,11 +126,11 @@ func Launch(path string, defaultArgs []string, url string) {
 		args = append(args, url)
 	}
 	command := exec.Command(path, args...)
-	// "0x01000000" is the raw version of "CREATE_BREAKAWAY_FROM_JOB".
+	const CREATE_BREAKAWAY_FROM_JOB = 0x01000000;
 	// See also:
 	//   https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#Closing_the_native_app
 	//   https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx
-	command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x01000000}
+	command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: CREATE_BREAKAWAY_FROM_JOB}
 	response := &LaunchResponse{true, path, args, DebugLogs}
 
 	err := command.Start()
