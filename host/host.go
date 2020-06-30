@@ -6,6 +6,7 @@ import (
 	"github.com/clear-code/mcd-go"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/lhside/chrome-go"
+	"github.com/mitchellh/go-ps"
 	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"log"
@@ -16,6 +17,8 @@ import (
 	"syscall"
 	"time"
 )
+
+const CREATE_BREAKAWAY_FROM_JOB = 0x01000000;
 
 type RequestParams struct {
 	// launch
@@ -126,11 +129,18 @@ func Launch(path string, defaultArgs []string, url string) {
 		args = append(args, url)
 	}
 	command := exec.Command(path, args...)
-	const CREATE_BREAKAWAY_FROM_JOB = 0x01000000;
+
+	parentPID := os.Getppid()
+	pidInfo, _ := ps.FindProcess(parentPID)
+	if strings.Contains(pidInfo.Executable(), "firefox") {
 	// See also:
 	//   https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#Closing_the_native_app
 	//   https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx
 	command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: CREATE_BREAKAWAY_FROM_JOB}
+	} else {
+		command.SysProcAttr = &syscall.SysProcAttr{CreationFlags: syscall.CREATE_NEW_PROCESS_GROUP}
+	}
+
 	response := &LaunchResponse{true, path, args, DebugLogs}
 
 	err := command.Start()
