@@ -127,7 +127,7 @@ func Launch(path string, defaultArgs []string, url string) {
 		}
 	}
 	if !replacedPlaceholder {
-		args = append(args, url)
+		args = append(args, "\""+url+"\"")
 	}
 	command := exec.Command(path, args...)
 
