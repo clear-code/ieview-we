@@ -464,7 +464,11 @@ var gOpeningTabs = new Map();
     if (aChangeInfo.status == 'complete' ||
         (aChangeInfo.url &&
          !/^(about:(blank|newtab|home))$/.test(aChangeInfo.url))) {
-      gOpeningTabs.delete(aTabId);
+      setTimeout(() => {
+        debug('remove tab from opening tabs list: ', aTab.id);
+        // This needs to be done after the onBeforeRequest listener is processed.
+        gOpeningTabs.delete(aTabId);
+      }, configs.closeReloadPageMaxDelayMsec);
     }
   });
 })();

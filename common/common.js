@@ -28,6 +28,7 @@ configs = new Configs({
 	forceielist      : '',
 	disableForce     : false,
 	closeReloadPage  : true,
+	closeReloadPageMaxDelayMsec: 150,
 	contextMenu      : true,
 	onlyMainFrame    : true,
 	ignoreQueryString: false,
