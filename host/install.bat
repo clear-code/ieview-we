@@ -29,14 +29,14 @@ IF %PROCESSOR_ARCHITECTURE% == AMD64 (
 COPY *.json "%INSTALL_DIR%\"
 COPY *.bat "%INSTALL_DIR%\"
 
-DEL %INSTALL_DIR%\%NAME%.chrome.json
+DEL "%INSTALL_DIR%\%NAME%.chrome.json"
 
 setlocal enabledelayedexpansion
 for /f "delims=" %%A in (%NAME%.chrome.json) do (
   set source=%%A
   set install_dir_filled=!source:__INSTALL_PATH__=%INSTALL_DIR%\host.exe!
   set escaped=!install_dir_filled:\=\\!
-  echo !escaped!>>%INSTALL_DIR%\%NAME%.chrome.json
+  echo !escaped!>>"%INSTALL_DIR%\%NAME%.chrome.json"
 )
 endlocal
 
