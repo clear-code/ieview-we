@@ -89,10 +89,11 @@ function onBeforeRequest(aDetails) {
       debug('matched to sitesOpenedBySelfRegex?: ', matched);
       if (matched)
         redirected = false;
-      debug('redirected?: ', redirected);
     }
+    debug('redirected?: ', redirected);
     if (redirected) {
       launch(aDetails.url);
+      log('is opening tab?: ', gOpeningTabs.has(aDetails.tabId));
       if (configs.closeReloadPage &&
           gOpeningTabs.has(aDetails.tabId)) {
         gOpeningTabs.delete(aDetails.tabId);
@@ -456,6 +457,7 @@ var gOpeningTabs = new Map();
 
 
   browser.tabs.onCreated.addListener(aTab => {
+    debug('new tab: ', aTab.id);
     gOpeningTabs.set(aTab.id, true);
   });
   browser.tabs.onUpdated.addListener((aTabId, aChangeInfo, aTab) => {
