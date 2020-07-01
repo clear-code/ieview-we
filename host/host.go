@@ -95,7 +95,7 @@ func main() {
 func LogForInfo(message string) {
 	DebugLogs = append(DebugLogs, message)
 	if Logging {
-		fmt.Fprintf(os.Stderr, "[info] " + message + "\n")
+		fmt.Fprintf(os.Stderr, "[info] "+message+"\n")
 		log.Print(message + "\r\n")
 	}
 }
@@ -103,7 +103,7 @@ func LogForInfo(message string) {
 func LogForDebug(message string) {
 	DebugLogs = append(DebugLogs, message)
 	if Logging && Debug {
-		fmt.Fprintf(os.Stderr, "[debug] " + message + "\n")
+		fmt.Fprintf(os.Stderr, "[debug] "+message+"\n")
 		log.Print(message + "\r\n")
 	}
 }
