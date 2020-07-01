@@ -119,16 +119,20 @@ func Launch(path string, defaultArgs []string, url string) {
 	args := []string{}
 	replacedPlaceholder := false
 	for _, arg := range defaultArgs {
-		if arg == "%s" || arg == "%**" {
-			args = append(args, url)
+		if strings.Contains(arg, "%s") {
+			args = append(args, strings.Replace(arg, "%s", url, 1))
+			replacedPlaceholder = true
+		} else if strings.Contains(arg, "%**") {
+			args = append(args, strings.Replace(arg, "%**", url, 1))
 			replacedPlaceholder = true
 		} else {
 			args = append(args, arg)
 		}
 	}
 	if !replacedPlaceholder {
-		args = append(args, "\""+url+"\"")
+		args = append(args, url)
 	}
+	LogForInfo("Args: \n  " + strings.Join(args, "\n  "))
 	command := exec.Command(path, args...)
 
 	if !strings.HasPrefix(os.Args[1], "chrome-extension://") { // non-Chromium caller => Firefox
