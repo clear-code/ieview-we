@@ -4,6 +4,6 @@
   "path": "__INSTALL_PATH__",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://ojjhhpmlkebklbhbkockaldmdnglhcaa/"
+    "chrome-extension://nifnmbbelnhfhgeiampkfghakhmgggcf/"
   ]
 }
