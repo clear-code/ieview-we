@@ -6,7 +6,6 @@ import (
 	"github.com/clear-code/mcd-go"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	"github.com/lhside/chrome-go"
-	"github.com/mitchellh/go-ps"
 	"golang.org/x/sys/windows/registry"
 	"io/ioutil"
 	"log"
@@ -130,9 +129,7 @@ func Launch(path string, defaultArgs []string, url string) {
 	}
 	command := exec.Command(path, args...)
 
-	parentPID := os.Getppid()
-	pidInfo, _ := ps.FindProcess(parentPID)
-	if strings.Contains(pidInfo.Executable(), "firefox") {
+	if !strings.HasPrefix(os.Args[1], "chrome-extension://") { // non-Chromium caller => Firefox
 		// See also:
 		//   https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#Closing_the_native_app
 		//   https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863(v=vs.85).aspx
