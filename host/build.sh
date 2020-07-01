@@ -38,7 +38,6 @@ main() {
   prepare_dependency github.com/robertkrimen/otto
   prepare_dependency github.com/clear-code/mcd-go
   prepare_dependency github.com/lestrrat/go-file-rotatelogs
-  prepare_dependency github.com/mitchellh/go-ps
 
   local path="$(echo "$temp_src" | sed 's;^src/;;')/host"
   gox -os="windows" "$path"
