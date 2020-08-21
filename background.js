@@ -256,8 +256,13 @@ var ChromeTalkClient = {
     var server = configs.talkServerName;
     var query = new String('Q chrome ' + details.url);
 
+    if (details.tabId < 0) {
+        return;
+    }
+
     chrome.tabs.get(details.tabId, (tab) => {
       /* This is required for Chrome's "preload" tabs */
+      if (chrome.runtime.lastError) return;
       if (!tab) return;
 
       /* Open another browser via Query */
@@ -281,13 +286,13 @@ var ChromeTalkClient = {
       return;
     }
 
-    /* HostNamePatterns */
-    for (var i = 0; i < bs.HostNamePatterns.length; i++) {
-      var pattern = bs.HostNamePatterns[i][0];
-      var browser = bs.HostNamePatterns[i][1].toLowerCase();
+    /* URLPatterns */
+    for (var i = 0; i < bs.URLPatterns.length; i++) {
+      var pattern = bs.URLPatterns[i][0];
+      var browser = bs.URLPatterns[i][1].toLowerCase();
 
-      if (this.regex(pattern, bs).test(host)) {
-        debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
+      if (this.regex(pattern, bs).test(details.url)) {
+        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
         if (browser == 'chrome')
           return;
         if (browser == '' && bs.SecondBrowser == 'chrome')
@@ -296,13 +301,13 @@ var ChromeTalkClient = {
       }
     }
 
-    /* URLPatterns */
-    for (var i = 0; i < bs.URLPatterns.length; i++) {
-      var pattern = bs.URLPatterns[i][0];
-      var browser = bs.URLPatterns[i][1].toLowerCase();
+    /* HostNamePatterns */
+    for (var i = 0; i < bs.HostNamePatterns.length; i++) {
+      var pattern = bs.HostNamePatterns[i][0];
+      var browser = bs.HostNamePatterns[i][1].toLowerCase();
 
-      if (this.regex(pattern, bs).test(details.url)) {
-        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
+      if (this.regex(pattern, bs).test(host)) {
+        debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
         if (browser == 'chrome')
           return;
         if (browser == '' && bs.SecondBrowser == 'chrome')
@@ -321,6 +326,9 @@ var ChromeTalkClient = {
 
 /*
  * Talk Client for ThinBridge (Google Chrome).
+ *
+ * This class is used when configs.talkServerName is configured
+ * to 'com.clear_code.thinbridge'.
  */
 var ThinBridgeTalkClient = {
 
@@ -401,7 +409,7 @@ var ThinBridgeTalkClient = {
         }
         mp = i;
         cp = j + 1
-      } else if (wild[i] == string[j] || (wild[i] == '?')) {
+      } else if ((wild[i] == string[j]) || (wild[i] == '?')) {
         i += 1;
         j += 1;
       } else {
@@ -420,7 +428,7 @@ var ThinBridgeTalkClient = {
     var server = configs.talkServerName;
     var query = new String('Q chrome ' + details.url);
 
-    if (details.tabId <= 0) {
+    if (details.tabId < 0) {
         return;
     }
 

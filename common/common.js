@@ -38,6 +38,6 @@ configs = new Configs({
 	logRotationCount : 12,
 	logRotationTime  : 24,
 	talkEnabled      : false,
-	talkServerName   : '',
+	talkServerName   : 'com.clear_code.browserselector_talk',
 	debug            : false
 });

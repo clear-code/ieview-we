@@ -43,3 +43,7 @@ managed: prepare
 
 all: host managed xpi chrome
 
+clean:
+	rm -rf chrome
+	rm -f *.zip
+	rm -f *.xpi
