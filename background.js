@@ -377,21 +377,43 @@ var ThinBridgeTalkClient = {
     });
   },
 
-  /* Convert BrowserSelector's pattern into RegExp */
-  regex: function(pattern, bs) {
-    if (bs.UseRegex)
-        return RegExp(pattern);
+  /* ThinBridge-compatible match() function
+   * See 'CURLRedirectDataClass.wildcmp()' for details.
+   */
+  match: function(wild, string) {
+    var i = 0;
+    var j = 0;
+    var mp, cp;
 
-    // ThinBridge support a 'simple' pattern that allows to use
-    // `*` for any strings, and `?` for any single character.
-    var specials = /(\.|\+|\(|\)|\[|\]|\\|\^|\$|\|)/g;
-    //                .  +  (  )  [  ]  \  ^  $  |
+    while ((j < string.length) && (wild[i] != '*')) {
+      if ((wild[i] != string[j]) && (wild[i] != '?')) {
+        return 0;
+      }
+      i += 1;
+      j += 1;
+    }
+    while (j < string.length) {
+      if (wild[i] == '*') {
+        i += 1;
 
-    pattern = pattern.replace(specials, '\\$1');
-    pattern = pattern.replace(/\*/g, '.*');
-    pattern = pattern.replace(/\?/g, '.');
-
-    return RegExp('^' + pattern + '$', 'i');
+        if (i == wild.length) {
+          return 1;
+        }
+        mp = i;
+        cp = j + 1
+      } else if (wild[i] == string[j] || (wild[i] == '?')) {
+        i += 1;
+        j += 1;
+      } else {
+        i = mp;
+        j = cp;
+        cp += 1;
+      }
+    }
+    while (wild[i] == '*' && i < wild.length) {
+      i += 1;
+    }
+    return i >= wild.length;
   },
 
   redirect: function(bs, details) {
@@ -436,7 +458,7 @@ var ThinBridgeTalkClient = {
       if (browser != 'chrome')
         continue;
 
-      if (this.regex(pattern, bs).test(details.url)) {
+      if (this.match(pattern, details.url)) {
         debug('[Talk] Match Exclude', {pattern: pattern, url: details.url, browser: browser})
         return this.redirect(bs, details);
       }
@@ -447,7 +469,7 @@ var ThinBridgeTalkClient = {
       var pattern = bs.URLPatterns[i][0];
       var browser = bs.URLPatterns[i][1].toLowerCase();
 
-      if (this.regex(pattern, bs).test(details.url)) {
+      if (this.match(pattern, details.url)) {
         debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
         if (browser == 'chrome')
           return;
