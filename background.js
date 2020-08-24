@@ -65,7 +65,7 @@ function onBeforeRequest(aDetails) {
     var targetURL = aDetails.url;
     if (configs.ignoreQueryString)
       targetURL = aDetails.url.replace(/\?.*/, '');
-  
+
     debug('targetURL: ', targetURL);
     if (forceIEListRegex) {
       debug('forceIEListRegex: ', forceIEListRegex);
@@ -319,6 +319,170 @@ var ChromeTalkClient = {
   }
 };
 
+/*
+ * Talk Client for ThinBridge (Google Chrome).
+ */
+var ThinBridgeTalkClient = {
+
+  NAME: 'ThinBridgeTalkClient',
+
+  INTERVAL: 1, /* N minutes between configuration refreshes */
+
+  init: function() {
+    this.cached = null;
+    this.isNewTab = {};
+    this.configure();
+    this.listen();
+    log('Running as Thinbridge Talk client');
+  },
+
+  configure: function() {
+    var server = configs.talkServerName;
+    var query = new String('C chrome');
+
+    chrome.runtime.sendNativeMessage(server, query, (resp) => {
+      this.cached = resp.config;
+      debug('[Talk] configure', resp.config);
+    });
+  },
+
+  listen: function() {
+    chrome.webRequest.onBeforeRequest.addListener(
+      this.onBeforeRequest.bind(this),
+      {
+        urls: ['<all_urls>'],
+        types: ['main_frame']
+      },
+      ['blocking']
+    );
+
+    /* Refresh config for every N minute */
+    chrome.alarms.create(this.NAME, {'periodInMinutes': this.INTERVAL});
+
+    chrome.alarms.onAlarm.addListener((alarm) => {
+      if (alarm.name === this.NAME) {
+        this.configure();
+      }
+    });
+
+    /* Tab book-keeping for intelligent tab handlings */
+    chrome.tabs.onCreated.addListener(tab => {
+      this.isNewTab[tab.id] = 1;
+    });
+
+    chrome.tabs.onUpdated.addListener((id, info, tab) => {
+      if (info.status === 'complete') {
+        delete this.isNewTab[tab.id];
+      }
+    });
+  },
+
+  /* ThinBridge-compatible match() function
+   * See 'CURLRedirectDataClass.wildcmp()' for details.
+   */
+  match: function(wild, string) {
+    var i = 0;
+    var j = 0;
+    var mp, cp;
+
+    while ((j < string.length) && (wild[i] != '*')) {
+      if ((wild[i] != string[j]) && (wild[i] != '?')) {
+        return 0;
+      }
+      i += 1;
+      j += 1;
+    }
+    while (j < string.length) {
+      if (wild[i] == '*') {
+        i += 1;
+
+        if (i == wild.length) {
+          return 1;
+        }
+        mp = i;
+        cp = j + 1
+      } else if (wild[i] == string[j] || (wild[i] == '?')) {
+        i += 1;
+        j += 1;
+      } else {
+        i = mp;
+        j = cp;
+        cp += 1;
+      }
+    }
+    while (wild[i] == '*' && i < wild.length) {
+      i += 1;
+    }
+    return i >= wild.length;
+  },
+
+  redirect: function(bs, details) {
+    var server = configs.talkServerName;
+    var query = new String('Q chrome ' + details.url);
+
+    if (details.tabId <= 0) {
+        return;
+    }
+
+    chrome.tabs.get(details.tabId, (tab) => {
+      /* This is required for Chrome's "preload" tabs */
+      if (chrome.runtime.lastError) return;
+      if (!tab) return;
+
+      /* Open another browser via Query */
+      chrome.runtime.sendNativeMessage(server, query);
+
+      /* Close the opening tab automatically (if required) */
+      if (bs.CloseEmptyTab && this.isNewTab[details.tabId]) {
+        chrome.tabs.remove(details.tabId);
+      }
+    });
+    return CANCEL_RESPONSE;
+  },
+
+  onBeforeRequest: function(details) {
+    var bs = this.cached;
+    var host = details.url.split('/')[2];
+
+    if (!bs) {
+      log('[Talk] config cache is empty. Fetching...');
+      this.configure();
+      return;
+    }
+
+    /* URLExcludePatterns */
+    for (var i = 0; i < bs.URLExcludePatterns.length; i++) {
+      var pattern = bs.URLExcludePatterns[i][0];
+      var browser = bs.URLExcludePatterns[i][1].toLowerCase();
+
+      if (browser != 'chrome')
+        continue;
+
+      if (this.match(pattern, details.url)) {
+        debug('[Talk] Match Exclude', {pattern: pattern, url: details.url, browser: browser})
+        return this.redirect(bs, details);
+      }
+    }
+
+    /* URLPatterns */
+    for (var i = 0; i < bs.URLPatterns.length; i++) {
+      var pattern = bs.URLPatterns[i][0];
+      var browser = bs.URLPatterns[i][1].toLowerCase();
+
+      if (this.match(pattern, details.url)) {
+        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
+        if (browser == 'chrome')
+          return;
+        return this.redirect(bs, details);
+      }
+    }
+
+    /* No pattern matched */
+    debug('[Talk] No pattern matched', {url: details.url})
+    return this.redirect(bs, details);
+  }
+};
+
 
 /*
  * main
@@ -427,8 +591,11 @@ var gOpeningTabs = new Map();
 (async () => {
   await configs.$loaded;
 
+
   if (configs.talkEnabled) {
-    if (gIsChromium) {
+    if (configs.talkServerName == 'com.clear_code.thinbridge') {
+        return ThinBridgeTalkClient.init();
+    } else if (gIsChromium) {
         return ChromeTalkClient.init();
     } else {
         return TalkClient.init();
