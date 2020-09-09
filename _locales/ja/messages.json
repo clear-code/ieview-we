@@ -20,6 +20,7 @@
   "config_logRotationCount_label":    { "message": "ログを指定した世代保存する" },
   "config_logRotationTime_label":     { "message": "ログをローテーションする間隔(時間)" },
   "config_debug_label":               { "message": "デバッグログを出力" },
-  "config_talkEnabled_label":         { "message": "Talkサーバーとの対話モードを有効化する（高度な機能／要再起動）" },
-  "config_talkServerName_label":      { "message": "接続するTalkサーバー" }
+  "config_talkEnabled_label":         { "message": "Talkサーバーとの対話モードを有効化する（要再起動）" },
+  "config_talkServerName_label":      { "message": "接続するTalkサーバー" },
+  "config_talkAlarmMinutes_label":    { "message": "TalkサーバーとN分ごとに設定を同期する（Chrome版のみ有効）" }
 }

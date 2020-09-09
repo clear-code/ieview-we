@@ -20,6 +20,7 @@
   "config_logRotationCount_label":    { "message": "Max count of log files" },
   "config_logRotationTime_label":     { "message": "Rotate log file by specified hour" },
   "config_debug_label":               { "message": "Print debug log" },
-  "config_talkEnabled_label":         { "message": "Enable Talk client mode (Advanced/Needs Restart)" },
-  "config_talkServerName_label":      { "message": "Talk server to connect" }
+  "config_talkEnabled_label":         { "message": "Enable Talk client mode (Needs Restart)" },
+  "config_talkServerName_label":      { "message": "Talk server to connect" },
+  "config_talkAlarmMinutes_label":    { "message": "Sync with Talk server for every N minutes（Chrome only）" }
 }
