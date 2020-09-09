@@ -359,7 +359,7 @@ var ThinBridgeTalkClient = {
       this.onBeforeRequest.bind(this),
       {
         urls: ['<all_urls>'],
-        types: ['main_frame']
+        types: ['main_frame','sub_frame']
       },
       ['blocking']
     );
@@ -441,8 +441,10 @@ var ThinBridgeTalkClient = {
       chrome.runtime.sendNativeMessage(server, query);
 
       /* Close the opening tab automatically (if required) */
-      if (bs.CloseEmptyTab && this.isNewTab[details.tabId]) {
-        chrome.tabs.remove(details.tabId);
+      if (details.type == 'main_frame') {
+        if (bs.CloseEmptyTab && this.isNewTab[details.tabId]) {
+          chrome.tabs.remove(details.tabId);
+        }
       }
     });
     return CANCEL_RESPONSE;
@@ -450,12 +452,21 @@ var ThinBridgeTalkClient = {
 
   onBeforeRequest: function(details) {
     var bs = this.cached;
-    var host = details.url.split('/')[2];
+    var url = details.url;
 
     if (!bs) {
       log('[Talk] config cache is empty. Fetching...');
       this.configure();
       return;
+    }
+
+    if (bs.OnlyMainFrame && details.type != "main_frame") {
+      debug('[Talk] ignore subframe request', url);
+      return;
+    }
+
+    if (bs.IgnoreQueryString) {
+      url = url.replace(/\?.*/, '');
     }
 
     /* URLExcludePatterns */
@@ -466,8 +477,8 @@ var ThinBridgeTalkClient = {
       if (browser != 'chrome')
         continue;
 
-      if (this.match(pattern, details.url)) {
-        debug('[Talk] Match Exclude', {pattern: pattern, url: details.url, browser: browser})
+      if (this.match(pattern, url)) {
+        debug('[Talk] Match Exclude', {pattern: pattern, url: url, browser: browser})
         return this.redirect(bs, details);
       }
     }
@@ -477,8 +488,8 @@ var ThinBridgeTalkClient = {
       var pattern = bs.URLPatterns[i][0];
       var browser = bs.URLPatterns[i][1].toLowerCase();
 
-      if (this.match(pattern, details.url)) {
-        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
+      if (this.match(pattern, url)) {
+        debug('[Talk] Match', {pattern: pattern, url: url, browser: browser})
         if (browser == 'chrome')
           return;
         return this.redirect(bs, details);
@@ -486,7 +497,7 @@ var ThinBridgeTalkClient = {
     }
 
     /* No pattern matched */
-    debug('[Talk] No pattern matched', {url: details.url})
+    debug('[Talk] No pattern matched', {url: url})
     return this.redirect(bs, details);
   }
 };
