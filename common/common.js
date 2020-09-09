@@ -39,5 +39,6 @@ configs = new Configs({
 	logRotationTime  : 24,
 	talkEnabled      : false,
 	talkServerName   : 'com.clear_code.browserselector_talk',
+	talkAlarmMinutes : 1,
 	debug            : false
 });

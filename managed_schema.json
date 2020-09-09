@@ -16,6 +16,7 @@
     "logRotationTime":   {"type": "integer"},
     "talkEnabled":       {"type": "boolean"},
     "talkServerName":    {"type": "string"},
+    "talkAlarmMinutes":  {"type": "integer"},
     "debug":             {"type": "boolean"}
   }
 }

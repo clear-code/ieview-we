@@ -184,8 +184,6 @@ var ChromeTalkClient = {
 
   NAME: 'ChromeTalkClient',
 
-  INTERVAL: 3, /* N minutes between configuration refreshes */
-
   init: function() {
     this.cached = null;
     this.isNewTab = {};
@@ -215,7 +213,8 @@ var ChromeTalkClient = {
     );
 
     /* Refresh config for every N minute */
-    chrome.alarms.create(this.NAME, {'periodInMinutes': this.INTERVAL});
+    log('[Talk] poll config for every', configs.talkAlarmMinutes, 'minutes');
+    chrome.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
 
     chrome.alarms.onAlarm.addListener((alarm) => {
       if (alarm.name === this.NAME) {
@@ -334,8 +333,6 @@ var ThinBridgeTalkClient = {
 
   NAME: 'ThinBridgeTalkClient',
 
-  INTERVAL: 1, /* N minutes between configuration refreshes */
-
   init: function() {
     this.cached = null;
     this.isNewTab = {};
@@ -365,7 +362,8 @@ var ThinBridgeTalkClient = {
     );
 
     /* Refresh config for every N minute */
-    chrome.alarms.create(this.NAME, {'periodInMinutes': this.INTERVAL});
+    log('[Talk] poll config for every', configs.talkAlarmMinutes, 'minutes');
+    chrome.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
 
     chrome.alarms.onAlarm.addListener((alarm) => {
       if (alarm.name === this.NAME) {
