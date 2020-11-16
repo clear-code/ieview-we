@@ -174,7 +174,7 @@ var TalkClient = {
 };
 
 /*
- * Talk Client for Google Chrome.
+ * Talk Client for Chrome (and Edge).
  *
  * We need a separate implementation for Google Chrome since
  * chrome.webRequest won't allow to communicate with the host
@@ -194,7 +194,7 @@ var ChromeTalkClient = {
 
   configure: function() {
     var server = configs.talkServerName;
-    var query = new String('C chrome');
+    var query = new String('C ' + configs.talkBrowserName);
 
     chrome.runtime.sendNativeMessage(server, query, (resp) => {
       this.cached = resp.config;
@@ -253,7 +253,7 @@ var ChromeTalkClient = {
 
   redirect: function(bs, details) {
     var server = configs.talkServerName;
-    var query = new String('Q chrome ' + details.url);
+    var query = new String('Q ' + configs.talkBrowserName + ' ' + details.url);
 
     if (details.tabId < 0) {
         return;
@@ -292,9 +292,9 @@ var ChromeTalkClient = {
 
       if (this.regex(pattern, bs).test(details.url)) {
         debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
-        if (browser == 'chrome')
+        if (browser == configs.talkBrowserName)
           return;
-        if (browser == '' && bs.SecondBrowser == 'chrome')
+        if (browser == '' && bs.SecondBrowser == configs.talkBrowserName)
           return;
         return this.redirect(bs, details);
       }
@@ -307,9 +307,9 @@ var ChromeTalkClient = {
 
       if (this.regex(pattern, bs).test(host)) {
         debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
-        if (browser == 'chrome')
+        if (browser == configs.talkBrowserName)
           return;
-        if (browser == '' && bs.SecondBrowser == 'chrome')
+        if (browser == '' && bs.SecondBrowser == configs.talkBrowserName)
           return;
         return this.redirect(bs, details);
       }
@@ -317,7 +317,7 @@ var ChromeTalkClient = {
 
     /* No pattern matched */
     debug('[Talk] No pattern matched', {url: details.url})
-    if (bs.DefaultBrowser !== 'chrome') {
+    if (bs.DefaultBrowser !== configs.talkBrowserName) {
       return this.redirect(bs, details);
     }
   }

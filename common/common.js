@@ -22,6 +22,18 @@ function debug(aMessage, ...aArgs)
 	log('[DEBUG] ' + aMessage, ...aArgs);
 }
 
+function getDefaultBrowser()
+{
+    /* Assume Chrome if UA is not accessible */
+    if (!navigator || !navigator.userAgent)
+        return "chrome";
+
+    if (/Edg/.test(navigator.userAgent))
+        return "edge";
+
+    return "chrome";
+}
+
 configs = new Configs({
 	ieapp            : '',
 	ieargs           : '',
@@ -40,5 +52,6 @@ configs = new Configs({
 	talkEnabled      : false,
 	talkServerName   : 'com.clear_code.browserselector_talk',
 	talkAlarmMinutes : 1,
+	talkBrowserName  : getDefaultBrowser(),
 	debug            : false
 });

@@ -12,6 +12,12 @@
     <script type="application/javascript" src="/extlib/l10n.js"></script>
     <script type="application/javascript" src="/options/init.js"></script>
   </head>
+  <style>
+    #BS {background:#fffabb;}
+    #BS:disabled {background:none}
+    #BS div {padding:0.5em 0;}
+    #BS.firefox .nofirefox {display:none;}
+  </style>
   <body>
     <p><label>__MSG_config_ieapp_label_before__
          <input id="ieapp"
@@ -59,14 +65,26 @@
     <p><label><input id="debug"
                      type="checkbox">
              __MSG_config_debug_label__</label></p>
-    <p><label><input id="talkEnabled"
-                     type="checkbox">
-             __MSG_config_talkEnabled_label__</label></p>
-    <p><label>__MSG_config_talkServerName_label__
-          <input id="talkServerName"
-                 type="text"
-                 size="30"></label></p>
-    <p><label>__MSG_config_talkAlarmMinutes_label__
-              <input id="talkAlarmMinutes" type="number" min="1"></label></p>
+
+    <fieldset id='BS'>
+      <legend>
+        <label><input id="talkEnabled" type="checkbox">__MSG_config_talkEnabled_label__</label>
+      </legend>
+      <div>
+        <label>__MSG_config_talkServerName_label__
+        <input id="talkServerName" type="text" size="40"></label>
+      </div>
+      <div class='nofirefox'>
+        <label>__MSG_config_talkAlarmMinutes_label__
+        <input id="talkAlarmMinutes" type="number" min="1"></label>
+      </div>
+      <div class='nofirefox'>
+        <label>__MSG_config_talkBrowserName_label__
+        <select id="talkBrowserName">
+          <option value='chrome'>Google Chrome</option>
+          <option value='edge'>Microsoft Edge</option>
+        </select></label>
+      </div>
+    </fieldset>
   </body>
 </html>
