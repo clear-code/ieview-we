@@ -12,6 +12,9 @@
     <script type="application/javascript" src="/extlib/l10n.js"></script>
     <script type="application/javascript" src="/options/init.js"></script>
   </head>
+  <style>
+    .box {padding:0.5em;border:1px dashed #999;background:#f7f7f7;}
+  </style>
   <body>
     <p><label>__MSG_config_ieapp_label_before__
          <input id="ieapp"
@@ -59,6 +62,8 @@
     <p><label><input id="debug"
                      type="checkbox">
              __MSG_config_debug_label__</label></p>
+
+    <div class='box'>
     <p><label><input id="talkEnabled"
                      type="checkbox">
              __MSG_config_talkEnabled_label__</label></p>
@@ -68,5 +73,11 @@
                  size="30"></label></p>
     <p><label>__MSG_config_talkAlarmMinutes_label__
               <input id="talkAlarmMinutes" type="number" min="1"></label></p>
+    <p><label>__MSG_config_talkBrowserName_label__
+              <select id="talkBrowserName">
+                <option value='chrome'>Google Chrome</option>
+                <option value='edge'>Microsoft Edge</option>
+              </select>
+    </div>
   </body>
 </html>

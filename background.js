@@ -194,7 +194,8 @@ var ChromeTalkClient = {
 
   configure: function() {
     var server = configs.talkServerName;
-    var query = new String('C chrome');
+    var browser = configs.talkBrowserName;
+    var query = new String('C ' + browser);
 
     chrome.runtime.sendNativeMessage(server, query, (resp) => {
       this.cached = resp.config;
@@ -253,7 +254,8 @@ var ChromeTalkClient = {
 
   redirect: function(bs, details) {
     var server = configs.talkServerName;
-    var query = new String('Q chrome ' + details.url);
+    var browser = configs.talkBrowserName;
+    var query = new String('Q ' + browser + ' ' + details.url);
 
     if (details.tabId < 0) {
         return;
@@ -278,6 +280,7 @@ var ChromeTalkClient = {
   onBeforeRequest: function(details) {
     var bs = this.cached;
     var host = details.url.split('/')[2];
+    var browser = configs.talkBrowserName;
 
     if (!bs) {
       log('[Talk] config cache is empty. Fetching...');
@@ -292,9 +295,9 @@ var ChromeTalkClient = {
 
       if (this.regex(pattern, bs).test(details.url)) {
         debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
-        if (browser == 'chrome')
+        if (browser == browser)
           return;
-        if (browser == '' && bs.SecondBrowser == 'chrome')
+        if (browser == '' && bs.SecondBrowser == browser)
           return;
         return this.redirect(bs, details);
       }
@@ -307,9 +310,9 @@ var ChromeTalkClient = {
 
       if (this.regex(pattern, bs).test(host)) {
         debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
-        if (browser == 'chrome')
+        if (browser == browser)
           return;
-        if (browser == '' && bs.SecondBrowser == 'chrome')
+        if (browser == '' && bs.SecondBrowser == browser)
           return;
         return this.redirect(bs, details);
       }
@@ -317,7 +320,7 @@ var ChromeTalkClient = {
 
     /* No pattern matched */
     debug('[Talk] No pattern matched', {url: details.url})
-    if (bs.DefaultBrowser !== 'chrome') {
+    if (bs.DefaultBrowser !== browser) {
       return this.redirect(bs, details);
     }
   }

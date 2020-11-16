@@ -22,5 +22,6 @@
   "config_debug_label":               { "message": "Print debug log" },
   "config_talkEnabled_label":         { "message": "Enable Talk client mode (Needs Restart)" },
   "config_talkServerName_label":      { "message": "Talk server to connect" },
-  "config_talkAlarmMinutes_label":    { "message": "Sync with Talk server for every N minutes（Chrome only）" }
+  "config_talkAlarmMinutes_label":    { "message": "Sync with Talk server for every N minutes (for Chrome/Edge)" },
+  "config_talkBrowserName_label":     { "message": "Choose the browser model (for Chrome/Edge)" }
 }

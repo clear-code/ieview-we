@@ -40,5 +40,6 @@ configs = new Configs({
 	talkEnabled      : false,
 	talkServerName   : 'com.clear_code.browserselector_talk',
 	talkAlarmMinutes : 1,
+	talkBrowserName  : "chrome",
 	debug            : false
 });
