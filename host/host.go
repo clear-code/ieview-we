@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/clear-code/mcd-go"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
@@ -16,6 +17,8 @@ import (
 	"syscall"
 	"time"
 )
+
+const VERSION = "1.6.0";
 
 const CREATE_BREAKAWAY_FROM_JOB = 0x01000000
 
@@ -39,6 +42,13 @@ var Logging bool
 var Debug bool
 
 func main() {
+	shouldReportVersion := flag.Bool("v", false, "v")
+	flag.Parse()
+	if *shouldReportVersion == true {
+		fmt.Println(VERSION)
+		return
+	}
+
 	log.SetOutput(ioutil.Discard)
 
 	rawRequest, err := chrome.Receive(os.Stdin)

@@ -39,6 +39,10 @@ main() {
   prepare_dependency github.com/clear-code/mcd-go
   prepare_dependency github.com/lestrrat/go-file-rotatelogs
 
+  addon_version="$(cat "$dist_dir/../manifest.json" | jq -r .version)"
+  echo "version is ${addon_version}"
+  sed -i -r -e "s/^(const VERSION = \")[^\"]*(\")/\1${addon_version}\2/" "$temp_src/host/host.go"
+
   local path="$(echo "$temp_src" | sed 's;^src/;;')/host"
   gox -os="windows" "$path"
 
