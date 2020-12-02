@@ -189,7 +189,7 @@ var ChromeTalkClient = {
     this.isNewTab = {};
     this.configure();
     this.listen();
-    log('Running as Chrome Talk client');
+    log('Running as Talk client for', configs.talkBrowserName);
   },
 
   configure: function() {
