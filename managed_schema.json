@@ -6,6 +6,7 @@
     "forceielist":       {"type": "string"},
     "disableForce":      {"type": "boolean"},
     "closeReloadPage":   {"type": "boolean"},
+    "closeReloadPageMaxDelayMsec": {"type": "integer"},
     "contextMenu":       {"type": "boolean"},
     "onlyMainFrame":     {"type": "boolean"},
     "ignoreQueryString": {"type": "boolean"},
@@ -17,6 +18,7 @@
     "talkEnabled":       {"type": "boolean"},
     "talkServerName":    {"type": "string"},
     "talkAlarmMinutes":  {"type": "integer"},
+    "talkBrowserName":   {"type": "string"},
     "debug":             {"type": "boolean"}
   }
 }
