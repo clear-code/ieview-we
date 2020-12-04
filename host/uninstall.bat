@@ -19,6 +19,7 @@ IF EXIST "%INSTALL_DIR%_try\" (
 
 REG DELETE "%REG_BASE%\SOFTWARE\Mozilla\NativeMessagingHosts\%NAME%" /f
 REG DELETE "%REG_BASE%\SOFTWARE\Google\Chrome\NativeMessagingHosts\%NAME%" /f
+REG DELETE "%REG_BASE%\SOFTWARE\Microsoft\Edge\NativeMessagingHosts\%NAME%" /f
 
 RMDIR /Q /S "%INSTALL_DIR%"
 

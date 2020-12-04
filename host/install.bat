@@ -30,6 +30,7 @@ COPY *.json "%INSTALL_DIR%\"
 COPY *.bat "%INSTALL_DIR%\"
 
 DEL "%INSTALL_DIR%\%NAME%.chrome.json"
+DEL "%INSTALL_DIR%\%NAME%.edge.json"
 
 setlocal enabledelayedexpansion
 for /f "delims=" %%A in (%NAME%.chrome.json) do (
@@ -38,12 +39,20 @@ for /f "delims=" %%A in (%NAME%.chrome.json) do (
   set escaped=!install_dir_filled:\=\\!
   echo !escaped!>>"%INSTALL_DIR%\%NAME%.chrome.json"
 )
+
+for /f "delims=" %%A in (%NAME%.edge.json) do (
+  set source=%%A
+  set install_dir_filled=!source:__INSTALL_PATH__=%INSTALL_DIR%\host.exe!
+  set escaped=!install_dir_filled:\=\\!
+  echo !escaped!>>"%INSTALL_DIR%\%NAME%.edge.json"
+)
 endlocal
 
 ECHO Registering...
 FOR %%f IN ("%INSTALL_DIR%") DO SET EXPANDED_PATH=%%~sf
 REG ADD "%REG_BASE%\SOFTWARE\Mozilla\NativeMessagingHosts\%NAME%" /ve /t REG_SZ /d "%EXPANDED_PATH%\%NAME%.json" /f
 REG ADD "%REG_BASE%\SOFTWARE\Google\Chrome\NativeMessagingHosts\%NAME%" /ve /t REG_SZ /d "%EXPANDED_PATH%\%NAME%.chrome.json" /f
+REG ADD "%REG_BASE%\SOFTWARE\Microsoft\Edge\NativeMessagingHosts\%NAME%" /ve /t REG_SZ /d "%EXPANDED_PATH%\%NAME%.edge.json" /f
 
 ECHO Done.
 PAUSE
