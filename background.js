@@ -146,7 +146,9 @@ var TalkClient = {
 
     browser.tabs.onUpdated.addListener((id, info, tab) => {
       if (info.status === 'complete') {
-        delete this.isNewTab[tab.id];
+        if (info.url && !/^(about:(blank|newtab|home))$/.test(info.url)) {
+          delete this.isNewTab[tab.id];
+        }
       }
     });
   },
@@ -164,6 +166,7 @@ var TalkClient = {
     }
     if (resp.open) {
         if (resp.close_tab && this.isNewTab[details.tabId]) {
+            debug('Cloding tab', details.tabId);
             delete this.isNewTab[details.tabId];
             await browser.tabs.remove(details.tabId);
         }
