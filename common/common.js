@@ -54,4 +54,4 @@ configs = new Configs({
 	talkAlarmMinutes : 1,
 	talkBrowserName  : getDefaultBrowser(),
 	debug            : false
-});
+}, {logging: true});

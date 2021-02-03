@@ -23,6 +23,9 @@ installMenuItems.supportsTabContext = false;
 
 var forceIEListRegex = null;
 function installBlocker() {
+  if (configs.talkEnabled) {
+      return;
+  }
   var list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
   log('force list: ', list);
   var types = ['main_frame'];
@@ -123,9 +126,13 @@ function onBeforeRequest(aDetails) {
 var TalkClient = {
 
   init: function() {
+    if (this.running) {
+        return;
+    }
     this.isNewTab = {};
     this.callback = this.onBeforeRequest.bind(this);
     this.listen();
+    this.running = true;
     log('Running as Talk client');
   },
 
@@ -188,10 +195,14 @@ var ChromeTalkClient = {
   NAME: 'ChromeTalkClient',
 
   init: function() {
+    if (this.running) {
+        return;
+    }
     this.cached = null;
     this.isNewTab = {};
     this.configure();
     this.listen();
+    this.running = true;
     log('Running as Talk client for', configs.talkBrowserName);
   },
 
@@ -337,10 +348,14 @@ var ThinBridgeTalkClient = {
   NAME: 'ThinBridgeTalkClient',
 
   init: function() {
+    if (this.running) {
+        return;
+    }
     this.cached = null;
     this.isNewTab = {};
     this.configure();
     this.listen();
+    this.running = true;
     log('Running as Thinbridge Talk client');
   },
 
@@ -503,6 +518,40 @@ var ThinBridgeTalkClient = {
   }
 };
 
+function runTalkServer() {
+    if (configs.talkServerName == 'com.clear_code.thinbridge') {
+        return ThinBridgeTalkClient.init();
+    } else if (gIsChromium) {
+        return ChromeTalkClient.init();
+    } else {
+        return TalkClient.init();
+    }
+}
+
+/*
+ * Listen `chrome.storage.onChange` to launch talkServer on
+ * delay-loaded GPO settings.
+ */
+function onTalkEnabled(data, storageName) {
+    if (data.talkBrowserName) {
+        configs.talkBrowserName = data.talkBrowserName.newValue;
+    }
+
+    if (data.talkServerName) {
+        configs.talkServerName = data.talkServerName.newValue;
+    }
+
+    if (data.talkEnabled) {
+        configs.talkEnabled = data.talkEnabled.newValue;
+    }
+
+    if (data.talkEnabled && data.talkEnabled.newValue) {
+        log('[Talk] talkEnabled is turned on. Launch a client...');
+        uninstallBlocker();
+        runTalkServer();
+    }
+    log('chrome.storage.onChange: ', storageName, JSON.stringify(data));
+}
 
 /*
  * main
@@ -611,16 +660,10 @@ var gOpeningTabs = new Map();
 (async () => {
   await configs.$loaded;
 
-
   if (configs.talkEnabled) {
-    if (configs.talkServerName == 'com.clear_code.thinbridge') {
-        return ThinBridgeTalkClient.init();
-    } else if (gIsChromium) {
-        return ChromeTalkClient.init();
-    } else {
-        return TalkClient.init();
-    }
+      return runTalkServer();
   }
+  log('Running as a stand-alone mode')
 
   await applyMCDConfigs();
   await setDefaultPath();
@@ -642,6 +685,7 @@ var gOpeningTabs = new Map();
 
   configs.$addObserver(onConfigUpdated);
 
+  browser.storage.onChanged.addListener(onTalkEnabled);
 
   browser.tabs.onCreated.addListener(aTab => {
     debug('new tab: ', aTab.id);
