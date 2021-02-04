@@ -1,4 +1,5 @@
 .PHONY: prepare xpi chrome host managed
+TIMESTAMP=$(shell date +%Y%m%d)
 
 prepare:
 	git submodule update --init
@@ -21,7 +22,7 @@ chrome: prepare
 	cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js chrome/extlib/
 	sed -i -r -e 's;("scripts": *\[);\1"extlib/browser-polyfill.min.js",;' chrome/manifest.json
 	sed -i -r -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
-	cd chrome && zip -r ../ieview-we.zip .
+	cd chrome && zip -r ../ieview-we-${TIMESTAMP}.zip .
 
 
 # knldjmfmopnpolahpmmgbagdohdnhkik
@@ -30,7 +31,7 @@ DUMMY_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyX
 chrome-test: chrome
 	cat chrome/manifest.json | jq '.key = ${DUMMY_KEY}' > chrome/manifest.json.tmp
 	mv chrome/manifest.json.tmp chrome/manifest.json
-	cd chrome && zip -r ../ieview-we-test.zip .
+	cd chrome && zip -r ../ieview-we-test-${TIMESTAMP}.zip .
 
 host:
 	host/build.sh
