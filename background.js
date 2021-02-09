@@ -554,6 +554,44 @@ function onTalkEnabled(data, storageName) {
 }
 
 /*
+ * This is a safety lock to ensure ThinBridgeTalkClient is running.
+ *
+ * We have seen a few stability issues on Chrome where IEView WE
+ * fails to get managed policy on startup, so we check the running
+ * state a few seconds later.
+ */
+function checkThinBridgeMode() {
+    if (!browser.storage.managed) {
+        log('[managed] managed storage is null')
+    }
+
+    browser.storage.managed.get().then((m) => {
+        log(`[managed] config = `, JSON.stringify(m));
+
+        if (!gIsChromium) {
+            log('[managed] browser was not chrome');
+            return;
+        }
+        if (ChromeTalkClient.running) {
+            log('[managed] ChromeTalkClient already running');
+            return;
+        }
+        if (ThinBridgeTalkClient.running) {
+            log('[managed] ThinBridgeTalkClient already running');
+            return;
+        }
+
+        if (m.talkEnabled && m.talkServerName == "com.clear_code.thinbridge") {
+            log('[managed] Do dispatch ThinBridgeClient')
+            configs.talkEnabled = m.talkEnabled;
+            configs.talkServerName = m.talkServerName;
+            uninstallBlocker();
+            runTalkServer();
+        }
+    });
+}
+
+/*
  * main
  */
 const VALID_MATCH_PATTERN = (() => {
@@ -702,6 +740,7 @@ var gOpeningTabs = new Map();
       }, configs.closeReloadPageMaxDelayMsec);
     }
   });
+  setTimeout(checkThinBridgeMode, 2500);
 })();
 
 async function applyMCDConfigs() {
