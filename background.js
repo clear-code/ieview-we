@@ -338,6 +338,51 @@ var ChromeTalkClient = {
 };
 
 /*
+ * ThinBridge's matching function (See BHORedirector/URLRedirectCore.h)
+ *
+ *  1. `?` represents a single character.
+ *  2. `*` represents an arbitrary substring.
+ *
+ * >>> wildcmp("http?://*.example.com/*", "https://www.example.com/")
+ * true
+ */
+function wildcmp(wild, string) {
+  var i = 0;
+  var j = 0;
+  var mp, cp;
+
+  while ((j < string.length) && (wild[i] != '*')) {
+    if ((wild[i] != string[j]) && (wild[i] != '?')) {
+      return 0;
+    }
+    i += 1;
+    j += 1;
+  }
+  while (j < string.length) {
+    if (wild[i] == '*') {
+      i += 1;
+
+      if (i == wild.length) {
+        return 1;
+      }
+      mp = i;
+      cp = j + 1
+    } else if ((wild[i] == string[j]) || (wild[i] == '?')) {
+      i += 1;
+      j += 1;
+    } else {
+      i = mp;
+      j = cp;
+      cp += 1;
+    }
+  }
+  while (wild[i] == '*' && i < wild.length) {
+    i += 1;
+  }
+  return i >= wild.length;
+};
+
+/*
  * Talk Client for ThinBridge (Google Chrome).
  *
  * This class is used when configs.talkServerName is configured
@@ -401,45 +446,6 @@ var ThinBridgeTalkClient = {
     });
   },
 
-  /* ThinBridge-compatible match() function
-   * See 'CURLRedirectDataClass.wildcmp()' for details.
-   */
-  match: function(wild, string) {
-    var i = 0;
-    var j = 0;
-    var mp, cp;
-
-    while ((j < string.length) && (wild[i] != '*')) {
-      if ((wild[i] != string[j]) && (wild[i] != '?')) {
-        return 0;
-      }
-      i += 1;
-      j += 1;
-    }
-    while (j < string.length) {
-      if (wild[i] == '*') {
-        i += 1;
-
-        if (i == wild.length) {
-          return 1;
-        }
-        mp = i;
-        cp = j + 1
-      } else if ((wild[i] == string[j]) || (wild[i] == '?')) {
-        i += 1;
-        j += 1;
-      } else {
-        i = mp;
-        j = cp;
-        cp += 1;
-      }
-    }
-    while (wild[i] == '*' && i < wild.length) {
-      i += 1;
-    }
-    return i >= wild.length;
-  },
-
   redirect: function(bs, details) {
     var server = configs.talkServerName;
     var query = new String('Q chrome ' + details.url);
@@ -493,7 +499,7 @@ var ThinBridgeTalkClient = {
       if (browser != 'chrome')
         continue;
 
-      if (this.match(pattern, url)) {
+      if (wildcmp(pattern, url)) {
         debug('[Talk] Match Exclude', {pattern: pattern, url: url, browser: browser})
         return this.redirect(bs, details);
       }
@@ -504,7 +510,7 @@ var ThinBridgeTalkClient = {
       var pattern = bs.URLPatterns[i][0];
       var browser = bs.URLPatterns[i][1].toLowerCase();
 
-      if (this.match(pattern, url)) {
+      if (wildcmp(pattern, url)) {
         debug('[Talk] Match', {pattern: pattern, url: url, browser: browser})
         if (browser == 'chrome')
           return;
