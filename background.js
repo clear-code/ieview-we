@@ -433,7 +433,7 @@ var ThinBridgeTalkClient = {
     );
 
     /* Refresh config for every N minute */
-    log('[Talk] poll config for every', configs.talkAlarmMinutes, 'minutes');
+    console.log('Poll config for every', configs.talkAlarmMinutes, 'minutes');
     chrome.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
 
     chrome.alarms.onAlarm.addListener((alarm) => {
@@ -466,11 +466,11 @@ var ThinBridgeTalkClient = {
       }
 
       var query = new String('Q chrome ' + url);
-      chrome.runtime.sendNativeMessage(configs.talkServerName, query);
-
-      if (closeTab) {
-        chrome.tabs.remove(tabId);
-      }
+      chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
+        if (closeTab) {
+          chrome.tabs.remove(tabId);
+        }
+      });
     });
   },
 
