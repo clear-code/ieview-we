@@ -405,12 +405,20 @@ var ThinBridgeTalkClient = {
   },
 
   configure: function() {
-    var server = configs.talkServerName;
     var query = new String('C chrome');
 
-    chrome.runtime.sendNativeMessage(server, query, (resp) => {
+    chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
+      if (chrome.runtime.lastError) {
+        console.log('Cannot fetch config', JSON.stringify(chrome.runtime.lastError));
+        return;
+      }
+      var isStartup = (this.cached == null);
       this.cached = resp.config;
-      debug('[Talk] configure', resp.config);
+      console.log('Fetch config', JSON.stringify(this.cached));
+
+      if (isStartup) {
+        this.handleStartup(this.cached);
+      }
     });
   },
 
@@ -498,6 +506,20 @@ var ThinBridgeTalkClient = {
     }
     console.log(`* No pattern matched`);
     return true;
+  },
+
+  /* Handle startup tabs preceding to onBeforeRequest */
+  handleStartup: function(tbconfig) {
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        var url = tab.url || tab.pendingUrl;
+        console.log(`handleStartup ${url} (tab=${tab.id})`);
+        if (this.isRedirectURL(tbconfig, url)) {
+          console.log(`* Redirect to another browser`);
+          this.redirect(url, tab.id, tbconfig.CloseEmptyTab);
+        }
+      });
+    });
   },
 
   /* Callback for webRequest.onBeforeRequest */
