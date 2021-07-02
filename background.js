@@ -401,7 +401,7 @@ var ThinBridgeTalkClient = {
     this.configure();
     this.listen();
     this.running = true;
-    log('Running as Thinbridge Talk client');
+    console.log('Running as Thinbridge Talk client');
   },
 
   configure: function() {
@@ -446,6 +446,26 @@ var ThinBridgeTalkClient = {
     });
   },
 
+  redirect: function(url, tabId, closeTab) {
+    chrome.tabs.get(tabId, (tab) => {
+      if (chrome.runtime.lastError) {
+        console.log(`* Ignore prefetch request`);
+        return;
+      }
+      if (!tab) {
+        console.log(`* URL is not coming from an actual tab`);
+        return;
+      }
+
+      var query = new String('Q chrome ' + url);
+      chrome.runtime.sendNativeMessage(configs.talkServerName, query);
+
+      if (closeTab) {
+        chrome.tabs.remove(tabId);
+      }
+    });
+  },
+
   isRedirectURL: function(tbconfig, url) {
     if (!url) {
       console.log(`* Empty URL found`);
@@ -472,89 +492,47 @@ var ThinBridgeTalkClient = {
 
     for (i = 0; i < tbconfig.URLPatterns.length; i++) {
       if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
-        debug(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+        console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
         return false;
       }
     }
-    debug(`* No pattern matched`);
+    console.log(`* No pattern matched`);
     return true;
   },
 
-  redirect: function(bs, details) {
-    var server = configs.talkServerName;
-    var query = new String('Q chrome ' + details.url);
-
-    if (details.tabId < 0) {
-        return;
-    }
-
-    chrome.tabs.get(details.tabId, (tab) => {
-      /* This is required for Chrome's "preload" tabs */
-      if (chrome.runtime.lastError) return;
-      if (!tab) return;
-
-      /* Open another browser via Query */
-      chrome.runtime.sendNativeMessage(server, query);
-
-      /* Close the opening tab automatically (if required) */
-      if (details.type == 'main_frame') {
-        if (bs.CloseEmptyTab && this.isNewTab[details.tabId]) {
-          chrome.tabs.remove(details.tabId);
-        }
-      }
-    });
-    return CANCEL_RESPONSE;
-  },
-
+  /* Callback for webRequest.onBeforeRequest */
   onBeforeRequest: function(details) {
-    var bs = this.cached;
-    var url = details.url;
+    var tbconfig = this.cached;
+    var closeTab = false;
+    var isMainFrame = (details.type == 'main_frame');
 
-    if (!bs) {
-      log('[Talk] config cache is empty. Fetching...');
+    console.log(`onBeforeRequest ${details.url} (tab=${details.tabId})`);
+
+    if (!tbconfig) {
+      console.log('* Config cache is empty. Fetching...');
       this.configure();
       return;
     }
 
-    if (bs.OnlyMainFrame && details.type != "main_frame") {
-      debug('[Talk] ignore subframe request', url);
+    if (details.tabId < 0) {
+      console.log(`* Ignore internal request`);
       return;
     }
 
-    if (bs.IgnoreQueryString) {
-      url = url.replace(/\?.*/, '');
+    if (tbconfig.OnlyMainFrame && !isMainFrame) {
+      console.log(`* Ignore subframe request`);
+      return;
     }
 
-    /* URLExcludePatterns */
-    for (var i = 0; i < bs.URLExcludePatterns.length; i++) {
-      var pattern = bs.URLExcludePatterns[i][0];
-      var browser = bs.URLExcludePatterns[i][1].toLowerCase();
-
-      if (browser != 'chrome')
-        continue;
-
-      if (wildcmp(pattern, url)) {
-        debug('[Talk] Match Exclude', {pattern: pattern, url: url, browser: browser})
-        return this.redirect(bs, details);
-      }
+    if (tbconfig.CloseEmptyTab && isMainFrame && this.isNewTab[details.tabId]) {
+      closeTab = true;
     }
 
-    /* URLPatterns */
-    for (var i = 0; i < bs.URLPatterns.length; i++) {
-      var pattern = bs.URLPatterns[i][0];
-      var browser = bs.URLPatterns[i][1].toLowerCase();
-
-      if (wildcmp(pattern, url)) {
-        debug('[Talk] Match', {pattern: pattern, url: url, browser: browser})
-        if (browser == 'chrome')
-          return;
-        return this.redirect(bs, details);
-      }
+    if (this.isRedirectURL(tbconfig, details.url)) {
+      console.log(`* Redirect to another browser`);
+      this.redirect(details.url, details.tabId, closeTab);
+      return CANCEL_RESPONSE;
     }
-
-    /* No pattern matched */
-    debug('[Talk] No pattern matched', {url: url})
-    return this.redirect(bs, details);
   }
 };
 
