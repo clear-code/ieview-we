@@ -446,6 +446,40 @@ var ThinBridgeTalkClient = {
     });
   },
 
+  isRedirectURL: function(tbconfig, url) {
+    if (!url) {
+      console.log(`* Empty URL found`);
+      return false;
+    }
+
+    if (!/^https?:/.test(url)) {
+      console.log(`* Ignore non-HTTP/HTTPS URL`);
+      return false;
+    }
+
+    if (tbconfig.IgnoreQueryString) {
+      url = url.replace(/\?.*/, '');
+    }
+    console.log(`* Check patterns for ${url}`);
+
+    var i;
+    for (i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
+      if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
+        console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
+        return true;
+      }
+    }
+
+    for (i = 0; i < tbconfig.URLPatterns.length; i++) {
+      if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
+        debug(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+        return false;
+      }
+    }
+    debug(`* No pattern matched`);
+    return true;
+  },
+
   redirect: function(bs, details) {
     var server = configs.talkServerName;
     var query = new String('Q chrome ' + details.url);
