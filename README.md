@@ -10,10 +10,9 @@ For example: `http://example.com` => `http://example.com/*` (note that the added
 
 # Steps to install
 
- 1. Download a zip package of the native messaging host from the [releases page](https://github.com/clear-code/ieview-we/releases).
- 2. Unzip downloaded file.
- 3. Double-click the batch file named `install.bat`.
- 4. [Install "IE View WE" Firefox addon from its xpi package.](https://addons.mozilla.org/firefox/addon/ie-view-we/)
+ 1. Download the MSI suitable for your environment's architecture, or a zip package "ieview-we-host.zip" from the [releases page](https://github.com/clear-code/ieview-we/releases/latest).
+ 2. If you've downloaded an MSI, run it to install. Otherwise, unzip the downloaded file and double-click the batch file named "install.bat".
+ 3. [Install "IE View WE" Firefox addon from its xpi package.](https://addons.mozilla.org/firefox/addon/ie-view-we/)
 
 # Steps to uninstall
 
