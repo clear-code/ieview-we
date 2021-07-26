@@ -92,7 +92,7 @@ prepare_msi_sources() {
       > templates/product.wxs
 
   build_msi_bat="build_msi.bat"
-  msi_basename="lst-addons-in-win-programs-nmh"
+  msi_basename="ieview-we-nmh"
 
   rm -f "$build_msi_bat"
   touch "$build_msi_bat"
