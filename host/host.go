@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-const VERSION = "1.6.0";
+const VERSION = "1.6.4";
 
 const CREATE_BREAKAWAY_FROM_JOB = 0x01000000
 
