@@ -1,0 +1,7 @@
+386
+amd64
+outdir
+templates/product.wxs
+*.msi
+*.exe
+build_msi.bat

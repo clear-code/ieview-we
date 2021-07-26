@@ -26,6 +26,11 @@ then
 fi
 
 main() {
+  build_host
+  prepare_msi_sources
+}
+
+build_host() {
   cd "$GOPATH"
 
   echo "preparing dependencies..."
@@ -63,6 +68,46 @@ main() {
 prepare_dependency() {
   local path="$1"
   [ -d "src/$path" ] || go get "$path"
+}
+
+prepare_msi_sources() {
+  cd "$dist_dir"
+
+  product_name="$(cat wix.json | jq -r .product)"
+  host_name="$(ls *.json | grep -E -v 'wix.json|chrome.json|edge.json' | sed -r -e 's/.json$//')"
+  vendor_name="$(cat wix.json | jq -r .company)"
+  addon_version="$(cat ../manifest.json | jq -r .version)"
+  upgrade_code_guid="$(cat wix.json | jq -r '."upgrade-code"')"
+  files_guid="$(cat wix.json | jq -r .files.guid)"
+  env_guid="$(cat wix.json | jq -r .env.guid)"
+
+  cat templates/product.wxs.template |
+    sed -r -e "s/%PRODUCT%/${product_name}/g" \
+           -e "s/%NAME%/${host_name}/g" \
+           -e "s/%VENDOR%/${vendor_name}/g" \
+           -e "s/%VERSION%/${addon_version}/g" \
+           -e "s/%UPGRADE_CODE_GUID%/${upgrade_code_guid}/g" \
+           -e "s/%FILES_GUID%/${files_guid}/g" \
+           -e "s/%ENV_GUID%/${env_guid}/g" \
+      > templates/product.wxs
+
+  build_msi_bat="build_msi.bat"
+  msi_basename="lst-addons-in-win-programs-nmh"
+
+  rm -f "$build_msi_bat"
+  touch "$build_msi_bat"
+  echo -e "set MSITEMP=%USERPROFILE%\\\\temp%RANDOM%\r" >> "$build_msi_bat"
+  echo -e "set SOURCE=%~dp0\r" >> "$build_msi_bat"
+  echo -e "xcopy \"%SOURCE%\\*\" \"%MSITEMP%\" /S /I \r" >> "$build_msi_bat"
+  echo -e "cd \"%MSITEMP%\" \r" >> "$build_msi_bat"
+  echo -e "copy 386\\host.exe \"%cd%\\\" \r" >> "$build_msi_bat"
+  echo -e "go-msi.exe make --msi ${msi_basename}-386.msi --version ${addon_version} --src templates --out \"%cd%\\outdir\" --arch 386 \r" >> "$build_msi_bat"
+  echo -e "del host.exe \r" >> "$build_msi_bat"
+  echo -e "copy amd64\\host.exe \"%cd%\\\" \r" >> "$build_msi_bat"
+  echo -e "go-msi.exe make --msi ${msi_basename}-amd64.msi --version ${addon_version} --src templates --out \"%cd%\\outdir\" --arch amd64 \r" >> "$build_msi_bat"
+  echo -e "xcopy *.msi \"%SOURCE%\" /I /Y \r" >> "$build_msi_bat"
+  echo -e "cd \"%SOURCE%\" \r" >> "$build_msi_bat"
+  echo -e "rd /S /Q \"%MSITEMP%\" \r" >> "$build_msi_bat"
 }
 
 main

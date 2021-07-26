@@ -1,0 +1,34 @@
+{
+  "product": "IE View WE Native Messaging Host",
+  "company": "ClearCode Inc.",
+  "upgrade-code": "a57431ca-9141-4e78-ab2d-bbba133a68c4",
+  "files": {
+    "guid": "8e352576-6293-4578-a649-37ac9bbd829a",
+    "items": [
+      "host.exe",
+      "com.clear_code.ieview_we_host.json",
+      "com.clear_code.ieview_we_host.edge.json",
+      "com.clear_code.ieview_we_host.chrome.json"
+    ]
+  },
+  "env": {
+    "guid": "f662a755-a488-4f2f-b8ea-c5bfb521e968",
+    "vars": [
+      {
+        "name": "PATH",
+        "value": "[INSTALLDIR]",
+        "permanent": "no",
+        "system": "no",
+        "action": "set",
+        "part": "last"
+      }
+    ]
+  },
+  "shortcuts": {},
+  "choco": {
+    "description": "IE View WE Native Messaging Host",
+    "project-url": "https://github.com/clear-code/ieview-we",
+    "tags": "firefox addon",
+    "license-url": "https://github.com/clear-code/ieview-we/blob/master/webextensions/host/LICENSE"
+  }
+}
