@@ -35,6 +35,7 @@ function getDefaultBrowser()
 }
 
 configs = new Configs({
+	autoDetectTarget : '',
 	ieapp            : '',
 	ieargs           : '',
 	forceielist      : '',

@@ -17,12 +17,33 @@
     #BS:disabled {background:none}
     #BS div {padding:0.5em 0;}
     #BS.firefox .nofirefox {display:none;}
+    p {
+      margin: 0;
+    }
+    .sub {
+      margin-left: 2em;
+    }
   </style>
   <body>
-    <p><label>__MSG_config_ieapp_label_before__
-         <input id="ieapp"
-                type="text"
-                size="20"></label></p>
+    <fieldset>
+      <legend>__MSG_config_autoDetectTarget_caption__</legend>
+      <p><label><input name="autoDetectTarget"
+                       type="radio"
+                       value="ie">
+                __MSG_config_autoDetectTarget_ie__</label></p>
+      <p><label><input name="autoDetectTarget"
+                       type="radio"
+                       value="edge">
+                __MSG_config_autoDetectTarget_edge__</label></p>
+      <p><label><input name="autoDetectTarget"
+                       type="radio"
+                       value="manual">
+                __MSG_config_autoDetectTarget_manual__</label></p>
+      <p class="sub"><label>__MSG_config_ieapp_label_before__
+                            <input id="ieapp"
+                                   type="text"
+                                   size="20"></label></p>
+    </fieldset>
     <p><label>__MSG_config_ieargs_label_before__
          <input id="ieargs"
                 type="text"

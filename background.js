@@ -734,6 +734,7 @@ function matchPatternToRegExp(pattern) {
 }
 
 var gOpeningTabs = new Map();
+var gAppPath;
 
 (async () => {
   await configs.$loaded;
@@ -743,8 +744,15 @@ var gOpeningTabs = new Map();
   }
   log('Running as a stand-alone mode')
 
+  if (!configs.autoDetectTarget) {
+    if (configs.ieapp)
+      configs.autoDetectTarget = 'manual';
+    else
+      configs.autoDetectTarget = 'ie';
+  }
+
   await applyMCDConfigs();
-  await setDefaultPath();
+  await updateAppPath();
 
   var browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
   gIsFirefox  = browserInfo && browserInfo.name == 'Firefox';
@@ -806,15 +814,23 @@ async function applyMCDConfigs() {
   }
 }
 
-async function setDefaultPath() {
-  if (configs.ieapp)
+async function updateAppPath() {
+  if (configs.autoDetectTarget == 'manual') {
+    gAppPath = configs.ieapp;
     return;
+  }
   try {
-    let response = await send({ command: 'get-ie-path' });
+    gAppPath = '';
+    let response = await send({
+      command: 'get-ie-path',
+      params: {
+        autoDetectTarget: configs.autoDetectTarget,
+      },
+    });
     if (response) {
       log('Received: ', JSON.stringify(response));
       if (response.path)
-        configs.ieapp = response.path;
+        gAppPath = response.path;
     }
   }
   catch(aError) {
@@ -845,8 +861,20 @@ function setSitesOpenedBySelf() {
   }
 }
 
-function onConfigUpdated(aKey) {
+async function onConfigUpdated(aKey) {
   switch (aKey) {
+    case 'autoDetectTarget':
+      await updateAppPath();
+      break;
+
+    case 'ieapp':
+      if (configs.ieapp)
+        configs.autoDetectTarget = 'manual';
+      else if (configs.autoDetectTarget == 'manual')
+        configs.autoDetectTarget = 'ie';
+      await updateAppPath();
+      break;
+
     case 'contextMenu':
       if (configs.contextMenu) {
         installMenuItems();
@@ -889,13 +917,13 @@ browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
 
 
 async function launch(aURL) {
-  if (!configs.ieapp && !configs.ieargs)
+  if (!gAppPath && !configs.ieargs)
     return;
 
   let message = {
     command: 'launch',
     params: {
-      path: configs.ieapp,
+      path: gAppPath,
       args: configs.ieargs.trim().split(/\s+/).filter((aItem) => !!aItem),
       url:  aURL
     }

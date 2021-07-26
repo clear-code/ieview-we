@@ -27,6 +27,8 @@ type RequestParams struct {
 	Path string   `json:path`
 	Args []string `json:args`
 	Url  string   `json:url`
+	// get-ie-path
+	AutoDetectTarget string `json:autoDetectTarget`
 }
 type Request struct {
 	Command          string        `json:"command"`
@@ -91,7 +93,7 @@ func main() {
 	case "launch":
 		Launch(request.Params.Path, request.Params.Args, request.Params.Url)
 	case "get-ie-path":
-		SendIEPath()
+		SendIEPath(request.Params.AutoDetectTarget)
 	case "read-mcd-configs":
 		SendMCDConfigs()
 	default: // just echo
@@ -182,8 +184,8 @@ type SendIEPathResponse struct {
 	Logs []string `json:"logs"`
 }
 
-func SendIEPath() {
-	path := GetIEPath()
+func SendIEPath(target string) {
+	path := GetAppPath(target)
 	response := &SendIEPathResponse{path, DebugLogs}
 	body, err := json.Marshal(response)
 	if err != nil {
@@ -195,8 +197,16 @@ func SendIEPath() {
 	}
 }
 
-func GetIEPath() (path string) {
-	keyPath := `SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe`
+func GetAppPath(target string) (path string) {
+	keyPath := ""
+	switch target {
+		case "edge":
+			keyPath = `SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe`
+		case "ie":
+			fallthrough
+		default:
+			keyPath = `SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\iexplore.exe`
+	}
 	key, err := registry.OpenKey(registry.LOCAL_MACHINE,
 		keyPath,
 		registry.QUERY_VALUE)

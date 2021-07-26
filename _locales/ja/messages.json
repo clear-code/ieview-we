@@ -1,12 +1,16 @@
 {
   "extensionName": { "message": "IE View WE" },
-  "extensionDescription": { "message": "ページやリンクをInternet Explorerで開く機能を提供します（WebExtensionsベースのIE Viewクローン）" },
+  "extensionDescription": { "message": "ページやリンクを外部ブラウザーで開く機能を提供します（WebExtensionsベースのIE Viewクローン）" },
 
   "contextMenu_page_label": { "message": "このページをIEで開く" },
   "contextMenu_link_label": { "message": "このリンクをIEで開く" },
 
-  "config_ieapp_label_before":        { "message": "Internet Explorerのパス" },
-  "config_ieargs_label_before":       { "message": "起動オプション" },
+  "config_autoDetectTarget_caption":  { "message": "使用する外部ブラウザー：" },
+  "config_autoDetectTarget_ie":       { "message": "Internet Explorer" },
+  "config_autoDetectTarget_edge":     { "message": "Edge" },
+  "config_autoDetectTarget_manual":   { "message": "手動設定" },
+  "config_ieapp_label_before":        { "message": "外部ブラウザーの実行ファイルのパス" },
+  "config_ieargs_label_before":       { "message": "外部ブラウザーの起動オプション" },
   "config_contextMenu_label":         { "message": "コンテキストメニューに「IEで開く」を追加する" },
   "config_onlyMainFrame_label":       { "message": "アドレスバーに表示されるURLのみを判定する" },
   "config_forceielist_caption":       { "message": "Internet Explorerで常に開くWebサイト" },

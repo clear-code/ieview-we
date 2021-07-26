@@ -1,12 +1,16 @@
 {
   "extensionName": { "message": "IE View WE" },
-  "extensionDescription": { "message": "Provides ability to open pages and links by Internet Explorer (Cloned IE View based on WebExtensions-based)" },
+  "extensionDescription": { "message": "Provides ability to open pages and links by any external browser (Cloned IE View based on WebExtensions-based)" },
 
   "contextMenu_page_label": { "message": "Open this Page by IE" },
   "contextMenu_link_label": { "message": "Open this Link by IE" },
 
-  "config_ieapp_label_before":        { "message": "Path to Internet Explorer:" },
-  "config_ieargs_label_before":       { "message": "Command Line Arguments:" },
+  "config_autoDetectTarget_caption":  { "message": "External Browser:" },
+  "config_autoDetectTarget_ie":       { "message": "Internet Explorer" },
+  "config_autoDetectTarget_edge":     { "message": "Edge" },
+  "config_autoDetectTarget_manual":   { "message": "Manual" },
+  "config_ieapp_label_before":        { "message": "Path to the Executable of the External Browser:" },
+  "config_ieargs_label_before":       { "message": "Command Line Arguments for External Browser:" },
   "config_contextMenu_label":         { "message": "Add \"Open by IE\" items to the context menu" },
   "config_onlyMainFrame_label":       { "message": "Only check URL which is shown in location bar" },
   "config_forceielist_caption":       { "message": "Websites to be opened by IE always" },
