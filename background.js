@@ -43,25 +43,17 @@ function installBlocker() {
   }).join('|'));
   log('forceIEListRegex:', forceIEListRegex);
 
-  if (list.length > 0) {
-    if (!browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
+  if (list.length > 0 &&
+      !browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.addListener(
       onBeforeRequest,
       { urls, types },
       ['blocking']
     );
-    if (!browser.webRequest.onBeforeRedirect.hasListener(onBeforeRedirect))
-      browser.webRequest.onBeforeRedirect.addListener(
-        onBeforeRedirect,
-        { urls, types }
-      );
-  }
 }
 function uninstallBlocker() {
   if (browser.webRequest.onBeforeRequest.hasListener(onBeforeRequest))
     browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
-  if (browser.webRequest.onBeforeRedirect.hasListener(onBeforeRedirect))
-    browser.webRequest.onBeforeRedirect.removeListener(onBeforeRedirect);
   forceIEListRegex = null;
 }
 function onBeforeRequest(aDetails) {
@@ -121,10 +113,6 @@ function onBeforeRequest(aDetails) {
 
   return CANCEL_RESPONSE;
 }
-function onBeforeRedirect(aDetails) {
-  log('onBeforeRedirect', aDetails);
-  // this listener can't block the request.
-}
 
 /*
  * Talk Protocol Support
@@ -142,6 +130,7 @@ var TalkClient = {
         return;
     }
     this.isNewTab = {};
+    this.callback = this.onBeforeRequest.bind(this);
     this.listen();
     this.running = true;
     log('Running as Talk client');
@@ -149,19 +138,12 @@ var TalkClient = {
 
   listen: function() {
     browser.webRequest.onBeforeRequest.addListener(
-      this.onBeforeRequest.bind(this),
+      this.callback,
       {
         urls: ['<all_urls>'],
         types: ['main_frame']
       },
       ['blocking']
-    );
-    browser.webRequest.onBeforeRedirect.addListener(
-      this.onBeforeRedirect.bind(this),
-      {
-        urls: ['<all_urls>'],
-        types: ['main_frame']
-      }
     );
 
     /* Tab book-keeping for intelligent tab handlings */
@@ -198,11 +180,7 @@ var TalkClient = {
         return CANCEL_RESPONSE;  // Stop the request
     }
     return {};
-  },
-
-  onBeforeRedirect: function(details) {
-    debug('TalkClient.onBeforeRedirect ', details);
-  },
+  }
 };
 
 /*
@@ -246,13 +224,6 @@ var ChromeTalkClient = {
         types: ['main_frame']
       },
       ['blocking']
-    );
-    chrome.webRequest.onBeforeRedirect.addListener(
-      this.onBeforeRedirect.bind(this),
-      {
-        urls: ['<all_urls>'],
-        types: ['main_frame']
-      }
     );
 
     /* Refresh config for every N minute */
@@ -363,11 +334,7 @@ var ChromeTalkClient = {
     if (bs.DefaultBrowser !== configs.talkBrowserName) {
       return this.redirect(bs, details);
     }
-  },
-
-  onBeforeRedirect: function(details) {
-    debug('ChromeTalkClient.onBeforeRedirect ', details);
-  },
+  }
 };
 
 /*
@@ -463,13 +430,6 @@ var ThinBridgeTalkClient = {
         types: ['main_frame','sub_frame']
       },
       ['blocking']
-    );
-    chrome.webRequest.onBeforeRedirect.addListener(
-      this.onBeforeRedirect.bind(this),
-      {
-        urls: ['<all_urls>'],
-        types: ['main_frame','sub_frame']
-      }
     );
 
     /* Refresh config for every N minute */
@@ -595,11 +555,7 @@ var ThinBridgeTalkClient = {
       this.redirect(details.url, details.tabId, closeTab);
       return CANCEL_RESPONSE;
     }
-  },
-
-  onBeforeRedirect: function(details) {
-    debug('ThinBridgeTalkClient.onBeforeRedirect ', details);
-  },
+  }
 };
 
 function runTalkServer() {
