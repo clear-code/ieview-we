@@ -474,7 +474,7 @@ var ThinBridgeTalkClient = {
     });
   },
 
-  isRedirectURL: function(tbconfig, url) {
+  isMatchedURL: function(tbconfig, url) {
     if (!url) {
       console.log(`* Empty URL found`);
       return false;
@@ -509,12 +509,48 @@ var ThinBridgeTalkClient = {
   },
 
   handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
-    if (!this.isRedirectURL(tbconfig, url))
-      return false;
+    if (tbconfig.Sections) {
+      // full mode
+      let redirected = false;
+      let determined = false;
+      configsLoop:
+      for (const section of tbconfig.Sections) {
+        const config = {
+          IgnoreQueryString: tbconfig.IgnoreQueryString,
+          ...section,
+        };
+        if (!this.isMatchedURL(config, url))
+          continue;
 
-    console.log(`* Redirect to another browser`);
-    this.redirect(url, tabId, tbconfig.CloseEmptyTab && isClosableTab);
-    return true;
+        switch (config.Name.toLowerCase()) {
+          case 'custom18':
+          case BROWSER.toLowerCase():
+            determined = true;
+            break configsLoop;
+
+          default:
+            redirected = true;
+            determined = true
+            break;
+        }
+      }
+
+      if (redirected) {
+        console.log(`* Redirect to another browser`);
+        this.redirect(url, tabId, tbconfig.CloseEmptyTab && isClosableTab);
+      }
+      console.log(`* Continue to load: ${!determined}`);
+      return determined;
+    }
+    else {
+      // legacy mode
+      if (!this.isMatchedURL(tbconfig, url))
+        return false;
+
+      console.log(`* Redirect to another browser`);
+      this.redirect(url, tabId, tbconfig.CloseEmptyTab && isClosableTab);
+      return true;
+    }
   },
 
   /* Handle startup tabs preceding to onBeforeRequest */
