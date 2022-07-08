@@ -535,36 +535,52 @@ var ThinBridgeTalkClient = {
   handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
     if (tbconfig.Sections) {
       // full mode
-      let redirected = false;
-      let determined = false;
-      configsLoop:
+      let redirectCount = 0;
+      let closeTabCount = 0;
+      const matchedSectionNames = [];
+      sectionsLoop:
       for (const section of tbconfig.Sections) {
         const config = {
           IgnoreQueryString: tbconfig.IgnoreQueryString,
+          CloseEmptyTab:     tbconfig.CloseEmptyTab,
           ...section,
         };
         if (!this.isMatchedURL(config, url))
           continue;
 
-        switch (config.Name.toLowerCase()) {
-          case 'custom18':
-          case BROWSER.toLowerCase():
-            determined = true;
-            break configsLoop;
+        const sectionName = config.Name.toLowerCase();
+        matchedSectionNames.push(sectionName);
 
-          default:
-            redirected = true;
-            determined = true
-            break;
+        if (config.CloseEmptyTab && isClosableTab)
+          closeTabCount++;
+
+        if (config.Action) {
+          if (config.Action.toLowerCase() == 'redirect')
+            redirectCount++;
+        }
+        else {
+          switch (sectionName) {
+            case 'custom18':
+              break sectionsLoop;
+
+            case BROWSER.toLowerCase():
+              break;
+
+            default:
+              redirectCount++;
+              if (sectionName == 'custom19')
+                break sectionsLoop;
+              break;
+          }
         }
       }
 
-      if (redirected) {
+      if (redirectCount > 0) {
         console.log(`* Redirect to another browser`);
-        this.redirect(url, tabId, tbconfig.CloseEmptyTab && isClosableTab);
+        this.redirect(url, tabId, closeTabCount > 0);
       }
-      console.log(`* Continue to load: ${!determined}`);
-      return determined;
+      console.log(`* Continue to load: ${matchedSectionNames.length == 0}`);
+      return matchedSectionNames.length > 0;
     }
     else {
       // legacy mode
