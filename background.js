@@ -433,6 +433,10 @@ var ThinBridgeTalkClient = {
             ];
           }
         }
+        this.cached.Sections = [
+          ...(sectionsByName.custom18 ? [sectionsByName.custom18] : []),
+          ...this.cached.Sections.filter(section => section.name.toLowerCase != 'custom18'),
+        ];
         console.log('Populated config', JSON.stringify(this.cached));
       }
 
