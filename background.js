@@ -508,16 +508,22 @@ var ThinBridgeTalkClient = {
     return true;
   },
 
+  handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
+    if (!this.isRedirectURL(tbconfig, url))
+      return false;
+
+    console.log(`* Redirect to another browser`);
+    this.redirect(url, tabId, tbconfig.CloseEmptyTab && isClosableTab);
+    return true;
+  },
+
   /* Handle startup tabs preceding to onBeforeRequest */
   handleStartup: function(tbconfig) {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
         var url = tab.url || tab.pendingUrl;
         console.log(`handleStartup ${url} (tab=${tab.id})`);
-        if (this.isRedirectURL(tbconfig, url)) {
-          console.log(`* Redirect to another browser`);
-          this.redirect(url, tab.id, tbconfig.CloseEmptyTab);
-        }
+        this.handleURLAndBlock({ tbconfig, tabId: tab.id, url, isMainFrame: true, isClosableTab: true });
       });
     });
   },
@@ -546,13 +552,9 @@ var ThinBridgeTalkClient = {
       return;
     }
 
-    if (tbconfig.CloseEmptyTab && isMainFrame && this.isNewTab[details.tabId]) {
-      closeTab = true;
-    }
+    var isClosableTab = isMainFrame && this.isNewTab[details.tabId];
 
-    if (this.isRedirectURL(tbconfig, details.url)) {
-      console.log(`* Redirect to another browser`);
-      this.redirect(details.url, details.tabId, closeTab);
+    if (this.handleURLAndBlock({ tbconfig, tabId: details.tabId, url: details.url, isMainFrame, isClosableTab })) {
       return CANCEL_RESPONSE;
     }
   }
