@@ -413,8 +413,28 @@ var ThinBridgeTalkClient = {
         return;
       }
       var isStartup = (this.cached == null);
-      this.cached = resp.config;
+      this.cached = resp.config || {};
       console.log('Fetch config', JSON.stringify(this.cached));
+      if (this.cached.Sections) { // full mode
+        const sectionsByName = {};
+        for (const section of this.cached.Sections) {
+          sectionsByName[section.Name.toLowerCase()] = section;
+        }
+        for (const section of this.cached.Sections) {
+          if (!section.ExcludeGroups)
+            continue;
+          for (const name of section.ExcludeGroups) {
+            const referredSection = sectionsByName[name.toLowerCase()];
+            if (!referredSection)
+              continue;
+            section.URLExcludePatterns = [
+              ...(section.URLExcludePatterns || []),
+              ...(referredSection.URLPatterns || []),
+            ];
+          }
+        }
+        console.log('Populated config', JSON.stringify(this.cached));
+      }
 
       if (isStartup) {
         this.handleStartup(this.cached);
