@@ -535,6 +535,7 @@ var ThinBridgeTalkClient = {
   handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
     if (tbconfig.Sections) {
       // full mode
+      let loadCount     = 0;
       let redirectCount = 0;
       let closeTabCount = 0;
       const matchedSectionNames = [];
@@ -555,15 +556,25 @@ var ThinBridgeTalkClient = {
           closeTabCount++;
 
         if (config.Action) {
-          if (config.Action.toLowerCase() == 'redirect')
-            redirectCount++;
+          switch(config.Action.toLowerCase()) {
+            case 'redirect':
+              redirectCount++;
+              break;
+
+            case 'load':
+            default:
+              loadCount++;
+              break;
+          }
         }
         else {
           switch (sectionName) {
             case 'custom18':
+              loadCount++;
               break sectionsLoop;
 
             case BROWSER.toLowerCase():
+              loadCount++;
               break;
 
             default:
@@ -575,12 +586,12 @@ var ThinBridgeTalkClient = {
         }
       }
 
-      if (redirectCount > 0) {
+      if (redirectCount > 0 || loadCount == 0) {
         console.log(`* Redirect to another browser`);
         this.redirect(url, tabId, closeTabCount > 0);
       }
-      console.log(`* Continue to load: ${matchedSectionNames.length == 0}`);
-      return matchedSectionNames.length > 0;
+      console.log(`* Continue to load: ${loadCount > 0}`);
+      return loadCount > 0;
     }
     else {
       // legacy mode
