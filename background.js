@@ -546,7 +546,7 @@ var ThinBridgeTalkClient = {
           CloseEmptyTab:     tbconfig.CloseEmptyTab,
           ...section,
         };
-        console.log(`handleURLAndBlock: check for section ${section.name} (${JSON.stringify(config)})`);
+        console.log(`handleURLAndBlock: check for section ${section.Name} (${JSON.stringify(config)})`);
         if (!this.isMatchedURL(config, url)) {
           console.log(` => unmached`);
           continue;
