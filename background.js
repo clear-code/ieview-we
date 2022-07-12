@@ -498,7 +498,7 @@ var ThinBridgeTalkClient = {
     });
   },
 
-  isMatchedURL: function(tbconfig, url) {
+  isMatchedURL: function(tbconfig, url, defaultMatched) {
     if (!url) {
       console.log(`* Empty URL found`);
       return false;
@@ -529,7 +529,7 @@ var ThinBridgeTalkClient = {
       }
     }
     console.log(`* No pattern matched`);
-    return true;
+    return !!defaultMatched;
   },
 
   handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
@@ -604,7 +604,7 @@ var ThinBridgeTalkClient = {
     }
     else {
       // legacy mode
-      if (!this.isMatchedURL(tbconfig, url))
+      if (!this.isMatchedURL(tbconfig, url, true))
         return false;
 
       console.log(`* Redirect to another browser`);
