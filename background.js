@@ -604,7 +604,7 @@ var ThinBridgeTalkClient = {
               loadCount++;
               break;
           }
-          if (sectionName == 'custom18')
+          if (sectionName == 'custom18' || sectionName == 'custom19')
             break sectionsLoop;
         }
         else {
