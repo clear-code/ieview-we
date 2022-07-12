@@ -546,8 +546,11 @@ var ThinBridgeTalkClient = {
           CloseEmptyTab:     tbconfig.CloseEmptyTab,
           ...section,
         };
-        if (!this.isMatchedURL(config, url))
+        console.log(`handleURLAndBlock: check for section ${section.name} (${JSON.stringify(config)})`);
+        if (!this.isMatchedURL(config, url)) {
+          console.log(` => unmached`);
           continue;
+        }
 
         const sectionName = (config.Name || '').toLowerCase();
         matchedSectionNames.push(sectionName);
@@ -555,6 +558,7 @@ var ThinBridgeTalkClient = {
         if (config.CloseEmptyTab && isClosableTab)
           closeTabCount++;
 
+        console.log(` => matched, action = ${config.Action}`);
         if (config.Action) {
           switch(config.Action.toLowerCase()) {
             case 'redirect':
@@ -570,14 +574,17 @@ var ThinBridgeTalkClient = {
         else {
           switch (sectionName) {
             case 'custom18':
+              console.log(` => action not defined, default action for CUSTMO18: load`);
               loadCount++;
               break sectionsLoop;
 
             case BROWSER.toLowerCase():
+              console.log(` => action not defined, default action for ${BROWSER}: load`);
               loadCount++;
               break;
 
             default:
+              console.log(` => action not defined, default action: redirect`);
               redirectCount++;
               if (sectionName == 'custom19')
                 break sectionsLoop;
