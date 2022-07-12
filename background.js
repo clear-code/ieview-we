@@ -634,7 +634,7 @@ var ThinBridgeTalkClient = {
         this.redirect(url, tabId, closeTabCount > 0);
       }
       console.log(`* Continue to load: ${loadCount > 0}`);
-      return loadCount > 0;
+      return loadCount == 0;
     }
     else {
       // legacy mode
