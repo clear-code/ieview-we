@@ -518,6 +518,40 @@ var ThinBridgeTalkClient = {
     for (i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
       if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
         console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
+        return false;
+      }
+    }
+
+    for (i = 0; i < tbconfig.URLPatterns.length; i++) {
+      if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
+        console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+        return true;
+      }
+    }
+    console.log(`* No pattern matched`);
+    return false;
+  },
+
+  isMatchedURLLegacy: function(tbconfig, url) {
+    if (!url) {
+      console.log(`* Empty URL found`);
+      return false;
+    }
+
+    if (!/^https?:/.test(url)) {
+      console.log(`* Ignore non-HTTP/HTTPS URL`);
+      return false;
+    }
+
+    if (tbconfig.IgnoreQueryString) {
+      url = url.replace(/\?.*/, '');
+    }
+    console.log(`* Check patterns for ${url}`);
+
+    var i;
+    for (i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
+      if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
+        console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
         return true;
       }
     }
@@ -529,7 +563,7 @@ var ThinBridgeTalkClient = {
       }
     }
     console.log(`* No pattern matched`);
-    return !!defaultMatched;
+    return true;
   },
 
   handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
@@ -604,7 +638,7 @@ var ThinBridgeTalkClient = {
     }
     else {
       // legacy mode
-      if (!this.isMatchedURL(tbconfig, url, true))
+      if (!this.isMatchedURLLegacy(tbconfig, url))
         return false;
 
       console.log(`* Redirect to another browser`);
