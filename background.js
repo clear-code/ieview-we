@@ -570,6 +570,8 @@ var ThinBridgeTalkClient = {
               loadCount++;
               break;
           }
+          if (sectionName == 'custom18')
+            break sectionsLoop;
         }
         else {
           switch (sectionName) {
