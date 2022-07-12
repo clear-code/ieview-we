@@ -418,7 +418,7 @@ var ThinBridgeTalkClient = {
       if (this.cached.Sections) { // full mode
         const sectionsByName = {};
         for (const section of this.cached.Sections) {
-          sectionsByName[section.Name.toLowerCase()] = section;
+          sectionsByName[(section.Name || '').toLowerCase()] = section;
         }
         for (const section of this.cached.Sections) {
           if (!section.ExcludeGroups)
@@ -435,7 +435,7 @@ var ThinBridgeTalkClient = {
         }
         this.cached.Sections = [
           ...(sectionsByName.custom18 ? [sectionsByName.custom18] : []),
-          ...this.cached.Sections.filter(section => section.name.toLowerCase != 'custom18'),
+          ...this.cached.Sections.filter(section => (section.Name || '').toLowerCase() != 'custom18'),
         ];
         console.log('Populated config', JSON.stringify(this.cached));
       }
@@ -549,7 +549,7 @@ var ThinBridgeTalkClient = {
         if (!this.isMatchedURL(config, url))
           continue;
 
-        const sectionName = config.Name.toLowerCase();
+        const sectionName = (config.Name || '').toLowerCase();
         matchedSectionNames.push(sectionName);
 
         if (config.CloseEmptyTab && isClosableTab)
