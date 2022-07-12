@@ -1,5 +1,6 @@
 var gIsFirefox  = browser.runtime.getBrowserInfo;
 var gIsChromium = !browser.runtime.getBrowserInfo;
+var BROWSER = gIsFirefox ? 'Firefox' : 'Chrome';
 
 var CANCEL_RESPONSE = gIsChromium ?
   { redirectUrl: `data:text/html,${escape('<script type="application/javascript">history.back()</script>')}` } :
