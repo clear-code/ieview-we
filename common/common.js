@@ -4,24 +4,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-var configs;
-
-function log(aMessage, ...aArgs)
-{
-	if (!configs || !configs.logging)
-		return;
-
-	console.log('ieview-we: ' + aMessage, ...aArgs);
-}
-
-function debug(aMessage, ...aArgs)
-{
-	if (!configs || !configs.debug)
-		return;
-
-	log('[DEBUG] ' + aMessage, ...aArgs);
-}
-
 function getDefaultBrowser()
 {
     /* Assume Chrome if UA is not accessible */
@@ -34,7 +16,7 @@ function getDefaultBrowser()
     return "chrome";
 }
 
-configs = new Configs({
+const configs = new Configs({
 	ieapp            : '',
 	ieargs           : '',
 	forceielist      : '',
@@ -55,3 +37,19 @@ configs = new Configs({
 	talkBrowserName  : getDefaultBrowser(),
 	debug            : false
 }, {logging: true});
+
+function log(aMessage, ...aArgs)
+{
+	if (!configs || !configs.logging)
+		return;
+
+	console.log('ieview-we: ' + aMessage, ...aArgs);
+}
+
+function debug(aMessage, ...aArgs)
+{
+	if (!configs || !configs.debug)
+		return;
+
+	log('[DEBUG] ' + aMessage, ...aArgs);
+}

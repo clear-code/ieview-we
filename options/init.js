@@ -4,12 +4,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-var options = new Options(configs);
+const options = new Options(configs);
 
 /*
  * Control "BrowserSelector" section in the option page.
  */
-var BrowserSelector = {
+const BrowserSelector = {
 
     init: async function() {
         configs.$addObserver(this.update);
@@ -19,7 +19,7 @@ var BrowserSelector = {
     },
 
     update: function(key) {
-        var fieldset = document.querySelector('#BS');
+        const fieldset = document.querySelector('#BS');
         if (configs.talkEnabled) {
             fieldset.removeAttribute('disabled');
         } else {
@@ -33,7 +33,7 @@ var BrowserSelector = {
 
         browser.runtime.getBrowserInfo().then((info) => {
             if (info.name === 'Firefox') {
-                var fieldset = document.querySelector('#BS');
+                const fieldset = document.querySelector('#BS');
                 fieldset.classList.add('firefox');
             }
         });

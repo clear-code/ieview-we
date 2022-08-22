@@ -1,8 +1,8 @@
-var gIsFirefox  = browser.runtime.getBrowserInfo;
-var gIsChromium = !browser.runtime.getBrowserInfo;
-var BROWSER = gIsFirefox ? 'Firefox' : 'Chrome';
+const gIsFirefox  = browser.runtime.getBrowserInfo;
+const gIsChromium = !browser.runtime.getBrowserInfo;
+const BROWSER = gIsFirefox ? 'Firefox' : 'Chrome';
 
-var CANCEL_RESPONSE = gIsChromium ?
+const CANCEL_RESPONSE = gIsChromium ?
   { redirectUrl: `data:text/html,${escape('<script type="application/javascript">history.back()</script>')}` } :
   { cancel: true } ;
 
@@ -22,14 +22,14 @@ function installMenuItems() {
 }
 installMenuItems.supportsTabContext = false;
 
-var forceIEListRegex = null;
+let forceIEListRegex = null;
 function installBlocker() {
   if (configs.talkEnabled) {
       return;
   }
-  var list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
+  const list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
   log('force list: ', list);
-  var types = ['main_frame'];
+  const types = ['main_frame'];
   if (!configs.onlyMainFrame)
     types.push('sub_frame');
   debug('frame types: ', types);
@@ -59,14 +59,14 @@ function uninstallBlocker() {
 }
 function onBeforeRequest(aDetails) {
   log('onBeforeRequest', aDetails);
-  var redirected = true;
+  let redirected = true;
 
   if (aDetails.tabId < 0) {
     log('invalid tabId: ', aDetails.tabId);
     redirected = false;
   }
   else {
-    var targetURL = aDetails.url;
+    let targetURL = aDetails.url;
     if (configs.ignoreQueryString)
       targetURL = aDetails.url.replace(/\?.*/, '');
 
@@ -87,7 +87,7 @@ function onBeforeRequest(aDetails) {
     if (sitesOpenedBySelfRegex) {
       debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
       debug('sitesOpenedBySelfRegex: ', sitesOpenedBySelfRegex);
-      var matched = false;
+      let matched = false;
       debug('test url:', targetURL);
       matched = sitesOpenedBySelfRegex.test(targetURL);
       debug('matched to sitesOpenedBySelfRegex?: ', matched);
@@ -124,7 +124,7 @@ function onBeforeRequest(aDetails) {
  * For more details, visit the project page of BrowserSelector.
  * https://gitlab.com/clear-code/browserselector/
  */
-var TalkClient = {
+const TalkClient = {
 
   init: function() {
     if (this.running) {
@@ -162,11 +162,11 @@ var TalkClient = {
   },
 
   onBeforeRequest: async function(details) {
-    var server = configs.talkServerName;
-    var query = 'Q firefox ' + details.url;
+    const server = configs.talkServerName;
+    const query = 'Q firefox ' + details.url;
 
     debug('Query "' + query + '" to ' + server);
-    var resp = await browser.runtime.sendNativeMessage(server, query);
+    const resp = await browser.runtime.sendNativeMessage(server, query);
 
     debug('Response was', JSON.stringify(resp));
     if (!resp) {
@@ -191,7 +191,7 @@ var TalkClient = {
  * chrome.webRequest won't allow to communicate with the host
  * program within onBeforeRequest().
  */
-var ChromeTalkClient = {
+const ChromeTalkClient = {
 
   NAME: 'ChromeTalkClient',
 
@@ -208,8 +208,8 @@ var ChromeTalkClient = {
   },
 
   configure: function() {
-    var server = configs.talkServerName;
-    var query = new String('C ' + configs.talkBrowserName);
+    const server = configs.talkServerName;
+    const query = new String('C ' + configs.talkBrowserName);
 
     chrome.runtime.sendNativeMessage(server, query, (resp) => {
       this.cached = resp.config;
@@ -256,7 +256,7 @@ var ChromeTalkClient = {
 
     // BrowserSelector support a 'simple' pattern that allows to use
     // `*` for any strings, and `?` for any single character.
-    var specials = /(\.|\+|\(|\)|\[|\]|\\|\^|\$|\|)/g;
+    const specials = /(\.|\+|\(|\)|\[|\]|\\|\^|\$|\|)/g;
     //                .  +  (  )  [  ]  \  ^  $  |
 
     pattern = pattern.replace(specials, '\\$1');
@@ -267,8 +267,8 @@ var ChromeTalkClient = {
   },
 
   redirect: function(bs, details) {
-    var server = configs.talkServerName;
-    var query = new String('Q ' + configs.talkBrowserName + ' ' + details.url);
+    const server = configs.talkServerName;
+    const query = new String('Q ' + configs.talkBrowserName + ' ' + details.url);
 
     if (details.tabId < 0) {
         return;
@@ -291,8 +291,8 @@ var ChromeTalkClient = {
   },
 
   onBeforeRequest: function(details) {
-    var bs = this.cached;
-    var host = details.url.split('/')[2];
+    const bs = this.cached;
+    const host = details.url.split('/')[2];
 
     if (!bs) {
       log('[Talk] config cache is empty. Fetching...');
@@ -301,9 +301,9 @@ var ChromeTalkClient = {
     }
 
     /* URLPatterns */
-    for (var i = 0; i < bs.URLPatterns.length; i++) {
-      var pattern = bs.URLPatterns[i][0];
-      var browser = bs.URLPatterns[i][1].toLowerCase();
+    for (let i = 0; i < bs.URLPatterns.length; i++) {
+      const pattern = bs.URLPatterns[i][0];
+      const browser = bs.URLPatterns[i][1].toLowerCase();
 
       if (this.regex(pattern, bs).test(details.url)) {
         debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
@@ -316,9 +316,9 @@ var ChromeTalkClient = {
     }
 
     /* HostNamePatterns */
-    for (var i = 0; i < bs.HostNamePatterns.length; i++) {
-      var pattern = bs.HostNamePatterns[i][0];
-      var browser = bs.HostNamePatterns[i][1].toLowerCase();
+    for (let i = 0; i < bs.HostNamePatterns.length; i++) {
+      const pattern = bs.HostNamePatterns[i][0];
+      const browser = bs.HostNamePatterns[i][1].toLowerCase();
 
       if (this.regex(pattern, bs).test(host)) {
         debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
@@ -348,9 +348,9 @@ var ChromeTalkClient = {
  * true
  */
 function wildcmp(wild, string) {
-  var i = 0;
-  var j = 0;
-  var mp, cp;
+  let i = 0;
+  let j = 0;
+  let mp, cp;
 
   while ((j < string.length) && (wild[i] != '*')) {
     if ((wild[i] != string[j]) && (wild[i] != '?')) {
@@ -389,7 +389,7 @@ function wildcmp(wild, string) {
  * This class is used when configs.talkServerName is configured
  * to 'com.clear_code.thinbridge'.
  */
-var ThinBridgeTalkClient = {
+const ThinBridgeTalkClient = {
 
   NAME: 'ThinBridgeTalkClient',
 
@@ -406,14 +406,14 @@ var ThinBridgeTalkClient = {
   },
 
   configure: function() {
-    var query = new String('C chrome');
+    const query = new String('C chrome');
 
     chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
       if (chrome.runtime.lastError) {
         console.log('Cannot fetch config', JSON.stringify(chrome.runtime.lastError));
         return;
       }
-      var isStartup = (this.cached == null);
+      const isStartup = (this.cached == null);
       this.cached = resp.config || {};
       console.log('Fetch config', JSON.stringify(this.cached));
       if (this.cached.Sections) { // full mode
@@ -490,7 +490,7 @@ var ThinBridgeTalkClient = {
         return;
       }
 
-      var query = new String('Q chrome ' + url);
+      const query = new String('Q chrome ' + url);
       chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
         if (closeTab) {
           chrome.tabs.remove(tabId);
@@ -505,15 +505,14 @@ var ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    var i;
-    for (i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
+    for (let i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
       if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
         console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
         return false;
       }
     }
 
-    for (i = 0; i < tbconfig.URLPatterns.length; i++) {
+    for (let i = 0; i < tbconfig.URLPatterns.length; i++) {
       if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
         console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
         return true;
@@ -529,15 +528,14 @@ var ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    var i;
-    for (i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
+    for (let i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
       if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
         console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
         return true;
       }
     }
 
-    for (i = 0; i < tbconfig.URLPatterns.length; i++) {
+    for (let i = 0; i < tbconfig.URLPatterns.length; i++) {
       if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
         console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
         return false;
@@ -642,7 +640,7 @@ var ThinBridgeTalkClient = {
   handleStartup: function(tbconfig) {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
-        var url = tab.url || tab.pendingUrl;
+        const url = tab.url || tab.pendingUrl;
         console.log(`handleStartup ${url} (tab=${tab.id})`);
         this.handleURLAndBlock({ tbconfig, tabId: tab.id, url, isMainFrame: true, isClosableTab: true });
       });
@@ -651,9 +649,9 @@ var ThinBridgeTalkClient = {
 
   /* Callback for webRequest.onBeforeRequest */
   onBeforeRequest: function(details) {
-    var tbconfig = this.cached;
-    var closeTab = false;
-    var isMainFrame = (details.type == 'main_frame');
+    const tbconfig = this.cached;
+    const closeTab = false;
+    const isMainFrame = (details.type == 'main_frame');
 
     console.log(`onBeforeRequest ${details.url} (tab=${details.tabId})`);
 
@@ -673,7 +671,7 @@ var ThinBridgeTalkClient = {
       return;
     }
 
-    var isClosableTab = isMainFrame && this.isNewTab[details.tabId];
+    const isClosableTab = isMainFrame && this.isNewTab[details.tabId];
 
     if (this.handleURLAndBlock({ tbconfig, tabId: details.tabId, url: details.url, isMainFrame, isClosableTab })) {
       return CANCEL_RESPONSE;
@@ -856,7 +854,7 @@ function matchPatternToRegExp(pattern) {
   return new RegExp(regex);
 }
 
-var gOpeningTabs = new Map();
+const gOpeningTabs = new Map();
 
 (async () => {
   await configs.$loaded;
@@ -869,7 +867,7 @@ var gOpeningTabs = new Map();
   await applyMCDConfigs();
   await setDefaultPath();
 
-  var browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
+  const browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
   gIsFirefox  = browserInfo && browserInfo.name == 'Firefox';
   gIsChromium = !gIsFirefox;
   if (gIsFirefox &&
@@ -908,7 +906,7 @@ var gOpeningTabs = new Map();
 
 async function applyMCDConfigs() {
   try {
-    var response = await send({ command: 'read-mcd-configs' });
+    const response = await send({ command: 'read-mcd-configs' });
     log('loaded MCD configs: ', JSON.stringify(response));
     if ('loadedKeys' in response) {
       if (Array.isArray(response.loadedKeys))
@@ -945,8 +943,8 @@ async function setDefaultPath() {
   }
 }
 
-var sitesOpenedBySelfList = [];
-var sitesOpenedBySelfRegex = null;
+let sitesOpenedBySelfList = [];
+let sitesOpenedBySelfRegex = null;
 function setSitesOpenedBySelf() {
   if (configs.disableException) {
     sitesOpenedBySelfList = [];
