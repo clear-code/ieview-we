@@ -167,9 +167,9 @@ const TalkClient = {
 
   onBeforeRequest: async function(details) {
     const server = configs.talkServerName;
-    const query = 'Q firefox ' + details.url;
+    const query = `Q firefox ${details.url}`;
 
-    debug('Query "' + query + '" to ' + server);
+    debug(`Query "${query}" to ${server}`);
     const resp = await browser.runtime.sendNativeMessage(server, query);
 
     debug('Response was', JSON.stringify(resp));
@@ -213,7 +213,7 @@ const ChromeTalkClient = {
 
   configure: function() {
     const server = configs.talkServerName;
-    const query = new String('C ' + configs.talkBrowserName);
+    const query = new String(`C ${configs.talkBrowserName}`);
 
     chrome.runtime.sendNativeMessage(server, query, (resp) => {
       this.cached = resp.config;
@@ -267,12 +267,12 @@ const ChromeTalkClient = {
     pattern = pattern.replace(/\*/g, '.*');
     pattern = pattern.replace(/\?/g, '.');
 
-    return RegExp('^' + pattern + '$', 'i');
+    return RegExp(`^${pattern}$`, 'i');
   },
 
   redirect: function(bs, details) {
     const server = configs.talkServerName;
-    const query = new String('Q ' + configs.talkBrowserName + ' ' + details.url);
+    const query = new String(`Q ${configs.talkBrowserName} ${details.url}`);
 
     if (details.tabId < 0) {
         return;
@@ -494,7 +494,7 @@ const ThinBridgeTalkClient = {
         return;
       }
 
-      const query = new String('Q chrome ' + url);
+      const query = new String(`Q chrome ${url}`);
       chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
         if (closeTab) {
           chrome.tabs.remove(tabId);
@@ -781,13 +781,13 @@ const VALID_MATCH_PATTERN = (() => {
 function migratePatternToRegExp(invalidPattern) {
   let pattern = invalidPattern;
   if (pattern.charAt(0) === '*' && pattern.charAt(pattern.length - 1) === '*') {
-    let extracted = pattern.substring(1, pattern.length - 1);
-    log('convert host to regex:', '*://*.' + extracted + '/*');
-    let hostRegex = matchPatternToRegExp('*://*.' + extracted + '/*');
-    log('convert path to regex:', '*://*/' + pattern);
-    let pathRegex = matchPatternToRegExp('*://*/' + pattern);
-    log('migrated match pattern based regex:', hostRegex + '|' + pathRegex);
-    return new RegExp(`${hostRegex}`.replace(/^\/(.+)\//, '$1') + '|' + `${pathRegex}`.replace(/^\/(.+)\//, '$1'));
+    const extracted = pattern.substring(1, pattern.length - 1);
+    log('convert host to regex:', `*://*.${extracted}/*`);
+    const hostRegex = matchPatternToRegExp(`*://*.${extracted}/*`);
+    log('convert path to regex:', `*://*/${pattern}`);
+    const pathRegex = matchPatternToRegExp(`*://*/${pattern}`);
+    log('migrated match pattern based regex:', `${hostRegex}|${pathRegex*`);
+    return new RegExp(`${hostRegex.replace(/^\/(.+)\//, '$1')}|${pathRegex.replace(/^\/(.+)\//, '$1')}`);
   } else {
     // Just convert * and ?
     pattern = pattern.replace(/\*/g, '.*');
@@ -811,7 +811,7 @@ function matchPatternToRegExp(pattern) {
   if (pattern === '')
     return (/^(?:http|https|file|ftp|app):\/\//);
 
-  let match = VALID_MATCH_PATTERN.exec(pattern);
+  const match = VALID_MATCH_PATTERN.exec(pattern);
   if (!match) {
     log('pattern is not a valid MatchPattern', pattern);
     throw new TypeError(`"${pattern}" is not a valid MatchPattern`);
@@ -935,7 +935,7 @@ async function setDefaultPath() {
   if (configs.ieapp)
     return;
   try {
-    let response = await send({ command: 'get-ie-path' });
+    const response = await send({ command: 'get-ie-path' });
     if (response) {
       log('Received: ', JSON.stringify(response));
       if (response.path)
@@ -1006,8 +1006,8 @@ function onConfigUpdated(aKey) {
 }
 
 browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
-  let url = aInfo.linkUrl || aInfo.pageUrl || aTab.url;
-  log('procesing url = ' + url);
+  const url = aInfo.linkUrl || aInfo.pageUrl || aTab.url;
+  log(`procesing url = ${url}`);
 
   launch(url);
 });
@@ -1017,7 +1017,7 @@ async function launch(aURL) {
   if (!configs.ieapp && !configs.ieargs)
     return;
 
-  let message = {
+  const message = {
     command: 'launch',
     params: {
       path: configs.ieapp,
@@ -1026,7 +1026,7 @@ async function launch(aURL) {
     }
   };
   try{
-    let response = await send(message);
+    const response = await send(message);
     log('Received: ', JSON.stringify(response));
   }
   catch(aError) {
