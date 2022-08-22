@@ -1,4 +1,4 @@
-.PHONY: prepare xpi chrome host managed
+.PHONY: prepare xpi chrome chrome-dev host managed
 TIMESTAMP=$(shell date +%Y%m%d)
 
 prepare:
@@ -24,6 +24,9 @@ chrome: prepare
 	sed -i -r -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
 	cd chrome && zip -r ../ieview-we-${TIMESTAMP}.zip .
 
+chrome-dev: chrome
+	sed -i -E -e 's/IE View WE/IE View WE Developer Edition/g' chrome/_locales/*/messages.json
+	cd chrome && zip -r ../ieview-we-dev-${TIMESTAMP}.zip .
 
 # knldjmfmopnpolahpmmgbagdohdnhkik
 DUMMY_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyXQ/A52JivHZKh4YO/9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB"
