@@ -1,6 +1,8 @@
 const gIsFirefox  = browser.runtime.getBrowserInfo;
 const gIsChromium = !browser.runtime.getBrowserInfo;
-const BROWSER = gIsFirefox ? 'Firefox' : 'Chrome';
+const BROWSER = gIsFirefox ? 'Firefox' :
+                /Edg/.test(navigator.userAgent) ? 'Edge' :
+                'Chrome';
 
 const CANCEL_RESPONSE = gIsChromium ?
   { redirectUrl: `data:text/html,${escape('<script type="application/javascript">history.back()</script>')}` } :
