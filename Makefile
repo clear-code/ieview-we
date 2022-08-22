@@ -13,7 +13,7 @@ xpi: prepare
 
 chrome: prepare
 	[ -d node_modules ] || npm install
-	rm -rf chrome
+	rm -rf chrome ieview-we-${TIMESTAMP}.zip
 	mkdir -p chrome/misc
 	cat manifest.json | jq 'del(.applications)' | jq '.storage.managed_schema = "managed_schema.json"' > chrome/manifest.json
 	cp -r managed_schema.json *.js _locales common options extlib chrome/
@@ -25,6 +25,7 @@ chrome: prepare
 	cd chrome && zip -r ../ieview-we-${TIMESTAMP}.zip .
 
 chrome-dev: chrome
+	rm -rf chrome ieview-we-dev-${TIMESTAMP}.zip
 	sed -i -E -e 's/IE View WE/IE View WE Developer Edition/g' chrome/_locales/*/messages.json
 	cd chrome && zip -r ../ieview-we-dev-${TIMESTAMP}.zip .
 
