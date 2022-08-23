@@ -500,16 +500,6 @@ var ThinBridgeTalkClient = {
   },
 
   isMatchedURL: function(tbconfig, url, defaultMatched) {
-    if (!url) {
-      console.log(`* Empty URL found`);
-      return false;
-    }
-
-    if (!/^https?:/.test(url)) {
-      console.log(`* Ignore non-HTTP/HTTPS URL`);
-      return false;
-    }
-
     if (tbconfig.IgnoreQueryString) {
       url = url.replace(/\?.*/, '');
     }
@@ -534,16 +524,6 @@ var ThinBridgeTalkClient = {
   },
 
   isMatchedURLLegacy: function(tbconfig, url) {
-    if (!url) {
-      console.log(`* Empty URL found`);
-      return false;
-    }
-
-    if (!/^https?:/.test(url)) {
-      console.log(`* Ignore non-HTTP/HTTPS URL`);
-      return false;
-    }
-
     if (tbconfig.IgnoreQueryString) {
       url = url.replace(/\?.*/, '');
     }
@@ -568,6 +548,16 @@ var ThinBridgeTalkClient = {
   },
 
   handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
+    if (!url) {
+      console.log(`* Empty URL found`);
+      return false;
+    }
+
+    if (!/^https?:/.test(url)) {
+      console.log(`* Ignore non-HTTP/HTTPS URL (${url})`);
+      return false;
+    }
+
     if (tbconfig.Sections) {
       // full mode
       let loadCount     = 0;
