@@ -19,14 +19,14 @@ const options = new Options(configs);
  */
 const BrowserSelector = {
 
-    init: async function() {
+    async init() {
         configs.$addObserver(this.update);
         await configs.$loaded;
         this.update();
         this.detectFirefox();
     },
 
-    update: function(key) {
+    update(key) {
         const fieldset = document.querySelector('#BS');
         if (configs.talkEnabled) {
             fieldset.removeAttribute('disabled');
@@ -35,7 +35,7 @@ const BrowserSelector = {
         }
     },
 
-    detectFirefox: function() {
+    detectFirefox() {
         if (!browser || !browser.runtime || !browser.runtime.getBrowserInfo)
             return;
 

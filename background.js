@@ -134,7 +134,7 @@ function onBeforeRequest(aDetails) {
  */
 const TalkClient = {
 
-  init: function() {
+  init() {
     if (this.running) {
         return;
     }
@@ -145,7 +145,7 @@ const TalkClient = {
     log('Running as Talk client');
   },
 
-  listen: function() {
+  listen() {
     browser.webRequest.onBeforeRequest.addListener(
       this.callback,
       {
@@ -169,7 +169,7 @@ const TalkClient = {
     });
   },
 
-  onBeforeRequest: async function(details) {
+  async onBeforeRequest(details) {
     const server = configs.talkServerName;
     const query = `Q firefox ${details.url}`;
 
@@ -203,7 +203,7 @@ const ChromeTalkClient = {
 
   NAME: 'ChromeTalkClient',
 
-  init: function() {
+  init() {
     if (this.running) {
         return;
     }
@@ -215,7 +215,7 @@ const ChromeTalkClient = {
     log('Running as Talk client for', configs.talkBrowserName);
   },
 
-  configure: function() {
+  configure() {
     const server = configs.talkServerName;
     const query = new String(`C ${configs.talkBrowserName}`);
 
@@ -225,7 +225,7 @@ const ChromeTalkClient = {
     });
   },
 
-  listen: function() {
+  listen() {
     chrome.webRequest.onBeforeRequest.addListener(
       this.onBeforeRequest.bind(this),
       {
@@ -258,7 +258,7 @@ const ChromeTalkClient = {
   },
 
   /* Convert BrowserSelector's pattern into RegExp */
-  regex: function(pattern, bs) {
+  regex(pattern, bs) {
     if (bs.UseRegex)
         return RegExp(pattern);
 
@@ -274,7 +274,7 @@ const ChromeTalkClient = {
     return RegExp(`^${pattern}$`, 'i');
   },
 
-  redirect: function(bs, details) {
+  redirect(bs, details) {
     const server = configs.talkServerName;
     const query = new String(`Q ${configs.talkBrowserName} ${details.url}`);
 
@@ -298,7 +298,7 @@ const ChromeTalkClient = {
     return CANCEL_RESPONSE;
   },
 
-  onBeforeRequest: function(details) {
+  onBeforeRequest(details) {
     const bs = this.cached;
     const host = details.url.split('/')[2];
 
@@ -401,7 +401,7 @@ const ThinBridgeTalkClient = {
 
   NAME: 'ThinBridgeTalkClient',
 
-  init: function() {
+  init() {
     if (this.running) {
         return;
     }
@@ -413,7 +413,7 @@ const ThinBridgeTalkClient = {
     console.log('Running as Thinbridge Talk client');
   },
 
-  configure: function() {
+  configure() {
     const query = new String('C chrome');
 
     chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
@@ -455,7 +455,7 @@ const ThinBridgeTalkClient = {
     });
   },
 
-  listen: function() {
+  listen() {
     chrome.webRequest.onBeforeRequest.addListener(
       this.onBeforeRequest.bind(this),
       {
@@ -487,7 +487,7 @@ const ThinBridgeTalkClient = {
     });
   },
 
-  redirect: function(url, tabId, closeTab) {
+  redirect(url, tabId, closeTab) {
     chrome.tabs.get(tabId, (tab) => {
       if (chrome.runtime.lastError) {
         console.log(`* Ignore prefetch request`);
@@ -507,7 +507,7 @@ const ThinBridgeTalkClient = {
     });
   },
 
-  isMatchedURL: function(tbconfig, url, defaultMatched) {
+  isMatchedURL(tbconfig, url, defaultMatched) {
     if (tbconfig.IgnoreQueryString) {
       url = url.replace(/\?.*/, '');
     }
@@ -530,7 +530,7 @@ const ThinBridgeTalkClient = {
     return false;
   },
 
-  isMatchedURLLegacy: function(tbconfig, url) {
+  isMatchedURLLegacy(tbconfig, url) {
     if (tbconfig.IgnoreQueryString) {
       url = url.replace(/\?.*/, '');
     }
@@ -553,7 +553,7 @@ const ThinBridgeTalkClient = {
     return true;
   },
 
-  handleURLAndBlock: function({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
+  handleURLAndBlock({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
     if (!url) {
       console.log(`* Empty URL found`);
       return false;
@@ -645,7 +645,7 @@ const ThinBridgeTalkClient = {
   },
 
   /* Handle startup tabs preceding to onBeforeRequest */
-  handleStartup: function(tbconfig) {
+  handleStartup(tbconfig) {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
         const url = tab.url || tab.pendingUrl;
@@ -656,7 +656,7 @@ const ThinBridgeTalkClient = {
   },
 
   /* Callback for webRequest.onBeforeRequest */
-  onBeforeRequest: function(details) {
+  onBeforeRequest(details) {
     const tbconfig = this.cached;
     const closeTab = false;
     const isMainFrame = (details.type == 'main_frame');
