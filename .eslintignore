@@ -1,0 +1,8 @@
+# include as a lint target.
+!.eslintrc.js
+
+chrome/
+
+# The Makefile will copy external libraries into this directory
+extlib/
+submodules/

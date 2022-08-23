@@ -2,6 +2,8 @@
 
 import {
   configs,
+  log,
+  debug,
 } from '/common/common.js';
 
 const gIsFirefox  = browser.runtime.getBrowserInfo;
@@ -790,7 +792,7 @@ function migratePatternToRegExp(invalidPattern) {
     const hostRegex = matchPatternToRegExp(`*://*.${extracted}/*`);
     log('convert path to regex:', `*://*/${pattern}`);
     const pathRegex = matchPatternToRegExp(`*://*/${pattern}`);
-    log('migrated match pattern based regex:', `${hostRegex}|${pathRegex*`);
+    log('migrated match pattern based regex:', `${hostRegex}|${pathRegex}`);
     return new RegExp(`${hostRegex.replace(/^\/(.+)\//, '$1')}|${pathRegex.replace(/^\/(.+)\//, '$1')}`);
   } else {
     // Just convert * and ?

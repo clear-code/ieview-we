@@ -39,7 +39,7 @@ export const configs = new Configs({
 	debug            : false
 }, {logging: true});
 
-function log(aMessage, ...aArgs)
+export function log(aMessage, ...aArgs)
 {
 	if (!configs || !configs.logging)
 		return;
@@ -47,7 +47,7 @@ function log(aMessage, ...aArgs)
 	console.log('ieview-we: ' + aMessage, ...aArgs);
 }
 
-function debug(aMessage, ...aArgs)
+export function debug(aMessage, ...aArgs)
 {
 	if (!configs || !configs.debug)
 		return;
