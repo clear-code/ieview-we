@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "version": "1.6.6",
   "description": "__MSG_extensionDescription__",
@@ -10,15 +10,14 @@
     "alarms",
     "tabs",
     "webRequest",
-    "webRequestBlocking",
+    "webRequestBlocking"
+  ],
+  "host_permissions": [
     "<all_urls>"
   ],
   "background": {
-    "scripts": [
-      "extlib/Configs.js",
-      "common/common.js",
-      "background.js"
-    ]
+    "service_worker": "background.js",
+    "type": "module"
   },
   "icons": {
     "128": "misc/128x128.png"
