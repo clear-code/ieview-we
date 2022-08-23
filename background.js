@@ -1,5 +1,9 @@
 'use strict';
 
+import {
+  configs,
+} from '/common/common.js';
+
 const gIsFirefox  = browser.runtime.getBrowserInfo;
 const gIsChromium = !browser.runtime.getBrowserInfo;
 const BROWSER = gIsFirefox ? 'Firefox' :

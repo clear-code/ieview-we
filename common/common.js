@@ -5,7 +5,7 @@
 */
 'use strict';
 
-function getDefaultBrowser()
+export function getDefaultBrowser()
 {
     /* Assume Chrome if UA is not accessible */
     if (!navigator || !navigator.userAgent)
@@ -17,7 +17,7 @@ function getDefaultBrowser()
     return "chrome";
 }
 
-const configs = new Configs({
+export const configs = new Configs({
 	ieapp            : '',
 	ieargs           : '',
 	forceielist      : '',

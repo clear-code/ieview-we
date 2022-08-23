@@ -5,6 +5,13 @@
 */
 'use strict';
 
+import Options from '/extlib/Options.js';
+import '/extlib/l10n.js';
+
+import {
+  configs,
+} from '/common/common.js';
+
 const options = new Options(configs);
 
 /*

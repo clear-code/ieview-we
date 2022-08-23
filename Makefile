@@ -3,9 +3,9 @@ TIMESTAMP=$(shell date +%Y%m%d)
 
 prepare:
 	git submodule update --init
-	cp submodules/webextensions-lib-configs/Configs.js extlib/
-	cp submodules/webextensions-lib-options/Options.js extlib/
-	cp submodules/webextensions-lib-l10n/l10n.js extlib/
+	cp submodules/webextensions-lib-configs/Configs.js extlib/; echo 'export default Configs;' >> extlib/Configs.js
+	cp submodules/webextensions-lib-options/Options.js extlib/; echo 'export default Options;' >> extlib/Options.js
+	cp submodules/webextensions-lib-l10n/l10n.js extlib/; echo 'export default l10n;' >> extlib/l10n.js
 
 xpi: prepare
 	rm -f ieview-we.xpi
