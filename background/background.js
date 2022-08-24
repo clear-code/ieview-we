@@ -901,14 +901,25 @@ function matchPatternToRegExp(pattern) {
     if (aChangeInfo.status == 'complete' ||
         (aChangeInfo.url &&
          !/^(about:(blank|newtab|home))$/.test(aChangeInfo.url))) {
-      setTimeout(() => {
-        debug('remove tab from opening tabs list: ', aTab.id);
-        // This needs to be done after the onBeforeRequest listener is processed.
-        gOpeningTabs.delete(aTabId);
-      }, configs.closeReloadPageMaxDelayMsec);
+      const alarmName = `onUpdated-${aTabId}`;
+      chrome.alarms.create(alarmName, { delayInMinutes: configs.closeReloadPageMaxDelayMsec / 1000 / 60 });
+      chrome.alarms.onAlarm.addListener((alarm) => {
+        if (alarm.name === alarmName) {
+          debug('remove tab from opening tabs list: ', aTabId);
+          // This needs to be done after the onBeforeRequest listener is processed.
+          gOpeningTabs.delete(aTabId);
+          chrome.alarms.clear(alarmName);
+        }
+      });
     }
   });
-  setTimeout(checkThinBridgeMode, 2500);
+
+  chrome.alarms.create('checkThinBridgeMode', { delayInMinutes: 2500 / 1000 / 60 });
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'checkThinBridgeMode') {
+      checkThinBridgeMode();
+    }
+  });
 })();
 
 async function applyMCDConfigs() {
