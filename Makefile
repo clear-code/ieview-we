@@ -1,4 +1,4 @@
-.PHONY: prepare xpi chrome chrome-dev host managed install_dependency lint format
+.PHONY: prepare xpi chrome chrome-dev host managed install_dependency lint format install_hook
 TIMESTAMP=$(shell date +%Y%m%d)
 
 NPM_MOD_DIR := $(CURDIR)/node_modules
@@ -65,3 +65,6 @@ lint: install_dependency
 
 format: install_dependency
 	"$(NPM_BIN_DIR)/eslint" . --ext=.js --report-unused-disable-directives --fix
+
+install_hook:
+	echo '#!/bin/sh\nmake lint' > "$(CURDIR)/.git/hooks/pre-commit" && chmod +x "$(CURDIR)/.git/hooks/pre-commit"
