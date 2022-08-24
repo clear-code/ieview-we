@@ -6,13 +6,13 @@ import {
   debug,
 } from '/common/common.js';
 
-let gIsFirefox  = !!browser.runtime.getBrowserInfo;
-let gIsChromium = !browser.runtime.getBrowserInfo;
-const BROWSER = gIsFirefox ? 'Firefox' :
+let isFirefox  = !!browser.runtime.getBrowserInfo;
+let isChromium = !browser.runtime.getBrowserInfo;
+const BROWSER = isFirefox ? 'Firefox' :
   /Edg/.test(navigator.userAgent) ? 'Edge' :
     'Chrome';
 
-const CANCEL_RESPONSE = gIsChromium ?
+const CANCEL_RESPONSE = isChromium ?
   { redirectUrl: `data:text/html,${escape('<script type="application/javascript">history.back()</script>')}` } :
   { cancel: true } ;
 
@@ -28,7 +28,7 @@ const VALID_MATCH_PATTERN = (() => {
 
 let sitesOpenedBySelfList = [];
 let sitesOpenedBySelfRegex = null;
-const gOpeningTabs = new Map();
+const openingTabs = new Map();
 
 
 function installMenuItems() {
@@ -47,23 +47,28 @@ function installMenuItems() {
 }
 installMenuItems.supportsTabContext = false;
 
+
 let forceIEListRegex = null;
+
 function installBlocker() {
   if (configs.talkEnabled)
     return;
 
   const list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
   log('force list: ', list);
+
   const types = ['main_frame'];
   if (!configs.onlyMainFrame)
     types.push('sub_frame');
+
   debug('frame types: ', types);
   let urls = list;
-  forceIEListRegex = new RegExp(list.map((pattern) => {
+  forceIEListRegex = new RegExp(list.map(pattern => {
     if (!VALID_MATCH_PATTERN.exec(pattern)) {
       urls = ['<all_urls>'];
       return `${migratePatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1')
-    } else {
+    }
+    else {
       return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1');
     }
   }).join('|'));
@@ -82,18 +87,18 @@ function uninstallBlocker() {
     browser.webRequest.onBeforeRequest.removeListener(onBeforeRequest);
   forceIEListRegex = null;
 }
-function onBeforeRequest(aDetails) {
-  log('onBeforeRequest', aDetails);
+function onBeforeRequest(details) {
+  log('onBeforeRequest', details);
   let redirected = true;
 
-  if (aDetails.tabId < 0) {
-    log('invalid tabId: ', aDetails.tabId);
+  if (details.tabId < 0) {
+    log('invalid tabId: ', details.tabId);
     redirected = false;
   }
   else {
-    let targetURL = aDetails.url;
+    let targetURL = details.url;
     if (configs.ignoreQueryString)
-      targetURL = aDetails.url.replace(/\?.*/, '');
+      targetURL = details.url.replace(/\?.*/, '');
 
     debug('targetURL: ', targetURL);
     if (forceIEListRegex) {
@@ -120,16 +125,16 @@ function onBeforeRequest(aDetails) {
     }
     debug('redirected?: ', redirected);
     if (redirected) {
-      launch(aDetails.url);
-      log('is opening tab?: ', gOpeningTabs.has(aDetails.tabId));
+      launch(details.url);
+      log('is opening tab?: ', openingTabs.has(details.tabId));
       if (configs.closeReloadPage &&
-          gOpeningTabs.has(aDetails.tabId)) {
-        gOpeningTabs.delete(aDetails.tabId);
-        browser.tabs.remove(aDetails.tabId);
+          openingTabs.has(details.tabId)) {
+        openingTabs.delete(details.tabId);
+        browser.tabs.remove(details.tabId);
       }
     }
     else {
-      log('url is not redirected: ', aDetails.url);
+      log('url is not redirected: ', details.url);
     }
   }
 
@@ -176,10 +181,10 @@ const TalkClient = {
       this.isNewTab[tab.id] = 1;
     });
 
-    browser.tabs.onUpdated.addListener((id, info, tab) => {
-      if (info.status === 'complete') {
-        if (info.url && !/^(about:(blank|newtab|home))$/.test(info.url)) {
-          delete this.isNewTab[tab.id];
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
+      if (changeInfo.status === 'complete') {
+        if (changeInfo.url && !/^(about:(blank|newtab|home))$/.test(changeInfo.url)) {
+          delete this.isNewTab[tabId];
         }
       }
     });
@@ -190,14 +195,14 @@ const TalkClient = {
     const query = `Q firefox ${details.url}`;
 
     debug(`Query "${query}" to ${server}`);
-    const resp = await browser.runtime.sendNativeMessage(server, query);
+    const response = await browser.runtime.sendNativeMessage(server, query);
 
-    debug('Response was', JSON.stringify(resp));
-    if (!resp)
+    debug('Response was', JSON.stringify(response));
+    if (!response)
       return {};  // Continue anyway
 
-    if (resp.open) {
-      if (resp.close_tab && this.isNewTab[details.tabId]) {
+    if (response.open) {
+      if (response.close_tab && this.isNewTab[details.tabId]) {
         debug('Cloding tab', details.tabId);
         delete this.isNewTab[details.tabId];
         await browser.tabs.remove(details.tabId);
@@ -235,14 +240,14 @@ const ChromeTalkClient = {
     const server = configs.talkServerName;
     const query = new String(`C ${configs.talkBrowserName}`);
 
-    chrome.runtime.sendNativeMessage(server, query, (resp) => {
-      this.cached = resp.config;
-      debug('[Talk] configure', JSON.stringify(resp.config));
+    browser.runtime.sendNativeMessage(server, query).then(response => {
+      this.cached = response.config;
+      debug('[Talk] configure', JSON.stringify(response.config));
     });
   },
 
   listen() {
-    chrome.webRequest.onBeforeRequest.addListener(
+    browser.webRequest.onBeforeRequest.addListener(
       this.onBeforeRequest.bind(this),
       {
         urls: ['<all_urls>'],
@@ -253,20 +258,20 @@ const ChromeTalkClient = {
 
     /* Refresh config for every N minute */
     log('[Talk] poll config for every', configs.talkAlarmMinutes, 'minutes');
-    chrome.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
+    browser.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
 
-    chrome.alarms.onAlarm.addListener((alarm) => {
-      if (alarm.name === this.NAME) {
-        this.configure();
-      }
+    browser.alarms.onAlarm.addListener(alarm => {
+      if (alarm.name != this.NAME)
+        return;
+      this.configure();
     });
 
     /* Tab book-keeping for intelligent tab handlings */
-    chrome.tabs.onCreated.addListener(tab => {
+    browser.tabs.onCreated.addListener(tab => {
       this.isNewTab[tab.id] = 1;
     });
 
-    chrome.tabs.onUpdated.addListener((id, info, tab) => {
+    browser.tabs.onUpdated.addListener((id, info, tab) => {
       if (info.status === 'complete') {
         delete this.isNewTab[tab.id];
       }
@@ -297,17 +302,17 @@ const ChromeTalkClient = {
     if (details.tabId < 0)
       return;
 
-    chrome.tabs.get(details.tabId, (tab) => {
+    browser.tabs.get(details.tabId).then(tab => {
       /* This is required for Chrome's "preload" tabs */
-      if (chrome.runtime.lastError) return;
+      if (browser.runtime.lastError) return;
       if (!tab) return;
 
       /* Open another browser via Query */
-      chrome.runtime.sendNativeMessage(server, query);
+      browser.runtime.sendNativeMessage(server, query);
 
       /* Close the opening tab automatically (if required) */
       if (bs.CloseEmptyTab && this.isNewTab[details.tabId]) {
-        chrome.tabs.remove(details.tabId);
+        browser.tabs.remove(details.tabId);
       }
     });
     return CANCEL_RESPONSE;
@@ -430,13 +435,13 @@ const ThinBridgeTalkClient = {
   configure() {
     const query = new String('C chrome');
 
-    chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
-      if (chrome.runtime.lastError) {
-        console.log('Cannot fetch config', JSON.stringify(chrome.runtime.lastError));
+    browser.runtime.sendNativeMessage(configs.talkServerName, query).then(response => {
+      if (browser.runtime.lastError) {
+        console.log('Cannot fetch config', JSON.stringify(browser.runtime.lastError));
         return;
       }
       const isStartup = (this.cached == null);
-      this.cached = resp.config || {};
+      this.cached = response.config || {};
       console.log('Fetch config', JSON.stringify(this.cached));
       if (this.cached.Sections) { // full mode
         const sectionsByName = {};
@@ -470,7 +475,7 @@ const ThinBridgeTalkClient = {
   },
 
   listen() {
-    chrome.webRequest.onBeforeRequest.addListener(
+    browser.webRequest.onBeforeRequest.addListener(
       this.onBeforeRequest.bind(this),
       {
         urls: ['<all_urls>'],
@@ -481,20 +486,20 @@ const ThinBridgeTalkClient = {
 
     /* Refresh config for every N minute */
     console.log('Poll config for every', configs.talkAlarmMinutes, 'minutes');
-    chrome.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
+    browser.alarms.create(this.NAME, {'periodInMinutes': configs.talkAlarmMinutes});
 
-    chrome.alarms.onAlarm.addListener((alarm) => {
+    browser.alarms.onAlarm.addListener(alarm => {
       if (alarm.name === this.NAME) {
         this.configure();
       }
     });
 
     /* Tab book-keeping for intelligent tab handlings */
-    chrome.tabs.onCreated.addListener(tab => {
+    browser.tabs.onCreated.addListener(tab => {
       this.isNewTab[tab.id] = 1;
     });
 
-    chrome.tabs.onUpdated.addListener((id, info, tab) => {
+    browser.tabs.onUpdated.addListener((id, info, tab) => {
       if (info.status === 'complete') {
         delete this.isNewTab[tab.id];
       }
@@ -502,8 +507,8 @@ const ThinBridgeTalkClient = {
   },
 
   redirect(url, tabId, closeTab) {
-    chrome.tabs.get(tabId, (tab) => {
-      if (chrome.runtime.lastError) {
+    browser.tabs.get(tabId).then(tab => {
+      if (browser.runtime.lastError) {
         console.log(`* Ignore prefetch request`);
         return;
       }
@@ -513,9 +518,9 @@ const ThinBridgeTalkClient = {
       }
 
       const query = new String(`Q chrome ${url}`);
-      chrome.runtime.sendNativeMessage(configs.talkServerName, query, _response => {
+      browser.runtime.sendNativeMessage(configs.talkServerName, query).then(_response => {
         if (closeTab) {
-          chrome.tabs.remove(tabId);
+          browser.tabs.remove(tabId);
         }
       });
     });
@@ -660,7 +665,7 @@ const ThinBridgeTalkClient = {
 
   /* Handle startup tabs preceding to onBeforeRequest */
   handleStartup(tbconfig) {
-    chrome.tabs.query({}, (tabs) => {
+    browser.tabs.query({}).then(tabs => {
       tabs.forEach((tab) => {
         const url = tab.url || tab.pendingUrl;
         console.log(`handleStartup ${url} (tab=${tab.id})`);
@@ -704,7 +709,7 @@ function runTalkServer() {
   if (configs.talkServerName == 'com.clear_code.thinbridge')
     return ThinBridgeTalkClient.init();
 
-  if (gIsChromium)
+  if (isChromium)
     return ChromeTalkClient.init();
 
   return TalkClient.init();
@@ -729,7 +734,7 @@ function onTalkEnabled(data, storageName) {
     uninstallBlocker();
     runTalkServer();
   }
-  log('chrome.storage.onChange: ', storageName, JSON.stringify(data));
+  log('browser.storage.onChange: ', storageName, JSON.stringify(data));
 }
 
 /*
@@ -746,7 +751,7 @@ function checkThinBridgeMode() {
   browser.storage.managed.get().then((m) => {
     log(`[managed] config = `, JSON.stringify(m));
 
-    if (!gIsChromium) {
+    if (!isChromium) {
       log('[managed] browser was not chrome');
       return;
     }
@@ -875,9 +880,9 @@ function matchPatternToRegExp(pattern) {
   await setDefaultPath();
 
   const browserInfo = browser.runtime.getBrowserInfo && await browser.runtime.getBrowserInfo();
-  gIsFirefox  = browserInfo && browserInfo.name == 'Firefox';
-  gIsChromium = !gIsFirefox;
-  if (gIsFirefox &&
+  isFirefox  = browserInfo && browserInfo.name == 'Firefox';
+  isChromium = !isFirefox;
+  if (isFirefox &&
       parseInt(browserInfo.version.split('.')[0]) >= 53)
     installMenuItems.supportsTabContext = true;
 
@@ -893,32 +898,32 @@ function matchPatternToRegExp(pattern) {
 
   browser.storage.onChanged.addListener(onTalkEnabled);
 
-  browser.tabs.onCreated.addListener(aTab => {
-    debug('new tab: ', aTab.id);
-    gOpeningTabs.set(aTab.id, true);
+  browser.tabs.onCreated.addListener(tab => {
+    debug('new tab: ', tab.id);
+    openingTabs.set(tab.id, true);
   });
-  browser.tabs.onUpdated.addListener((aTabId, aChangeInfo, _tab) => {
-    if (aChangeInfo.status == 'complete' ||
-        (aChangeInfo.url &&
-         !/^(about:(blank|newtab|home))$/.test(aChangeInfo.url))) {
-      const alarmName = `onUpdated-${aTabId}`;
-      chrome.alarms.create(alarmName, { delayInMinutes: configs.closeReloadPageMaxDelayMsec / 1000 / 60 });
-      chrome.alarms.onAlarm.addListener((alarm) => {
-        if (alarm.name === alarmName) {
-          debug('remove tab from opening tabs list: ', aTabId);
-          // This needs to be done after the onBeforeRequest listener is processed.
-          gOpeningTabs.delete(aTabId);
-          chrome.alarms.clear(alarmName);
-        }
+  browser.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
+    if (changeInfo.status == 'complete' ||
+        (changeInfo.url &&
+         !/^(about:(blank|newtab|home))$/.test(changeInfo.url))) {
+      const alarmName = `onUpdated-${tabId}`;
+      browser.alarms.create(alarmName, { delayInMinutes: configs.closeReloadPageMaxDelayMsec / 1000 / 60 });
+      browser.alarms.onAlarm.addListener(alarm => {
+        if (alarm.name != alarmName)
+          return;
+        debug('remove tab from opening tabs list: ', tabId);
+        // This needs to be done after the onBeforeRequest listener is processed.
+        openingTabs.delete(tabId);
+        browser.alarms.clear(alarmName);
       });
     }
   });
 
-  chrome.alarms.create('checkThinBridgeMode', { delayInMinutes: 2500 / 1000 / 60 });
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === 'checkThinBridgeMode') {
-      checkThinBridgeMode();
-    }
+  browser.alarms.create('checkThinBridgeMode', { delayInMinutes: 2500 / 1000 / 60 });
+  browser.alarms.onAlarm.addListener(alarm => {
+    if (alarm.name != 'checkThinBridgeMode')
+      return;
+    checkThinBridgeMode();
   });
 })();
 
@@ -928,20 +933,20 @@ async function applyMCDConfigs() {
     log('loaded MCD configs: ', JSON.stringify(response));
     if ('loadedKeys' in response) {
       if (Array.isArray(response.loadedKeys))
-        response.loadedKeys.forEach((aKey) => {
-          configs[aKey] = response[aKey];
-          configs.$lock(aKey);
+        response.loadedKeys.forEach(key => {
+          configs[key] = response[key];
+          configs.$lock(key);
         });
     }
     else {
-      Object.keys(response).forEach((aKey) => {
-        configs[aKey] = response[aKey];
-        configs.$lock(aKey);
+      Object.keys(response).forEach(key => {
+        configs[key] = response[key];
+        configs.$lock(key);
       });
     }
   }
-  catch(aError) {
-    log('Failed to read MCD configs: ', aError);
+  catch(error) {
+    log('Failed to read MCD configs: ', error);
   }
 }
 
@@ -956,8 +961,8 @@ async function setDefaultPath() {
         configs.ieapp = response.path;
     }
   }
-  catch(aError) {
-    log('Error: ', aError);
+  catch(error) {
+    log('Error: ', error);
   }
 }
 
@@ -967,9 +972,9 @@ function setSitesOpenedBySelf() {
     sitesOpenedBySelfRegex = null;
   }
   else {
-    sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter((aItem) => !!aItem);
+    sitesOpenedBySelfList = configs.sitesOpenedBySelf.trim().split(/\s+/).filter(item => !!item);
     if (sitesOpenedBySelfList.length > 0)
-      sitesOpenedBySelfRegex = new RegExp(sitesOpenedBySelfList.map((pattern) => {
+      sitesOpenedBySelfRegex = new RegExp(sitesOpenedBySelfList.map(pattern => {
         if (VALID_MATCH_PATTERN.exec(pattern)) {
           return `${matchPatternToRegExp(pattern)}`.replace(/^\/(.+)\//, '$1');
         }
@@ -982,8 +987,8 @@ function setSitesOpenedBySelf() {
   }
 }
 
-function onConfigUpdated(aKey) {
-  switch (aKey) {
+function onConfigUpdated(key) {
+  switch (key) {
     case 'contextMenu':
       if (configs.contextMenu) {
         installMenuItems();
@@ -1017,15 +1022,15 @@ function onConfigUpdated(aKey) {
   }
 }
 
-browser.contextMenus.onClicked.addListener(function(aInfo, aTab) {
-  const url = aInfo.linkUrl || aInfo.pageUrl || aTab.url;
+browser.contextMenus.onClicked.addListener((info, tab) => {
+  const url = info.linkUrl || info.pageUrl || tab.url;
   log(`procesing url = ${url}`);
 
   launch(url);
 });
 
 
-async function launch(aURL) {
+async function launch(url) {
   if (!configs.ieapp && !configs.ieargs)
     return;
 
@@ -1033,26 +1038,26 @@ async function launch(aURL) {
     command: 'launch',
     params: {
       path: configs.ieapp,
-      args: configs.ieargs.trim().split(/\s+/).filter((aItem) => !!aItem),
-      url:  aURL
+      args: configs.ieargs.trim().split(/\s+/).filter(item => !!item),
+      url
     }
   };
   try{
     const response = await send(message);
     log('Received: ', JSON.stringify(response));
   }
-  catch(aError) {
-    log('Error: ', aError);
+  catch(error) {
+    log('Error: ', error);
   }
 }
 
-function send(aMessage) {
+function send(message) {
   if (configs.logging)
-    aMessage.logging = true;
+    message.logging = true;
   if (configs.debug)
-    aMessage.debug = true;
-  aMessage.logRotationCount = configs.logRotationCount;
-  aMessage.logRotationTime = configs.logRotationTime;
-  log('Sending: ', JSON.stringify(aMessage));
-  return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', aMessage);
+    message.debug = true;
+  message.logRotationCount = configs.logRotationCount;
+  message.logRotationTime = configs.logRotationTime;
+  log('Sending: ', JSON.stringify(message));
+  return browser.runtime.sendNativeMessage('com.clear_code.ieview_we_host', message);
 }
