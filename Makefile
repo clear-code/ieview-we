@@ -25,7 +25,7 @@ chrome: prepare
 	#cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js chrome/extlib/
 	sed -i -E -e 's;("scripts": *\[);\1"extlib/browser-polyfill.min.js",;' chrome/manifest.json
 	#sed -i -E -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
-	sed -i -E -e 's;\bbrowser\.;chrome.;g' -e 's;window.messenger;false;g' chrome/extlib/Configs.js
+	sed -i -E -e 's;\bbrowser\.;chrome.;g' -e 's;window.messenger;false;g' chrome/*/*.js
 	cd chrome && zip -r ../ieview-we-${TIMESTAMP}.zip .
 
 chrome-dev: chrome
