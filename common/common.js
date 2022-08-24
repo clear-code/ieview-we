@@ -5,52 +5,53 @@
 */
 'use strict';
 
-export function getDefaultBrowser()
-{
-    /* Assume Chrome if UA is not accessible */
-    if (!navigator || !navigator.userAgent)
-        return "chrome";
+import Configs from '/extlib/Configs.js';
 
-    if (/Edg/.test(navigator.userAgent))
-        return "edge";
+export function getDefaultBrowser() {
+  /* Assume Chrome if UA is not accessible */
+  if (!navigator || !navigator.userAgent)
+    return 'chrome';
 
-    return "chrome";
+  if (/Edg/.test(navigator.userAgent))
+    return 'edge';
+
+  return 'chrome';
 }
 
 export const configs = new Configs({
-	ieapp            : '',
-	ieargs           : '',
-	forceielist      : '',
-	disableForce     : false,
-	closeReloadPage  : true,
-	closeReloadPageMaxDelayMsec: 150,
-	contextMenu      : true,
-	onlyMainFrame    : true,
-	ignoreQueryString: false,
-	sitesOpenedBySelf: '',
-	disableException : false,
-	logging          : true,
-	logRotationCount : 12,
-	logRotationTime  : 24,
-	talkEnabled      : false,
-	talkServerName   : 'com.clear_code.browserselector_talk',
-	talkAlarmMinutes : 1,
-	talkBrowserName  : getDefaultBrowser(),
-	debug            : false
+  ieapp            : '',
+  ieargs           : '',
+  forceielist      : '',
+  disableForce     : false,
+  closeReloadPage  : true,
+  closeReloadPageMaxDelayMsec: 150,
+  contextMenu      : true,
+  onlyMainFrame    : true,
+  ignoreQueryString: false,
+  sitesOpenedBySelf: '',
+  disableException : false,
+  logging          : true,
+  logRotationCount : 12,
+  logRotationTime  : 24,
+  talkEnabled      : false,
+  talkServerName   : 'com.clear_code.browserselector_talk',
+  talkAlarmMinutes : 1,
+  talkBrowserName  : getDefaultBrowser(),
+  debug            : false
 }, {logging: true});
 
 export function log(aMessage, ...aArgs)
 {
-	if (!configs || !configs.logging)
-		return;
+  if (!configs || !configs.logging)
+    return;
 
-	console.log('ieview-we: ' + aMessage, ...aArgs);
+  console.log('ieview-we: ' + aMessage, ...aArgs);
 }
 
 export function debug(aMessage, ...aArgs)
 {
-	if (!configs || !configs.debug)
-		return;
+  if (!configs || !configs.debug)
+    return;
 
-	log('[DEBUG] ' + aMessage, ...aArgs);
+  log('[DEBUG] ' + aMessage, ...aArgs);
 }

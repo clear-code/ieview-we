@@ -12,42 +12,42 @@ import {
   configs,
 } from '/common/common.js';
 
-const options = new Options(configs);
+/*const options = */new Options(configs);
 
 /*
  * Control "BrowserSelector" section in the option page.
  */
 const BrowserSelector = {
 
-    async init() {
-        configs.$addObserver(this.update);
-        await configs.$loaded;
-        this.update();
-        this.detectFirefox();
-    },
+  async init() {
+    configs.$addObserver(this.update);
+    await configs.$loaded;
+    this.update();
+    this.detectFirefox();
+  },
 
-    update(key) {
+  update(_key) {
+    const fieldset = document.querySelector('#BS');
+    if (configs.talkEnabled) {
+      fieldset.removeAttribute('disabled');
+    } else {
+      fieldset.setAttribute('disabled', 'true');
+    }
+  },
+
+  detectFirefox() {
+    if (!browser || !browser.runtime || !browser.runtime.getBrowserInfo)
+      return;
+
+    browser.runtime.getBrowserInfo().then((info) => {
+      if (info.name === 'Firefox') {
         const fieldset = document.querySelector('#BS');
-        if (configs.talkEnabled) {
-            fieldset.removeAttribute('disabled');
-        } else {
-            fieldset.setAttribute('disabled', 'true');
-        }
-    },
-
-    detectFirefox() {
-        if (!browser || !browser.runtime || !browser.runtime.getBrowserInfo)
-            return;
-
-        browser.runtime.getBrowserInfo().then((info) => {
-            if (info.name === 'Firefox') {
-                const fieldset = document.querySelector('#BS');
-                fieldset.classList.add('firefox');
-            }
-        });
-    },
+        fieldset.classList.add('firefox');
+      }
+    });
+  },
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    BrowserSelector.init();
+  BrowserSelector.init();
 });
