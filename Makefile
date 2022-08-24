@@ -19,7 +19,7 @@ chrome: prepare
 	rm -rf chrome ieview-we-${TIMESTAMP}.zip
 	mkdir -p chrome/misc
 	cat manifest.json | jq 'del(.applications)' | jq '.storage.managed_schema = "managed_schema.json"' > chrome/manifest.json
-	cp -r managed_schema.json *.js _locales common options extlib chrome/
+	cp -r managed_schema.json _locales background common options extlib chrome/
 	cp -r misc/128x128.png chrome/misc
 	find chrome -name '.*' | xargs rm -rf
 	cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js chrome/extlib/
