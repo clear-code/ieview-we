@@ -6,15 +6,30 @@ import {
   debug,
 } from '/common/common.js';
 
-const gIsFirefox  = browser.runtime.getBrowserInfo;
-const gIsChromium = !browser.runtime.getBrowserInfo;
+let gIsFirefox  = !!browser.runtime.getBrowserInfo;
+let gIsChromium = !browser.runtime.getBrowserInfo;
 const BROWSER = gIsFirefox ? 'Firefox' :
-                /Edg/.test(navigator.userAgent) ? 'Edge' :
-                'Chrome';
+  /Edg/.test(navigator.userAgent) ? 'Edge' :
+    'Chrome';
 
 const CANCEL_RESPONSE = gIsChromium ?
   { redirectUrl: `data:text/html,${escape('<script type="application/javascript">history.back()</script>')}` } :
   { cancel: true } ;
+
+const VALID_MATCH_PATTERN = (() => {
+  const schemeSegment = '(\\*|http|https|file|ftp)';
+  const hostSegment = '(\\*|(?:\\*\\.)?(?:[^/*]+))?';
+  const pathSegment = '(.*)';
+  const regex = new RegExp(
+    `^${schemeSegment}://${hostSegment}/${pathSegment}$`
+  );
+  return regex;
+})();
+
+let sitesOpenedBySelfList = [];
+let sitesOpenedBySelfRegex = null;
+const gOpeningTabs = new Map();
+
 
 function installMenuItems() {
   browser.contextMenus.create({
@@ -34,9 +49,9 @@ installMenuItems.supportsTabContext = false;
 
 let forceIEListRegex = null;
 function installBlocker() {
-  if (configs.talkEnabled) {
-      return;
-  }
+  if (configs.talkEnabled)
+    return;
+
   const list = configs.forceielist.trim().split(/\s+/).filter((aItem) => !!aItem);
   log('force list: ', list);
   const types = ['main_frame'];
@@ -83,7 +98,7 @@ function onBeforeRequest(aDetails) {
     debug('targetURL: ', targetURL);
     if (forceIEListRegex) {
       debug('forceIEListRegex: ', forceIEListRegex);
-      matched = forceIEListRegex.test(targetURL);
+      const matched = forceIEListRegex.test(targetURL);
       debug('matched to forceIEListRegex?: ', matched);
       if (matched)
         redirected = true;
@@ -97,9 +112,8 @@ function onBeforeRequest(aDetails) {
     if (sitesOpenedBySelfRegex) {
       debug('sitesOpenedBySelfList: ', sitesOpenedBySelfList);
       debug('sitesOpenedBySelfRegex: ', sitesOpenedBySelfRegex);
-      let matched = false;
       debug('test url:', targetURL);
-      matched = sitesOpenedBySelfRegex.test(targetURL);
+      const matched = sitesOpenedBySelfRegex.test(targetURL);
       debug('matched to sitesOpenedBySelfRegex?: ', matched);
       if (matched)
         redirected = false;
@@ -137,9 +151,9 @@ function onBeforeRequest(aDetails) {
 const TalkClient = {
 
   init() {
-    if (this.running) {
-        return;
-    }
+    if (this.running)
+      return;
+
     this.isNewTab = {};
     this.callback = this.onBeforeRequest.bind(this);
     this.listen();
@@ -179,16 +193,16 @@ const TalkClient = {
     const resp = await browser.runtime.sendNativeMessage(server, query);
 
     debug('Response was', JSON.stringify(resp));
-    if (!resp) {
-        return {};  // Continue anyway
-    }
+    if (!resp)
+      return {};  // Continue anyway
+
     if (resp.open) {
-        if (resp.close_tab && this.isNewTab[details.tabId]) {
-            debug('Cloding tab', details.tabId);
-            delete this.isNewTab[details.tabId];
-            await browser.tabs.remove(details.tabId);
-        }
-        return CANCEL_RESPONSE;  // Stop the request
+      if (resp.close_tab && this.isNewTab[details.tabId]) {
+        debug('Cloding tab', details.tabId);
+        delete this.isNewTab[details.tabId];
+        await browser.tabs.remove(details.tabId);
+      }
+      return CANCEL_RESPONSE;  // Stop the request
     }
     return {};
   }
@@ -206,9 +220,9 @@ const ChromeTalkClient = {
   NAME: 'ChromeTalkClient',
 
   init() {
-    if (this.running) {
-        return;
-    }
+    if (this.running)
+      return;
+
     this.cached = null;
     this.isNewTab = {};
     this.configure();
@@ -262,7 +276,7 @@ const ChromeTalkClient = {
   /* Convert BrowserSelector's pattern into RegExp */
   regex(pattern, bs) {
     if (bs.UseRegex)
-        return RegExp(pattern);
+      return RegExp(pattern);
 
     // BrowserSelector support a 'simple' pattern that allows to use
     // `*` for any strings, and `?` for any single character.
@@ -280,9 +294,8 @@ const ChromeTalkClient = {
     const server = configs.talkServerName;
     const query = new String(`Q ${configs.talkBrowserName} ${details.url}`);
 
-    if (details.tabId < 0) {
-        return;
-    }
+    if (details.tabId < 0)
+      return;
 
     chrome.tabs.get(details.tabId, (tab) => {
       /* This is required for Chrome's "preload" tabs */
@@ -342,9 +355,8 @@ const ChromeTalkClient = {
 
     /* No pattern matched */
     debug('[Talk] No pattern matched', {url: details.url})
-    if (bs.DefaultBrowser !== configs.talkBrowserName) {
+    if (bs.DefaultBrowser !== configs.talkBrowserName)
       return this.redirect(bs, details);
-    }
   }
 };
 
@@ -404,9 +416,9 @@ const ThinBridgeTalkClient = {
   NAME: 'ThinBridgeTalkClient',
 
   init() {
-    if (this.running) {
-        return;
-    }
+    if (this.running)
+      return;
+
     this.cached = null;
     this.isNewTab = {};
     this.configure();
@@ -501,7 +513,7 @@ const ThinBridgeTalkClient = {
       }
 
       const query = new String(`Q chrome ${url}`);
-      chrome.runtime.sendNativeMessage(configs.talkServerName, query, (resp) => {
+      chrome.runtime.sendNativeMessage(configs.talkServerName, query, _response => {
         if (closeTab) {
           chrome.tabs.remove(tabId);
         }
@@ -509,7 +521,7 @@ const ThinBridgeTalkClient = {
     });
   },
 
-  isMatchedURL(tbconfig, url, defaultMatched) {
+  isMatchedURL(tbconfig, url) {
     if (tbconfig.IgnoreQueryString) {
       url = url.replace(/\?.*/, '');
     }
@@ -555,7 +567,7 @@ const ThinBridgeTalkClient = {
     return true;
   },
 
-  handleURLAndBlock({ tbconfig, tabId, url, isMainFrame, isClosableTab }) {
+  handleURLAndBlock({ tbconfig, tabId, url, isClosableTab }) {
     if (!url) {
       console.log(`* Empty URL found`);
       return false;
@@ -652,7 +664,7 @@ const ThinBridgeTalkClient = {
       tabs.forEach((tab) => {
         const url = tab.url || tab.pendingUrl;
         console.log(`handleStartup ${url} (tab=${tab.id})`);
-        this.handleURLAndBlock({ tbconfig, tabId: tab.id, url, isMainFrame: true, isClosableTab: true });
+        this.handleURLAndBlock({ tbconfig, tabId: tab.id, url, isClosableTab: true });
       });
     });
   },
@@ -660,7 +672,6 @@ const ThinBridgeTalkClient = {
   /* Callback for webRequest.onBeforeRequest */
   onBeforeRequest(details) {
     const tbconfig = this.cached;
-    const closeTab = false;
     const isMainFrame = (details.type == 'main_frame');
 
     console.log(`onBeforeRequest ${details.url} (tab=${details.tabId})`);
@@ -683,20 +694,20 @@ const ThinBridgeTalkClient = {
 
     const isClosableTab = isMainFrame && this.isNewTab[details.tabId];
 
-    if (this.handleURLAndBlock({ tbconfig, tabId: details.tabId, url: details.url, isMainFrame, isClosableTab })) {
+    if (this.handleURLAndBlock({ tbconfig, tabId: details.tabId, url: details.url, isClosableTab })) {
       return CANCEL_RESPONSE;
     }
-  }
+  },
 };
 
 function runTalkServer() {
-    if (configs.talkServerName == 'com.clear_code.thinbridge') {
-        return ThinBridgeTalkClient.init();
-    } else if (gIsChromium) {
-        return ChromeTalkClient.init();
-    } else {
-        return TalkClient.init();
-    }
+  if (configs.talkServerName == 'com.clear_code.thinbridge')
+    return ThinBridgeTalkClient.init();
+
+  if (gIsChromium)
+    return ChromeTalkClient.init();
+
+  return TalkClient.init();
 }
 
 /*
@@ -704,24 +715,21 @@ function runTalkServer() {
  * delay-loaded GPO settings.
  */
 function onTalkEnabled(data, storageName) {
-    if (data.talkBrowserName) {
-        configs.talkBrowserName = data.talkBrowserName.newValue;
-    }
+  if (data.talkBrowserName)
+    configs.talkBrowserName = data.talkBrowserName.newValue;
 
-    if (data.talkServerName) {
-        configs.talkServerName = data.talkServerName.newValue;
-    }
+  if (data.talkServerName)
+    configs.talkServerName = data.talkServerName.newValue;
 
-    if (data.talkEnabled) {
-        configs.talkEnabled = data.talkEnabled.newValue;
-    }
+  if (data.talkEnabled)
+    configs.talkEnabled = data.talkEnabled.newValue;
 
-    if (data.talkEnabled && data.talkEnabled.newValue) {
-        log('[Talk] talkEnabled is turned on. Launch a client...');
-        uninstallBlocker();
-        runTalkServer();
-    }
-    log('chrome.storage.onChange: ', storageName, JSON.stringify(data));
+  if (data.talkEnabled && data.talkEnabled.newValue) {
+    log('[Talk] talkEnabled is turned on. Launch a client...');
+    uninstallBlocker();
+    runTalkServer();
+  }
+  log('chrome.storage.onChange: ', storageName, JSON.stringify(data));
 }
 
 /*
@@ -732,48 +740,38 @@ function onTalkEnabled(data, storageName) {
  * state a few seconds later.
  */
 function checkThinBridgeMode() {
-    if (!browser.storage.managed) {
-        log('[managed] managed storage is null')
+  if (!browser.storage.managed)
+    log('[managed] managed storage is null')
+
+  browser.storage.managed.get().then((m) => {
+    log(`[managed] config = `, JSON.stringify(m));
+
+    if (!gIsChromium) {
+      log('[managed] browser was not chrome');
+      return;
+    }
+    if (ChromeTalkClient.running) {
+      log('[managed] ChromeTalkClient already running');
+      return;
+    }
+    if (ThinBridgeTalkClient.running) {
+      log('[managed] ThinBridgeTalkClient already running');
+      return;
     }
 
-    browser.storage.managed.get().then((m) => {
-        log(`[managed] config = `, JSON.stringify(m));
-
-        if (!gIsChromium) {
-            log('[managed] browser was not chrome');
-            return;
-        }
-        if (ChromeTalkClient.running) {
-            log('[managed] ChromeTalkClient already running');
-            return;
-        }
-        if (ThinBridgeTalkClient.running) {
-            log('[managed] ThinBridgeTalkClient already running');
-            return;
-        }
-
-        if (m.talkEnabled && m.talkServerName == "com.clear_code.thinbridge") {
-            log('[managed] Do dispatch ThinBridgeClient')
-            configs.talkEnabled = m.talkEnabled;
-            configs.talkServerName = m.talkServerName;
-            uninstallBlocker();
-            runTalkServer();
-        }
-    });
+    if (m.talkEnabled && m.talkServerName == 'com.clear_code.thinbridge') {
+      log('[managed] Do dispatch ThinBridgeClient')
+      configs.talkEnabled = m.talkEnabled;
+      configs.talkServerName = m.talkServerName;
+      uninstallBlocker();
+      runTalkServer();
+    }
+  });
 }
 
 /*
  * main
  */
-const VALID_MATCH_PATTERN = (() => {
-  const schemeSegment = '(\\*|http|https|file|ftp)';
-  const hostSegment = '(\\*|(?:\\*\\.)?(?:[^/*]+))?';
-  const pathSegment = '(.*)';
-  const regex = new RegExp(
-    `^${schemeSegment}://${hostSegment}/${pathSegment}$`
-  );
-  return regex;
-})();
 
 /**
  * Transforms a pattern with wildcards (for original IE View) into a
@@ -823,6 +821,7 @@ function matchPatternToRegExp(pattern) {
     throw new TypeError(`"${pattern}" is not a valid MatchPattern`);
   }
 
+  // eslint-disable-next-line prefer-const
   let [, scheme, host, path] = match;
   if (!host)
     throw new TypeError(`"${pattern}" does not have a valid host`);
@@ -864,14 +863,12 @@ function matchPatternToRegExp(pattern) {
   return new RegExp(regex);
 }
 
-const gOpeningTabs = new Map();
-
 (async () => {
   await configs.$loaded;
 
-  if (configs.talkEnabled) {
-      return runTalkServer();
-  }
+  if (configs.talkEnabled)
+    return runTalkServer();
+
   log('Running as a stand-alone mode')
 
   await applyMCDConfigs();
@@ -953,8 +950,6 @@ async function setDefaultPath() {
   }
 }
 
-let sitesOpenedBySelfList = [];
-let sitesOpenedBySelfRegex = null;
 function setSitesOpenedBySelf() {
   if (configs.disableException) {
     sitesOpenedBySelfList = [];
