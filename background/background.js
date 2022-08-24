@@ -237,7 +237,7 @@ const ChromeTalkClient = {
 
     chrome.runtime.sendNativeMessage(server, query, (resp) => {
       this.cached = resp.config;
-      debug('[Talk] configure', resp.config);
+      debug('[Talk] configure', JSON.stringify(resp.config));
     });
   },
 
@@ -329,7 +329,7 @@ const ChromeTalkClient = {
       const browser = bs.URLPatterns[i][1].toLowerCase();
 
       if (this.regex(pattern, bs).test(details.url)) {
-        debug('[Talk] Match', {pattern: pattern, url: details.url, browser: browser})
+        debug('[Talk] Match', JSON.stringify({pattern: pattern, url: details.url, browser: browser}))
         if (browser == configs.talkBrowserName)
           return;
         if (browser == '' && bs.SecondBrowser == configs.talkBrowserName)
@@ -344,7 +344,7 @@ const ChromeTalkClient = {
       const browser = bs.HostNamePatterns[i][1].toLowerCase();
 
       if (this.regex(pattern, bs).test(host)) {
-        debug('[Talk] Match', {pattern: pattern, host: host, browser: browser})
+        debug('[Talk] Match', JSON.stringify({pattern: pattern, host: host, browser: browser}))
         if (browser == configs.talkBrowserName)
           return;
         if (browser == '' && bs.SecondBrowser == configs.talkBrowserName)
