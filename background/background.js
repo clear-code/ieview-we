@@ -897,7 +897,7 @@ function matchPatternToRegExp(pattern) {
     debug('new tab: ', aTab.id);
     gOpeningTabs.set(aTab.id, true);
   });
-  browser.tabs.onUpdated.addListener((aTabId, aChangeInfo, aTab) => {
+  browser.tabs.onUpdated.addListener((aTabId, aChangeInfo, _tab) => {
     if (aChangeInfo.status == 'complete' ||
         (aChangeInfo.url &&
          !/^(about:(blank|newtab|home))$/.test(aChangeInfo.url))) {
