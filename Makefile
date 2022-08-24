@@ -22,9 +22,10 @@ chrome: prepare
 	cp -r managed_schema.json _locales background common options extlib chrome/
 	cp -r misc/128x128.png chrome/misc
 	find chrome -name '.*' | xargs rm -rf
-	cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js chrome/extlib/
-	sed -i -r -e 's;("scripts": *\[);\1"extlib/browser-polyfill.min.js",;' chrome/manifest.json
-	sed -i -r -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
+	#cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js chrome/extlib/
+	sed -i -E -e 's;("scripts": *\[);\1"extlib/browser-polyfill.min.js",;' chrome/manifest.json
+	#sed -i -E -e 's;<!--\s*(script.+extlib/browser-polyfill.+)\s*-->;<\1>;' chrome/options/options.html
+	sed -i -E -e 's;\bbrowser\.;chrome.;g' -e 's;window.messenger;false;g' chrome/extlib/Configs.js
 	cd chrome && zip -r ../ieview-we-${TIMESTAMP}.zip .
 
 chrome-dev: chrome
