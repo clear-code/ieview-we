@@ -1,0 +1,13 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\Software\Policies\Google\Chrome\3rdparty\extensions\nifnmbbelnhfhgeiampkfghakhmgggcf\policy]
+"debug"=dword:00000001
+"talkEnabled"=dword:00000001
+"talkServerName"="com.clear_code.browserselector_talk"
+"talkBrowserName"="chrome"
+
+[HKEY_LOCAL_MACHINE\Software\Policies\Google\Chrome\3rdparty\extensions\gahanoflpdcmbcaijjkopjeheaikclcl\policy]
+"debug"=dword:00000001
+"talkEnabled"=dword:00000001
+"talkServerName"="com.clear_code.browserselector_talk"
+"talkBrowserName"="chrome"
