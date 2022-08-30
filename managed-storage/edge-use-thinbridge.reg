@@ -1,0 +1,13 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\Software\Policies\Google\Chrome\3rdparty\extensions\ifacgepgdnnddnckleiinelkadppopgh\policy]
+"debug"=dword:00000001
+"talkEnabled"=dword:00000001
+"talkServerName"="com.clear_code.thinbridge"
+"talkBrowserName"="edge"
+
+[HKEY_LOCAL_MACHINE\Software\Policies\Google\Chrome\3rdparty\extensions\gahanoflpdcmbcaijjkopjeheaikclcl\policy]
+"debug"=dword:00000001
+"talkEnabled"=dword:00000001
+"talkServerName"="com.clear_code.thinbridge"
+"talkBrowserName"="edge"
