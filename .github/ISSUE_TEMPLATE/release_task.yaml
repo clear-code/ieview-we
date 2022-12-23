@@ -1,0 +1,60 @@
+name: Issue for new release
+title: "Release: x.y.z"
+description: Create a issue for a new release
+body:
+  - type: markdown
+    id: description
+    attributes:
+      value: |
+        This is a issue for new release x.y.z
+  - type: checkboxes
+    id: create-new-tag
+    attributes:
+      label: Create a new tag
+      description: Tag a new version for planned release
+      options:
+        - label: New tag has been created!
+          required: false
+  - type: checkboxes
+    id: create-release-notes
+    attributes:
+      label: Create release note
+      description: Add release note as pre-release.
+      options:
+        - label: Release note has been created!
+          required: false
+  - type: checkboxes
+    id: build-assets
+    attributes:
+      label: Create new assets for release
+      description: |
+        Build binary files to upload.
+        See https://github.com/clear-code/ieview-we#how-to-build-the-native-messaging-host-and-its-installer
+      options:
+        - label: Asset files has been built!
+          required: false
+  - type: checkboxes
+    id: test-assets
+    attributes:
+      label: Test assets for release
+      description: |
+        Test prebuilt binary files whether it is production ready.
+        Described issues in release note should be tested.
+      options:
+        - label: Asset files has been attached!
+          required: false
+  - type: checkboxes
+    id: publish-release-notes
+    attributes:
+      label: Publish release notes
+      description: If it is ready to ship, publish the release note!
+      options:
+        - label: Release note has been published
+          required: false
+  - type: textarea
+    id: addtional-context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here.
+    validations:
+      required: false

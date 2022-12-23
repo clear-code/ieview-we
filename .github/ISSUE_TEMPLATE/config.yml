@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/clear-code/ieview-we/security/policy
+    about: For reporting a vulnerability, please refer our Security Policy here: https://github.com/clear-code/ieview-we/security/policy
