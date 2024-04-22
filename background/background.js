@@ -532,18 +532,20 @@ const ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    const URLExcludePatterns = tbconfig.URLExcludePatterns || tbconfig.Excludes;
-    for (let i = 0; i < URLExcludePatterns.length; i++) {
-      if (wildcmp(URLExcludePatterns[i][0], url)) {
-        console.log(`* Match Exclude [${URLExcludePatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLExcludePatterns || tbconfig.Excludes)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match Exclude [${pattern}]`)
         return false;
       }
     }
 
-    const URLPatterns = tbconfig.URLPatterns || tbconfig.Patterns;
-    for (let i = 0; i < URLPatterns.length; i++) {
-      if (wildcmp(URLPatterns[i][0], url)) {
-        console.log(`* Match [${URLPatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLPatterns || tbconfig.Patterns)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match [${pattern}]`)
         return true;
       }
     }
@@ -557,18 +559,20 @@ const ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    const URLExcludePatterns = tbconfig.URLExcludePatterns || tbconfig.Excludes;
-    for (let i = 0; i < URLExcludePatterns.length; i++) {
-      if (wildcmp(URLExcludePatterns[i][0], url)) {
-        console.log(`* Match Exclude [${URLExcludePatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLExcludePatterns || tbconfig.Excludes)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match Exclude [${pattern}]`)
         return true;
       }
     }
 
-    const URLPatterns = tbconfig.URLPatterns || tbconfig.Patterns;
-    for (let i = 0; i < URLPatterns.length; i++) {
-      if (wildcmp(URLPatterns[i][0], url)) {
-        console.log(`* Match [${URLPatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLPatterns || tbconfig.Patterns)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match [${pattern}]`)
         return false;
       }
     }
