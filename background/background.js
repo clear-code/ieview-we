@@ -532,16 +532,18 @@ const ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    for (let i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
-      if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
-        console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
+    const URLExcludePatterns = tbconfig.URLExcludePatterns || tbconfig.Excludes;
+    for (let i = 0; i < URLExcludePatterns.length; i++) {
+      if (wildcmp(URLExcludePatterns[i][0], url)) {
+        console.log(`* Match Exclude [${URLExcludePatterns[i][0]}]`)
         return false;
       }
     }
 
-    for (let i = 0; i < tbconfig.URLPatterns.length; i++) {
-      if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
-        console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+    const URLPatterns = tbconfig.URLPatterns || tbconfig.Patterns;
+    for (let i = 0; i < URLPatterns.length; i++) {
+      if (wildcmp(URLPatterns[i][0], url)) {
+        console.log(`* Match [${URLPatterns[i][0]}]`)
         return true;
       }
     }
@@ -555,16 +557,18 @@ const ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    for (let i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
-      if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
-        console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
+    const URLExcludePatterns = tbconfig.URLExcludePatterns || tbconfig.Excludes;
+    for (let i = 0; i < URLExcludePatterns.length; i++) {
+      if (wildcmp(URLExcludePatterns[i][0], url)) {
+        console.log(`* Match Exclude [${URLExcludePatterns[i][0]}]`)
         return true;
       }
     }
 
-    for (let i = 0; i < tbconfig.URLPatterns.length; i++) {
-      if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
-        console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+    const URLPatterns = tbconfig.URLPatterns || tbconfig.Patterns;
+    for (let i = 0; i < URLPatterns.length; i++) {
+      if (wildcmp(URLPatterns[i][0], url)) {
+        console.log(`* Match [${URLPatterns[i][0]}]`)
         return false;
       }
     }
