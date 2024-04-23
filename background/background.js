@@ -532,16 +532,20 @@ const ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    for (let i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
-      if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
-        console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLExcludePatterns || tbconfig.Excludes)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match Exclude [${pattern}]`)
         return false;
       }
     }
 
-    for (let i = 0; i < tbconfig.URLPatterns.length; i++) {
-      if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
-        console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLPatterns || tbconfig.Patterns)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match [${pattern}]`)
         return true;
       }
     }
@@ -555,16 +559,20 @@ const ThinBridgeTalkClient = {
     }
     console.log(`* Check patterns for ${url}`);
 
-    for (let i = 0; i < tbconfig.URLExcludePatterns.length; i++) {
-      if (wildcmp(tbconfig.URLExcludePatterns[i][0], url)) {
-        console.log(`* Match Exclude [${tbconfig.URLExcludePatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLExcludePatterns || tbconfig.Excludes)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match Exclude [${pattern}]`)
         return true;
       }
     }
 
-    for (let i = 0; i < tbconfig.URLPatterns.length; i++) {
-      if (wildcmp(tbconfig.URLPatterns[i][0], url)) {
-        console.log(`* Match [${tbconfig.URLPatterns[i][0]}]`)
+    for (let pattern of (tbconfig.URLPatterns || tbconfig.Patterns)) {
+      if (Array.isArray(pattern))
+        pattern = pattern[0];
+      if (wildcmp(pattern, url)) {
+        console.log(`* Match [${pattern}]`)
         return false;
       }
     }
@@ -642,6 +650,19 @@ const ThinBridgeTalkClient = {
                 break sectionsLoop;
               break;
           }
+        }
+      }
+
+      if (redirectCount == 0) {
+        console.log(`* No redirection: fallback to default`);
+        if (tbconfig.DefaultBrowser == '' ||
+            String(tbconfig.DefaultBrowser).toLowerCase() == BROWSER.toLowerCase()) {
+          console.log(`* Continue to load as the default reaction`);
+          loadCount++;
+        }
+        else {
+          console.log(`* Redirect to the default browser ${tbconfig.DefaultBrowser}`);
+          redirectCount++;
         }
       }
 
