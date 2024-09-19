@@ -1,8 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "ThinBridge",
-	"version": "2.3.0",
-	"description": "ThinBridge for Chrome",
+	"name": "IE View WE MV3",
+	"version": "3.0.0",
+	"description": "Provides ability to open pages and links by Internet Explorer (Originally cloned IE View based on WebExtensions-based)",
 	"permissions": [
 		"nativeMessaging",
 		"alarms",
@@ -19,8 +19,5 @@
 	"background": {
 		"service_worker": "background.js",
 		"type": "module"
-	},
-	"icons": {
-		"128": "misc/128x128.png"
 	}
 }
