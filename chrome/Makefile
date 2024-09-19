@@ -15,5 +15,4 @@ dev: $(FILES)
 	rm -rf dev
 	mkdir -p dev
 	cp -R manifest.json background.js dev/
-	sed -i -E -e 's/ThinBridge/ThinBridge Enterprise Developer Edition/g' dev/manifest.json
 	cd dev && zip -9 - $(FILES) > ../ieview-we-chrome-dev.zip
