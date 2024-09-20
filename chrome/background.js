@@ -218,14 +218,14 @@ const ThinBridgeTalkClient = {
       }
     }
 
-    for (const pattern of section.Excludes) {
+    for (const pattern of (section.Excludes || [])) {
       if (wildcmp(pattern, url)) {
         console.log(`* Match Exclude ${section.Name} [${pattern}]`);
         return false;
       }
     }
 
-    for (const pattern of section.Patterns) {
+    for (const pattern of (section.Patterns || [])) {
       if (wildcmp(pattern, url)) {
         console.log(`* Match ${section.Name} [${pattern}]`);
         return true;
