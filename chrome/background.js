@@ -210,7 +210,10 @@ const ThinBridgeTalkClient = {
       //console.log(`* Referring exclude group ${name}: ${JSON.stringify(foreignSection && foreignSection.Patterns)}`);
       if (!foreignSection)
         continue;
-      for (const pattern of foreignSection.Patterns) {
+      for (let pattern of (foreignSection.URLPatterns || foreignSection.Patterns || [])) {
+        if (Array.isArray(pattern)) {
+          pattern = pattern[0];
+        }
         if (wildcmp(pattern, url)) {
           console.log(`* Match Exclude ${section.Name} (referring ${name}) [${pattern}]`);
           return false;
@@ -218,14 +221,20 @@ const ThinBridgeTalkClient = {
       }
     }
 
-    for (const pattern of (section.Excludes || [])) {
+    for (let pattern of (section.URLExcludePatterns || section.Excludes || [])) {
+      if (Array.isArray(pattern)) {
+        pattern = pattern[0];
+      }
       if (wildcmp(pattern, url)) {
         console.log(`* Match Exclude ${section.Name} [${pattern}]`);
         return false;
       }
     }
 
-    for (const pattern of (section.Patterns || [])) {
+    for (let pattern of (section.URLPatterns || section.Patterns || [])) {
+      if (Array.isArray(pattern)) {
+        pattern = pattern[0];
+      }
       if (wildcmp(pattern, url)) {
         console.log(`* Match ${section.Name} [${pattern}]`);
         return true;
