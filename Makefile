@@ -10,12 +10,6 @@ chrome:
 	cd chrome && make
 	cp chrome/ieview-we-chrome.zip ./ieview-we-chrome-${TIMESTAMP}.zip
 
-chrome-dev:
-	[ -d node_modules ] || npm install
-	rm -rf ieview-we-chrome-${TIMESTAMP}.zip
-	cd chrome && make dev
-	cp chrome/ieview-we-chrome-dev.zip ./ieview-we-chrome-dev-${TIMESTAMP}.zip
-
 # knldjmfmopnpolahpmmgbagdohdnhkik
 DUMMY_KEY="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyXQ/A52JivHZKh4YO/9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB"
 
