@@ -8,7 +8,7 @@ chrome:
 	[ -d node_modules ] || npm install
 	rm -rf chrome ieview-we-chrome-${TIMESTAMP}.zip
 	cd chrome && make
-	cp chrome/ieview-we-chrome-dev.zip ./ieview-we-chrome-${TIMESTAMP}-dev.zip
+	cp chrome/ieview-we-chrome.zip ./ieview-we-chrome-${TIMESTAMP}.zip
 
 chrome-dev:
 	[ -d node_modules ] || npm install
