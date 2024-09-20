@@ -1,4 +1,4 @@
-# IE View WE
+# IE View WE MV3
 
 Provides ability to open pages and links by other browsers.
 
