@@ -24,7 +24,7 @@ host:
 	rm -f ieview-we-host.zip
 	cd host && zip -r -9 ../ieview-we-host.zip 386 amd64 *.bat *.json
 
-all: host chrome
+all: chrome
 
 clean:
 	rm -rf chrome
