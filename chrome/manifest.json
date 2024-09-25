@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "IE View WE MV3",
 	"version": "3.0.0",
-	"description": "Provides ability to open pages and links by Internet Explorer (Originally cloned IE View based on WebExtensions-based)",
+	"description": "Provides ability to open pages and links by other browsers based on pre-defined rules for ThinBridge.",
 	"permissions": [
 		"nativeMessaging",
 		"alarms",
