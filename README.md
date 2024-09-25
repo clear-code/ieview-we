@@ -4,22 +4,33 @@ Provides ability to open pages and links by Internet Explorer (Cloned IE View ba
 
 This works only on Windows.
 
+# for Google Chrome (IE View WE MV3)
+
+This was initially started as a cloned IE View based on WebExtensions API, but finally dropped support of original IE View compatible features including the options page.
+Only ThinBridge compatible implementation is left on the browser extension part, thus you need to install [ThinBridge](https://github.com/ThinBridge/ThinBridge/) as the native messaging host.
+See [ThinBridge](https://github.com/ThinBridge/ThinBridge/) for more details.
+
+IE View WE MV3 msut be loaded via GPO.
+See [the document describing how to install development version of the extension via GPO, in the TinBridge project](https://github.com/ThinBridge/ThinBridge/blob/master/DEVELOPMENT.md#how-to-try-extensions-for-development).
+
+# for Firefox (IE View WE MV2)
+
 *IMPORTANT NOTE: The list of URLs which should be opened by IE is not compatible to the legacy version's one.*
 You need to rewrite them based on the [matching pattern spec for Firefox addons](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Match_patterns).
 For example: `http://example.com` => `http://example.com/*` (note that the added wild card to match any page under the domain.)
 
-# Steps to install
+## Steps to install
 
  1. Download the MSI suitable for your environment's architecture, or a zip package "ieview-we-host.zip" from the [releases page](https://github.com/clear-code/ieview-we/releases/latest).
  2. If you've downloaded an MSI, run it to install. Otherwise, unzip the downloaded file and double-click the batch file named "install.bat".
  3. [Install "IE View WE" Firefox addon from its xpi package.](https://addons.mozilla.org/firefox/addon/ie-view-we/)
 
-# Steps to uninstall
+## Steps to uninstall
 
  1. Uninstall "IE View WE" Firefox addon via the addon manager.
  2. Double-click the batch file named `uninstall.bat`.
 
-# How to customize Options
+## How to customize Options
 
 There are some options which you can customize default behavior:
 You can also customize preset configuration via MCD.
@@ -28,7 +39,7 @@ You can also customize preset configuration via MCD.
 * `extensions.ieview.ieargs` Command Line Arguments (default: empty)
 * `extensions.ieview.contextMenu` Add "Open by IE" items to the context menu (default: true)
 
-## Rules to open by ...
+### Rules to open by ...
 
 * `extensions.ieview.forceielist` Websites to be opened by IE always (default: empty)
 * `extensions.ieview.disableForce` Disable websites opened by IE always (dfault: false)
@@ -37,14 +48,14 @@ You can also customize preset configuration via MCD.
 * `extensions.ieview.onlyMainFrame` Only check URL which is shown in location bar (default: true)
 * `extensions.ieview.ignoreQueryString` Ignore query string in URL (default: false)
 
-## Logging & Debugging
+### Logging & Debugging
 
 * `extensions.ieview.debug` Print Debug log (default: false)
 * `extensions.ieview.logging` Save log (default: true)
 * `extensions.ieview.logRotationTime` Rotate log file by specified hour (default: 24)
 * `extensions.ieview.logRotationCount` Max count of log files (default: 12)
 
-## How to build the native messaging host and its installer
+### How to build the native messaging host and its installer
 
 On Windows 10 + WSL:
 

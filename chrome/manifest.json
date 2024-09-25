@@ -1,0 +1,23 @@
+{
+	"manifest_version": 3,
+	"name": "IE View WE MV3",
+	"version": "3.0.0",
+	"description": "Provides ability to open pages and links by other browsers based on pre-defined rules for ThinBridge.",
+	"permissions": [
+		"nativeMessaging",
+		"alarms",
+		"scripting",
+		"storage",
+		"tabs",
+		"webNavigation",
+		"webRequest",
+		"webRequestBlocking"
+	],
+	"host_permissions": [
+		"<all_urls>"
+	],
+	"background": {
+		"service_worker": "background.js",
+		"type": "module"
+	}
+}
