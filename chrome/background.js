@@ -120,7 +120,7 @@ const ThinBridgeTalkClient = {
     }
     const isStartup = (this.cached == null);
     this.cached = resp.config;
-    this.cached.NamedSections = Object.fromEntries(resp.config.Sections.map(section => [section.Name, section]));
+    this.cached.NamedSections = Object.fromEntries(resp.config.Sections.map(section => [section.Name.toLowerCase(), section]));
     console.log('Fetch config', JSON.stringify(this.cached));
 
     if (isStartup && !this.resumed) {
@@ -207,7 +207,7 @@ const ThinBridgeTalkClient = {
   match(section, url, namedSections) {
     for (const name of (section.ExcludeGroups || [])) {
       const foreignSection = namedSections[name.toLowerCase()];
-      //console.log(`* Referring exclude group ${name}: ${JSON.stringify(foreignSection && foreignSection.Patterns)}`);
+      //console.log(`* Referring exclude group ${name}: ${JSON.stringify(foreignSection && (foreignSection.URLPatterns || foreignSection.Patterns))}`);
       if (!foreignSection)
         continue;
       for (let pattern of (foreignSection.URLPatterns || foreignSection.Patterns || [])) {
