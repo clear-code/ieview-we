@@ -104,11 +104,12 @@ const ThinBridgeTalkClient = {
   },
 
   async ensureLoadedAndConfigured() {
-    return Promise.all([
+    return this._promisedLoadedAndConfigured = this._promisedLoadedAndConfigured || Promise.all([
       !this.cached && this.configure(),
       this.load(),
     ]);
   },
+  _promisedLoadedAndConfigured: null,
 
   async configure() {
     const query = new String('C ' + BROWSER);
