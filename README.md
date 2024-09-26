@@ -8,10 +8,34 @@ This works only on Windows.
 
 This was initially started as a cloned IE View based on WebExtensions API, but finally dropped support of original IE View compatible features including the options page.
 Only ThinBridge compatible implementation is left on the browser extension part, thus you need to install [ThinBridge](https://github.com/ThinBridge/ThinBridge/) as the native messaging host.
-See [ThinBridge](https://github.com/ThinBridge/ThinBridge/) for more details.
 
-IE View WE MV3 msut be loaded via GPO.
-See [the document describing how to install development version of the extension via GPO, in the TinBridge project](https://github.com/ThinBridge/ThinBridge/blob/master/DEVELOPMENT.md#how-to-try-extensions-for-development).
+1. Download the [latest installer of ThinBridge](https://github.com/ThinBridge/ThinBridge/releases).
+2. Install ThinBridge with the installer.
+3. Put an [example configuration file](https://raw.githubusercontent.com/ThinBridge/ThinBridge/master/Resources/ThinBridgeBHO.ini) to the location `C:\Program Files\ThinBridge\ThinBridgeBHO.ini`.
+
+And you need to install this extension via GPO.
+
+1. Add a URL entry `"chrome-extension://gahanoflpdcmbcaijjkopjeheaikclcl/"` to the list of `"allowed_origins"` in `C:\Program Files\ThinBridge\ThinBridgeHost\chrome.json `.
+2. Install group policy template for Chrome and configure Chrome to load the addon.
+   1. Download [Google Chrome Bundle](https://support.google.com/chrome/a/answer/187202?hl=en#zippy=%2Cwindows) and extract contents of the saved zip file.
+   2. Copy `Configuration\admx\*.admx`, `Configuration\admx\en-US` and `Configuration\admx\ja` to `C:\Windows\PolicyDefinitions`.
+   3. Launch `gpedit.msc` and open `Local Computer Policy` => `Computer Configuration` => `Administrative Templates` => `Google` => `Google Chrome` => `Extensions` => `Configure the list of force-installed apps and extensions`.
+   4. Switch it to `Enabled`.
+   5. Click `Show...`.
+   6. Add `gahanoflpdcmbcaijjkopjeheaikclcl` to the list.
+3. Set up the client as a domain member if it is not joined to any Active Directory domain. For example, lauch `cmd.exe` as the system administrator and run following commands.
+   (Ref: https://hitco.at/blog/apply-edge-policies-for-non-domain-joined-devices/ )
+   ```
+   reg add HKLM\SOFTWARE\Microsoft\Enrollments\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v EnrollmentState /t reg_dword /d 1 /f
+   reg add HKLM\SOFTWARE\Microsoft\Enrollments\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v EnrollmentType /t reg_dword /d 0 /f
+   reg add HKLM\SOFTWARE\Microsoft\Enrollments\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v IsFederated /t reg_dword /d 0 /f
+   reg add HKLM\SOFTWARE\Microsoft\Provisioning\OMADM\Accounts\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v Flags /t reg_dword /d 0xd6fb7f /f
+   reg add HKLM\SOFTWARE\Microsoft\Provisioning\OMADM\Accounts\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v AcctUId /t reg_sz /d "0x000000000000000000000000000000000000000000000000000000000000000000000000" /f
+   reg add HKLM\SOFTWARE\Microsoft\Provisioning\OMADM\Accounts\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v RoamingCount /t reg_dword /d 0 /f
+   reg add HKLM\SOFTWARE\Microsoft\Provisioning\OMADM\Accounts\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v SslClientCertReference /t reg_sz /d "MY;User;0000000000000000000000000000000000000000" /f
+   reg add HKLM\SOFTWARE\Microsoft\Provisioning\OMADM\Accounts\FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF /v ProtoVer /t reg_sz /d "1.2" /f
+   ```
+4. Launch Chrome and confirm the IE VIew WE MV3 is automatically installed.
 
 # for Firefox (IE View WE MV2)
 
