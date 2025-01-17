@@ -1,3 +1,7 @@
+# Project Status
+
+This project will no longer be updated and no future updates are planned. Please consider using [BrowserSelector](https://gitlab.com/clear-code/browserselector) as the alternative.
+
 # IE View WE
 
 Provides ability to open pages and links by Internet Explorer (Cloned IE View based on WebExtensions-based.)
